@@ -1,0 +1,11 @@
+[
+    {
+    "Symbol":"$", "currencyCode":"USD", "Position":"first"
+    },
+    {
+    "Symbol":"£","currencyCode":"GBP",  "Position":"first"
+    },
+    {
+    "Symbol":"€","currencyCode":"EUR",  "Position":"last"
+    }
+]
