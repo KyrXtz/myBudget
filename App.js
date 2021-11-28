@@ -9,6 +9,7 @@
  import React, {Fragment, useState,useRef,useEffect, Component} from 'react';
  import AnimatedStyles from 'react-native-animated-styles';
  import VersionCheck from 'react-native-version-check';
+ import Rate, { AndroidMarket } from 'react-native-rate'
  import {
    SafeAreaView,
    Dimensions,
@@ -218,6 +219,8 @@ const locales = RNLocalize.getLocales();
        openSettings:false,
        isEditingEuroState:false,
        areAdsRemoved:'false',
+       daysPassed:0,
+       stopShowingPromptToRate:'false',
        dataSource : "",
        dataSourcePerDay : "",
        markedDates: {},
@@ -372,9 +375,14 @@ const locales = RNLocalize.getLocales();
       //
       
      }
+
      let _areAdsRemoved = await storageGet('RemovedAds');
+     let _daysPassed =parseInt( await storageGet('DaysPassed'));
+     let _stopShowingPromptToRate = await storageGet('stopShowingPromptToRate');
+     //ena modal k einai ok to prompt to rate
+     
      console.log('ARE ADS REMOVE'+_areAdsRemoved)
-     this.setState({markedDates:_markedDates,dataSourcePerDay:null,dataSource:value9,savingsState:value8,isEditingEuroState:false,newSpent:'0',openSettings:false,openCurrencySelect:false,openLanguageSelect:false,openCoffeeShop:false,removeAdsShop:false,closeModal1:false,closeModal2:false,closeModal3:false,moniesState:value7,spentMonthState: value6,fullDatePaydayState:value5, startingEuroState: value4 ,euroState: value1, paydayState: value2,spentTodayState: value3 , open: false ,cardTutorial:cardTutorial,tutorialViewd:tut,idOfTutToShow:0 , xPx:0,yPx:0,buttonModal1:false,buttonModal2:false,buttonModal3:false,areAdsRemoved:_areAdsRemoved,swiperIndex:0,tutorialText:I18n.t('TutorialText1')}) ;
+     this.setState({markedDates:_markedDates,dataSourcePerDay:null,dataSource:value9,savingsState:value8,isEditingEuroState:false,newSpent:'0',openSettings:false,openCurrencySelect:false,openLanguageSelect:false,openCoffeeShop:false,removeAdsShop:false,closeModal1:false,closeModal2:false,closeModal3:false,moniesState:value7,spentMonthState: value6,fullDatePaydayState:value5, startingEuroState: value4 ,euroState: value1, paydayState: value2,spentTodayState: value3 , open: false ,cardTutorial:cardTutorial,tutorialViewd:tut,idOfTutToShow:0 , xPx:0,yPx:0,buttonModal1:false,buttonModal2:false,buttonModal3:false,areAdsRemoved:_areAdsRemoved,daysPassed:_daysPassed,stopShowingPromptToRate:_stopShowingPromptToRate, swiperIndex:0,tutorialText:I18n.t('TutorialText1')}) ;
      if(this.state.tutorialViewd == 'false'){
       this.setState({tutorialViewd:'false'});
       intervalId =  setInterval(() => {
@@ -566,6 +574,12 @@ const locales = RNLocalize.getLocales();
     return remainingMonies.toString();
   }
   async DayChanged(todayrly){ // tha einai h 0 , h tha exoyn tis apothikeymenes times
+        let value0 = await storageGet('DaysPassed');
+        if(value0 =='' || value0 ==null){
+          await storageSet('DaysPassed','0');
+        }else{
+          await storageSet('DaysPassed',(parseInt(value0)+1).toString());
+        }
         let value1 =  await storageGet('SpentToday');
         let value2 =  await storageGet('SpentMonthBeforeToday');
         //checn an exei allaksei minas
@@ -2434,6 +2448,37 @@ async setExpensesOfPastMonth(month){
       () => {
       this.openBtnModal(i,!bool);
    },300);
+    let times = await storageGet('howManyTimesPressedConfirm');
+    let hasReviewdInApp = await storageGet('hasReviewdInApp');
+    if(times =='' || times == null){
+      await storageSet('howManyTimesPressedConfirm','0');
+    }else{
+      times = (parseInt(times)+1).toString();
+      await storageSet('howManyTimesPressedConfirm',times);
+    }
+    if(parseInt(times)>6 && hasReviewdInApp!='true'){
+      const options = {
+        //AppleAppID:"2193813192",
+        GooglePackageName:"com.kyrxtz.mybudget",
+       // AmazonPackageName:"com.mywebsite.myapp",
+        //OtherAndroidURL:"http://www.randomappstore.com/app/47172391",
+        preferredAndroidMarket: AndroidMarket.Google,
+        preferInApp:!openInPS,
+        openAppStoreIfInAppFails:true,
+        //fallbackPlatformURL:"http://www.mywebsite.com/myapp.html",
+      }
+      Rate.rate(options, async (success, errorMessage)=>{
+        if (success) {
+          // this technically only tells us if the user successfully went to the Review Page. Whether they actually did anything, we do not know.
+          //this.setState({rated:true})
+          await storageSet('hasReviewdInApp','true');
+        }
+        if (errorMessage) {
+          // errorMessage comes from the native code. Useful for debugging, but probably not for users to view
+          console.log(`Example page Rate.rate() error: ${errorMessage}`)
+        }
+      });
+    }
     console.log("UNLOCK")
   }
   async saveExpensesToStorage(){

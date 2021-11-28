@@ -419,11 +419,11 @@ android {
     compileSdkVersion rootProject.ext.compileSdkVersion
 
     defaultConfig {
-        applicationId "com.kyrxtz.fragkofonias"
+        applicationId "com.kyrxtz.mybudget"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 44
-        versionName "2.9.9"
+        versionCode 1
+        versionName "1"
         ndk {
             debugSymbolLevel 'FULL'
         }

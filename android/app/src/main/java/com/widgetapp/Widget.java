@@ -1,4 +1,4 @@
-package com.kyrxtz.fragkofonias;
+package com.kyrxtz.mybudget;
 
 import android.app.Activity;
 import android.content.Intent;

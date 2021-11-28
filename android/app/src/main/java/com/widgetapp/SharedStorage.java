@@ -1,4 +1,4 @@
-package com.kyrxtz.fragkofonias;
+package com.kyrxtz.mybudget;
 
 import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;

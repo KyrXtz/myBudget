@@ -18,7 +18,7 @@ export const AdMobBannerComponent = ({showAd,callback}) => {
         <View style={{backgroundColor:'transparent',flexDirection: 'row',justifyContent:'space-between'}}>      
           <AdMobBanner
             adSize="smartBanner"
-            adUnitID="ca-app-pub-4278197343444747/4277819106"
+            adUnitID="ca-app-pub-4278197343444747/9268816553"
             didFailToReceiveAdWithError={onFailToRecieveAd}
             onSizeChange = {(x)=>console.log('THIOS IS SIZE CHANGE'+x.width)}
           />

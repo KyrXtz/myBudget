@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.kyrxtz.fragkofonias">
+<?xml version="1.0" encoding="utf-8"?><manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.kyrxtz.mybudget">
 
     <uses-permission android:name="android.permission.INTERNET"/>
 
@@ -20,7 +20,7 @@
             
         </activity>
         <activity android:name="com.facebook.react.devsupport.DevSettingsActivity"/>
-        <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="ca-app-pub-4278197343444747~9544966969"/>
+        <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="ca-app-pub-4278197343444747~1873240942"/>
 
     </application>
 

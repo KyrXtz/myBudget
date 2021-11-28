@@ -54,7 +54,7 @@ export const Billing = () => {
           }
           const options = {
             //AppleAppID:"2193813192",
-            GooglePackageName:"com.kyrxtz.fragkofonias",
+            GooglePackageName:"com.kyrxtz.mybudget",
            // AmazonPackageName:"com.mywebsite.myapp",
             //OtherAndroidURL:"http://www.randomappstore.com/app/47172391",
             preferredAndroidMarket: AndroidMarket.Google,

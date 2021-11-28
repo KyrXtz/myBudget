@@ -1,4 +1,4 @@
-package com.kyrxtz.fragkofonias;
+package com.kyrxtz.mybudget;
 
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.JavaScriptModule;
