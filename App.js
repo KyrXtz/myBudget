@@ -2448,37 +2448,40 @@ async setExpensesOfPastMonth(month){
       () => {
       this.openBtnModal(i,!bool);
    },300);
-    let times = await storageGet('howManyTimesPressedConfirm');
-    let hasReviewdInApp = await storageGet('hasReviewdInApp');
-    if(times =='' || times == null){
-      await storageSet('howManyTimesPressedConfirm','0');
-    }else{
-      times = (parseInt(times)+1).toString();
-      await storageSet('howManyTimesPressedConfirm',times);
-    }
-    if(parseInt(times)>6 && hasReviewdInApp!='true'){
-      const options = {
-        //AppleAppID:"2193813192",
-        GooglePackageName:"com.kyrxtz.mybudget",
-       // AmazonPackageName:"com.mywebsite.myapp",
-        //OtherAndroidURL:"http://www.randomappstore.com/app/47172391",
-        preferredAndroidMarket: AndroidMarket.Google,
-        preferInApp:!openInPS,
-        openAppStoreIfInAppFails:true,
-        //fallbackPlatformURL:"http://www.mywebsite.com/myapp.html",
-      }
-      Rate.rate(options, async (success, errorMessage)=>{
-        if (success) {
-          // this technically only tells us if the user successfully went to the Review Page. Whether they actually did anything, we do not know.
-          //this.setState({rated:true})
-          await storageSet('hasReviewdInApp','true');
+    setTimeout(
+      ()=>{
+        let times = await storageGet('howManyTimesPressedConfirm');
+        let hasReviewdInApp = await storageGet('hasReviewdInApp');
+        if(times =='' || times == null){
+          await storageSet('howManyTimesPressedConfirm','0');
+        }else{
+          times = (parseInt(times)+1).toString();
+          await storageSet('howManyTimesPressedConfirm',times);
         }
-        if (errorMessage) {
-          // errorMessage comes from the native code. Useful for debugging, but probably not for users to view
-          console.log(`Example page Rate.rate() error: ${errorMessage}`)
+        if(parseInt(times)>6 && hasReviewdInApp!='true'){
+          const options = {
+            //AppleAppID:"2193813192",
+            GooglePackageName:"com.kyrxtz.mybudget",
+          // AmazonPackageName:"com.mywebsite.myapp",
+            //OtherAndroidURL:"http://www.randomappstore.com/app/47172391",
+            preferredAndroidMarket: AndroidMarket.Google,
+            preferInApp:!openInPS,
+            openAppStoreIfInAppFails:true,
+            //fallbackPlatformURL:"http://www.mywebsite.com/myapp.html",
+          }
+          Rate.rate(options, async (success, errorMessage)=>{
+            if (success) {
+              // this technically only tells us if the user successfully went to the Review Page. Whether they actually did anything, we do not know.
+              //this.setState({rated:true})
+              await storageSet('hasReviewdInApp','true');
+            }
+            if (errorMessage) {
+              // errorMessage comes from the native code. Useful for debugging, but probably not for users to view
+              console.log(`Example page Rate.rate() error: ${errorMessage}`)
+            }
+          });
         }
-      });
-    }
+      },400);
     console.log("UNLOCK")
   }
   async saveExpensesToStorage(){
