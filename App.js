@@ -2449,7 +2449,7 @@ async setExpensesOfPastMonth(month){
       this.openBtnModal(i,!bool);
    },300);
     setTimeout(
-      ()=>{
+      async ()=>{
         let times = await storageGet('howManyTimesPressedConfirm');
         let hasReviewdInApp = await storageGet('hasReviewdInApp');
         if(times =='' || times == null){
@@ -2458,14 +2458,14 @@ async setExpensesOfPastMonth(month){
           times = (parseInt(times)+1).toString();
           await storageSet('howManyTimesPressedConfirm',times);
         }
-        if(parseInt(times)>6 && hasReviewdInApp!='true'){
+        if(parseInt(times)>4 && hasReviewdInApp!='true'){
           const options = {
             //AppleAppID:"2193813192",
             GooglePackageName:"com.kyrxtz.mybudget",
           // AmazonPackageName:"com.mywebsite.myapp",
             //OtherAndroidURL:"http://www.randomappstore.com/app/47172391",
             preferredAndroidMarket: AndroidMarket.Google,
-            preferInApp:!openInPS,
+            preferInApp:true,
             openAppStoreIfInAppFails:true,
             //fallbackPlatformURL:"http://www.mywebsite.com/myapp.html",
           }
