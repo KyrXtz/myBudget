@@ -1,5 +1,6 @@
 {
-    "AppName": "myBudgetManager\nΓια να μή ξεμένεις ποτέ!",
+    "AppName": "myBudget",
+    "AppSubName":"Για να μή ξεμένεις ποτέ!",
     "No":"Οχι",
     "Yes":"Ναι",
     "Error":"Σφάλμα",
@@ -104,7 +105,11 @@
     "RemoveAdsEndMessage":"Ευχαριστούμε!",
     "RemoveAds":"Αφαίρεση διαφημίσεων",
     "PaymentsByGoogle":"Όλες οι αγορές γίνονται μέσω της Google, και είναι 100% ασφαλείς.",
-    "RemainingMonies":"Ποσό που απομένει:"
+    "RemainingMonies":"Ποσό που απομένει:",
+    "AmountOver":"Ποσό πάνω απο το budget:",
+    "AlreadyRated":"Έχω ήδη βαθμολογήσει",
+    "Maybe later":"Ίσως αργότερα",
+    "YesPlease":"Ναι, βεβαίως!"
 
 
     

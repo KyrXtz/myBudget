@@ -1,5 +1,6 @@
 {
-    "AppName": "myBudgetManager\nSo you never run out!",
+    "AppName": "myBudget",
+    "AppSubName":"So you never run out!",
     "No":"No",
     "Yes":"Yes",
     "Error":"Error",
@@ -104,7 +105,11 @@
     "RemoveAdsEndMessage":"Thank you!",
     "RemoveAds":"Remove Ads",
     "PaymentsByGoogle":"All payments are made via google, and are 100% safe.",
-    "RemainingMonies":"Remaining amount:"
+    "RemainingMonies":"Remaining amount:",
+    "AmountOver":"Amount over budget:",
+    "AlreadyRated":"I have already rated",
+    "Maybe later":"Maybe later",
+    "YesPlease":"Yes, please!"
 
 
 

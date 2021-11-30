@@ -298,7 +298,7 @@ const locales = RNLocalize.getLocales();
 
         
     }
-    await storageSet('CurrentBuildNo',currentBuildNo);
+    await storageSet('CurrentBuildNo',currentBuildNo.toString());
     let tut = await storageGet('TutorialViewd');
      if(tut == "" || tut == null){
        tut = 'true';
@@ -1352,7 +1352,7 @@ render() {
             <Text style={styles.textBold}>{this.stringWithCorrectCurrencyPosition(this.state.moniesState)} {I18n.t('PerDay')}</Text>
             <Text style={styles.textFaint}>{I18n.t('SpentToday')} {this.stringWithCorrectCurrencyPosition(this.getSpentTodayStateWithCorrectDecimals())}</Text> 
             { parseFloat(this.getRemainingToday()) <0 &&
-            <Text style={[styles.textFaint,{color:'#FF2D00DD'}]}>{I18n.t('RemainingMonies')} {this.stringWithCorrectCurrencyPosition(this.getRemainingToday())}</Text>
+            <Text style={[styles.textFaint,{color:'#FF2D00DD'}]}>{I18n.t('AmountOver')} {this.stringWithCorrectCurrencyPosition(this.getRemainingToday().replace('-',''))}</Text>
             }
             { parseFloat(this.getRemainingToday()) >=0 &&
             <Text style={styles.textFaint}>{I18n.t('RemainingMonies')} {this.stringWithCorrectCurrencyPosition(this.getRemainingToday())}</Text>
@@ -1475,7 +1475,29 @@ render() {
 
  </View>
  </MainViewMoveUp>
-    
+ {this.state.stopShowingPromptToRate!='true' && this.state.daysPassed>=2 &&
+ <Modal  useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.coffeeShopModal}  animationIn = {'slideInUp'} animationOut={'slideOutDown'}  transparent ={true} statusBarTranslucent={true} isVisible={true}> 
+            <View style={styles.billingWindowStyle}>
+            {/* <Swiper> */}
+            <Text style={{ fontSize:22,fontStyle:'italic',alignSelf:'center'}}>Do you like this app ?</Text>
+            <Text></Text>
+            <Text style={{ fontSize:17,alignSelf:'center',paddingHorizontal:10}}>If you do, please take a moment to rate it, it really helps us grow!</Text>
+            <Text></Text>
+            <View style={{ flexDirection: 'row',justifyContent:'space-around',paddingHorizontal:5}}>
+              <TouchableOpacity style={{width:'30%'}} onPress={async () => await this.stopShowingPrompt()}><Text  style={{fontSize:17,color:'#6cc3c3',textAlign:'center'}}>I have already rated</Text></TouchableOpacity>
+              <Text style={{width:'30%'}}></Text>
+              <TouchableOpacity style={{width:'20%'}} onPress={() => this.setState({daysPassed:0})}><Text style={{fontSize:17,color:'#6cc3c3',textAlign:'center'}}>Maybe later</Text></TouchableOpacity>
+              <TouchableOpacity style={{width:'20%'}} onPress={()=>this.takeUserToRate()}><Text style={{fontSize:17,color:'#6cc3c3',textAlign:'center'}}>Yes please!</Text></TouchableOpacity>
+
+
+      
+            </View>
+
+          {/* <LanguageSelect changeLanguage={this.changeLanguage}/>
+          </Swiper> */}
+          </View>
+</Modal>  
+}
  <View style={styles.footerLine}></View>
  <TouchableOpacity style={styles.updateButton}  onPress={async () => this.updateButton()}>
      {/* {TUTORIAL} */}
@@ -1692,7 +1714,8 @@ async setExpensesOfPastMonth(month){
       <View style={{flex:1}}>
       <View style={styles.drawerContainer}>
       <View style={styles.drawerMainView}>
-        <Text style={{fontWeight:'500',fontSize:20,color:'#8d8d8d',height:'15%',alignSelf:'center',textAlignVertical:'bottom'}}>{I18n.t("AppName")}</Text>
+        <Text style={{fontWeight:'600',fontSize:20,color:'#3d3d3d',height:'10%',alignSelf:'center',textAlignVertical:'bottom'}}>{I18n.t("AppName")}</Text>
+        <Text style={{fontWeight:'300',fontSize:15,color:'#8d8d8d',height:'3%',alignSelf:'center',textAlignVertical:'bottom'}}>{I18n.t("AppSubName")}</Text>
         <View style={styles.footerLine}/>
          <View style={[styles.twoViewsStartEndContainer,{padding:15}]}>
          <FontAwesome
@@ -2450,6 +2473,7 @@ async setExpensesOfPastMonth(month){
    },300);
     setTimeout(
       async ()=>{
+        console.log('REVIEW????????????????')
         let times = await storageGet('howManyTimesPressedConfirm');
         let hasReviewdInApp = await storageGet('hasReviewdInApp');
         if(times =='' || times == null){
@@ -2458,7 +2482,7 @@ async setExpensesOfPastMonth(month){
           times = (parseInt(times)+1).toString();
           await storageSet('howManyTimesPressedConfirm',times);
         }
-        if(parseInt(times)>4 && hasReviewdInApp!='true'){
+        if(parseInt(times)>=2 && hasReviewdInApp!='true'){
           const options = {
             //AppleAppID:"2193813192",
             GooglePackageName:"com.kyrxtz.mybudget",
@@ -2484,6 +2508,7 @@ async setExpensesOfPastMonth(month){
       },400);
     console.log("UNLOCK")
   }
+
   async saveExpensesToStorage(){
     
     var spentTodayJson = await storageGet('SpentTodayJson');
@@ -2645,7 +2670,36 @@ isValid(date:Date) {
     }
     return remainingDays.toString();
   }
- 
+  async stopShowingPrompt(){
+    await storageSet('stopShowingPromptToRate','true');
+    this.setState({stopShowingPromptToRate:'true'})
+
+  }
+ takeUserToRate(){
+  const options = {
+    //AppleAppID:"2193813192",
+    GooglePackageName:"com.kyrxtz.mybudget",
+  // AmazonPackageName:"com.mywebsite.myapp",
+    //OtherAndroidURL:"http://www.randomappstore.com/app/47172391",
+    preferredAndroidMarket: AndroidMarket.Google,
+    preferInApp:true,
+    openAppStoreIfInAppFails:true,
+    //fallbackPlatformURL:"http://www.mywebsite.com/myapp.html",
+  }
+  Rate.rate(options, async (success, errorMessage)=>{
+    if (success) {
+      // this technically only tells us if the user successfully went to the Review Page. Whether they actually did anything, we do not know.
+      //this.setState({rated:true})
+      await storageSet('hasReviewdInApp','true');
+      await storageSet('DaysPassed','0');
+      this.setState({daysPassed:0})
+    }
+    if (errorMessage) {
+      // errorMessage comes from the native code. Useful for debugging, but probably not for users to view
+      console.log(`Example page Rate.rate() error: ${errorMessage}`)
+    }
+  });
+ }
   async saveData(){
          //checkForNulls();
          await storageSet('Euros',this.state.euroState);
@@ -2702,7 +2756,7 @@ isValid(date:Date) {
       const value3 = await storageGet('SpentToday');
      // console.log("Payday:"+value2);
      // this.setDebug(value2);
-     if(value1 != '0' && value2 !='0' && value1 != '' && value2 !='' && value1 != null && value2 !=null){     
+     if(value1 != '' && value2 !='' && value1 != null && value2 !=null){     
        //let today = new Date().getDate();
        let remainingDays = parseInt(value2);
        if(value3 == null || value3==''){
@@ -2710,13 +2764,13 @@ isValid(date:Date) {
        }
        if(remainingDays <=0){
         remainingDays = 0;
-        return (parseFloat(value1) + parseFloat(value3));
+        return (parseFloat(value1) + parseFloat(value3)).toString();
        }
        let moneyPerDay = ((parseFloat(value1) + parseFloat(value3))/remainingDays).toFixed(2);
-       if(parseFloat(moneyPerDay) <0){
+       if(parseFloat(moneyPerDay) <=0){
         return '0';
       }
-       return moneyPerDay;
+       return moneyPerDay.toString();
      }
    }
 
@@ -2726,7 +2780,7 @@ isValid(date:Date) {
     let value3 = this.state.spentTodayState;
    // console.log("Payday:"+value2);
    // this.setDebug(value2);
-   if(value1 != '0' && value2 !='0' && value1 != '' && value2 !='' && value1 != null && value2 !=null){     
+   if(value1 != '' && value2 !='' && value1 != null && value2 !=null){     
     //let today = new Date().getDate();
      let remainingDays = parseInt(value2);
      if(value3 == null || value3==''){
@@ -2734,13 +2788,13 @@ isValid(date:Date) {
     }
      if(remainingDays <=0){
       remainingDays = 0;
-      return (parseFloat(value1) + parseFloat(value3));
+      return (parseFloat(value1) + parseFloat(value3)).toString();
      }
      let moneyPerDay = ((parseFloat(value1) + parseFloat(value3))/remainingDays).toFixed(2);
-     if(parseFloat(moneyPerDay) <0){
+     if(parseFloat(moneyPerDay) <=0){
        return '0';
      }
-     return moneyPerDay;
+     return moneyPerDay.toString();
    }
  }
    
@@ -3151,7 +3205,8 @@ modalMainViewSubInfo:{
 },topLeftButton:{
   position:'absolute',marginTop:deviceHeight/35,marginLeft:deviceWidth/19.635,height:'5%',width:'10%',elevation:100 //, backgroundColor:'#00000088'
 },billingWindowStyle:{
-  backgroundColor:'#FFFFFD',justifyContent: 'flex-start',alignItems: 'flex-start',   flexDirection: 'column',
+  backgroundColor:'#FFFFFD',justifyContent: 'flex-start',alignItems: 'flex-start',   flexDirection: 'column',  borderRadius:10
+
 },barStyle:{
   // position:'relative',top:110,left:27,elevation:101,fontSize:23
   position:'relative',elevation:101,fontSize:25 , alignSelf:'center',marginTop:5 //MARGIN TOP GIA KANEI ALIGN ME TO RIPPLE TOY TOUCHABLE OPACITY
