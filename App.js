@@ -1349,7 +1349,12 @@ render() {
           }
           {/* { end TUTORIAL} */}
             <View style={styles.colContainer}>
+            {parseFloat(this.getRemainingToday()) >=0 &&
             <Text style={styles.textBold}>{this.stringWithCorrectCurrencyPosition(this.state.moniesState)} {I18n.t('PerDay')}</Text>
+            }
+            {parseFloat(this.getRemainingToday()) <0 &&
+            <Text style={[styles.textBold,{color:'#FF2D00DD'}]}>{this.stringWithCorrectCurrencyPosition(this.state.moniesState)} {I18n.t('PerDay')}</Text>
+            }
             <Text style={styles.textFaint}>{I18n.t('SpentToday')} {this.stringWithCorrectCurrencyPosition(this.getSpentTodayStateWithCorrectDecimals())}</Text> 
             { parseFloat(this.getRemainingToday()) <0 &&
             <Text style={[styles.textFaint,{color:'#FF2D00DD'}]}>{I18n.t('AmountOver')} {this.stringWithCorrectCurrencyPosition(this.getRemainingToday().replace('-',''))}</Text>
@@ -2770,8 +2775,13 @@ isValid(date:Date) {
        if(parseFloat(moneyPerDay) <=0){
         return '0';
       }
+      if(parseFloat(moneyPerDay) < parseFloat(value3)){ //an to poso poy soy antistoixei ana imera einai mikrotero apo ayta pou ksodepses simera, return to true budget
+        moneyPerDay = (parseFloat(value1)/remainingDays).toFixed(2);
+      }
        return moneyPerDay.toString();
-     }
+     }else{
+      return '0';
+    }
    }
 
    CalculateEuroPerDayNotAsync(){
@@ -2794,7 +2804,12 @@ isValid(date:Date) {
      if(parseFloat(moneyPerDay) <=0){
        return '0';
      }
+     if(parseFloat(moneyPerDay) < parseFloat(value3)){ //an to poso poy soy antistoixei ana imera einai mikrotero apo ayta pou ksodepses simera, return to true budget
+      moneyPerDay = (parseFloat(value1)/remainingDays).toFixed(2);
+    }
      return moneyPerDay.toString();
+   }else{
+     return '0';
    }
  }
    
