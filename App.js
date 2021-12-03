@@ -224,7 +224,8 @@ const locales = RNLocalize.getLocales();
        dataSource : "",
        dataSourcePerDay : "",
        markedDates: {},
-       appState: AppState.currentState
+       appState: AppState.currentState,
+       selectedCategoryBtn:6
 
 
 
@@ -382,7 +383,7 @@ const locales = RNLocalize.getLocales();
      //ena modal k einai ok to prompt to rate
      
      console.log('ARE ADS REMOVE'+_areAdsRemoved)
-     this.setState({markedDates:_markedDates,dataSourcePerDay:null,dataSource:value9,savingsState:value8,isEditingEuroState:false,newSpent:'0',openSettings:false,openCurrencySelect:false,openLanguageSelect:false,openCoffeeShop:false,removeAdsShop:false,closeModal1:false,closeModal2:false,closeModal3:false,moniesState:value7,spentMonthState: value6,fullDatePaydayState:value5, startingEuroState: value4 ,euroState: value1, paydayState: value2,spentTodayState: value3 , open: false ,cardTutorial:cardTutorial,tutorialViewd:tut,idOfTutToShow:0 , xPx:0,yPx:0,buttonModal1:false,buttonModal2:false,buttonModal3:false,areAdsRemoved:_areAdsRemoved,daysPassed:_daysPassed,stopShowingPromptToRate:_stopShowingPromptToRate, swiperIndex:0,tutorialText:I18n.t('TutorialText1')}) ;
+     this.setState({markedDates:_markedDates,dataSourcePerDay:null,dataSource:value9,savingsState:value8,isEditingEuroState:false,newSpent:'0',openSettings:false,openCurrencySelect:false,openLanguageSelect:false,openCoffeeShop:false,removeAdsShop:false,closeModal1:false,closeModal2:false,closeModal3:false,moniesState:value7,spentMonthState: value6,fullDatePaydayState:value5, startingEuroState: value4 ,euroState: value1, paydayState: value2,spentTodayState: value3 , open: false ,cardTutorial:cardTutorial,tutorialViewd:tut,idOfTutToShow:0 , xPx:0,yPx:0,buttonModal1:false,buttonModal2:false,buttonModal3:false,areAdsRemoved:_areAdsRemoved,daysPassed:_daysPassed,stopShowingPromptToRate:_stopShowingPromptToRate, swiperIndex:0,selectedCategoryBtn:6,tutorialText:I18n.t('TutorialText1')}) ;
      if(this.state.tutorialViewd == 'false'){
       this.setState({tutorialViewd:'false'});
       intervalId =  setInterval(() => {
@@ -828,7 +829,7 @@ render() {
               {I18n.locale != 'el' && //!= ola ta ypoloipa translations
               <Image  style={{height:'35%',width:'100%', resizeMode:'stretch'}} source={require('./android/app/src/main/assets/playstoregraphics/FeatureGraphic-EN.png')}/>}
               <View>
-              <Text style={[styles.swiperText,{paddingVertical:30,elevation:10,borderRadius:30,backgroundColor:'#FFFFFDDD',paddingHorizontal:20,fontSize:30,fontWeight:'bold'}]}>{I18n.t("SwiperTutorial0")}</Text>
+              <Text style={[styles.swiperText,{paddingVertical:30,elevation:10,borderRadius:30,backgroundColor:'#FFFFFD',paddingHorizontal:20,fontSize:30,fontWeight:'bold'}]}>{I18n.t("SwiperTutorial0")}</Text>
               <Text style={{fontSize:10,alignSelf:'center', fontStyle:'italic',color:'#FFFFFD99'}}>{I18n.t("InternetConnectionRequired")}</Text>
               </View>
               </View>
@@ -930,8 +931,8 @@ render() {
               {I18n.locale != 'el' && //!= ola ta ypoloipa translations
               <Image  style={{height:'40%',width:'100%', resizeMode:'stretch'}} source={require('./android/app/src/main/assets/playstoregraphics/FeatureGraphic-EN.png')}/>}
               <TouchableOpacity onPress={async ()=> await this.setCardTutorial('true')}>
-              <Text style={[styles.swiperText,{paddingVertical:30,elevation:10,borderRadius:30,backgroundColor:'#FFFFFDDD',paddingHorizontal:20,fontSize:30,fontWeight:'bold'}]}>{I18n.t("SwiperTutorial8")}</Text>
-              <Text style={{fontSize:10,alignSelf:'center', fontStyle:'italic',color:'#FFFFFD99'}}>{I18n.t("SwiperTutorial13")}</Text>
+              <Text style={[styles.swiperText,{paddingVertical:30,elevation:10,borderRadius:30,backgroundColor:'#FFFFFD',paddingHorizontal:20,fontSize:30,fontWeight:'bold'}]}>{I18n.t("SwiperTutorial8")}</Text>
+              <Text style={{fontSize:10,alignSelf:'center', fontStyle:'italic',color:'#FFFFFD'}}>{I18n.t("SwiperTutorial13")}</Text>
               </TouchableOpacity>
               </View>
             </View>
@@ -1292,6 +1293,50 @@ render() {
         { this.state.dataSourcePerDay.map((item) => (
                 <View style={[styles.rowContainer,{justifyContent:'space-between'}]}>
                 <Text style={[styles.textFaint,{marginLeft:0,fontStyle:'italic'}]}>{this.stringWithCorrectCurrencyPosition(item.Amount)}</Text>
+                {item.Category ==0 && 
+                <FontAwesome
+                  style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}}
+           
+                 icon={SolidIcons.coffee}
+               />
+               }
+               {item.Category ==1 && 
+                <FontAwesome
+                  style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}}
+           
+                 icon={SolidIcons.gasPump}
+               />
+               }{item.Category ==2 && 
+                <FontAwesome
+                  style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}}
+           
+                 icon={SolidIcons.utensils}
+               />
+               }{item.Category ==3 && 
+                <FontAwesome
+                  style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}}
+           
+                 icon={SolidIcons.moneyCheckAlt}
+               />
+               }{item.Category ==4 && 
+                <FontAwesome
+                  style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}}
+           
+                 icon={SolidIcons.bus}
+               />
+               }{item.Category ==5 && 
+                <FontAwesome
+                  style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}}
+           
+                 icon={SolidIcons.tshirt}
+               />
+               }{item.Category ==6 && 
+                <FontAwesome
+                  style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}}
+           
+                 icon={SolidIcons.wallet}
+               />
+               }
                 <Text style={[styles.textFaint,{marginLeft:0,fontStyle:'italic'}]}>{item.Time}</Text>
                 </View> 
             ))}
@@ -1417,6 +1462,57 @@ render() {
           </View>
         </TouchableOpacity>
         </View>
+        <View style={styles.rowContainer}>
+           <TouchableOpacity onPress={()=> this.setState({selectedCategoryBtn:0})}>
+               <FontAwesome
+                  style={[this.state.selectedCategoryBtn !=0 && styles.categoryButton,this.state.selectedCategoryBtn == 0 && styles.selectedCategoryButton]}
+           
+                 icon={SolidIcons.coffee}
+               />
+           </TouchableOpacity>
+           <TouchableOpacity onPress={()=> this.setState({selectedCategoryBtn:1})}>
+               <FontAwesome
+                  style={[this.state.selectedCategoryBtn !=1 && styles.categoryButton,this.state.selectedCategoryBtn == 1 && styles.selectedCategoryButton]}
+           
+                 icon={SolidIcons.gasPump}
+               />
+           </TouchableOpacity>
+           <TouchableOpacity onPress={()=> this.setState({selectedCategoryBtn:2})}>
+               <FontAwesome
+                  style={[this.state.selectedCategoryBtn !=2 && styles.categoryButton,this.state.selectedCategoryBtn == 2 && styles.selectedCategoryButton]}
+           
+                 icon={SolidIcons.utensils}
+               />
+           </TouchableOpacity>
+           <TouchableOpacity onPress={()=> this.setState({selectedCategoryBtn:3})}>
+               <FontAwesome
+                  style={[this.state.selectedCategoryBtn !=3 && styles.categoryButton,this.state.selectedCategoryBtn == 3 && styles.selectedCategoryButton]}
+           
+                 icon={SolidIcons.moneyCheckAlt}
+               />
+           </TouchableOpacity>
+           <TouchableOpacity onPress={()=> this.setState({selectedCategoryBtn:4})}>
+               <FontAwesome
+                  style={[this.state.selectedCategoryBtn !=4 && styles.categoryButton,this.state.selectedCategoryBtn == 4 && styles.selectedCategoryButton]}
+           
+                 icon={SolidIcons.bus}
+               />
+           </TouchableOpacity>
+           <TouchableOpacity onPress={()=> this.setState({selectedCategoryBtn:5})}>
+               <FontAwesome
+                  style={[this.state.selectedCategoryBtn !=5 && styles.categoryButton,this.state.selectedCategoryBtn == 5 && styles.selectedCategoryButton]}
+           
+                 icon={SolidIcons.tshirt}
+               />
+           </TouchableOpacity>
+           <TouchableOpacity onPress={()=> this.setState({selectedCategoryBtn:6})}>
+               <FontAwesome
+                  style={[this.state.selectedCategoryBtn !=6 && styles.categoryButton,this.state.selectedCategoryBtn == 6 && styles.selectedCategoryButton]}
+           
+                 icon={SolidIcons.wallet}
+               />
+           </TouchableOpacity>
+        </View>
         <View  style={styles.inputInfoColContainer}>
         {(this.state.spentTodayState!='' && this.state.spentTodayState!=null)  &&
         <Text style={styles.modalMainViewSubInfo}>{I18n.t('SpentToday')} {this.stringWithCorrectCurrencyPosition(this.getSpentTodayStateWithCorrectDecimals())}</Text>
@@ -1448,6 +1544,50 @@ render() {
         { this.state.dataSource.map((item) => (
                <View style={[styles.rowContainer,{justifyContent:'space-between'}]}>
                <Text style={[styles.textFaint,{marginLeft:0,fontStyle:'italic'}]}>{this.stringWithCorrectCurrencyPosition(item.Amount)}</Text>
+               {item.Category ==0 && 
+                <FontAwesome
+                  style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}}
+           
+                 icon={SolidIcons.coffee}
+               />
+               }
+               {item.Category ==1 && 
+                <FontAwesome
+                  style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}}
+           
+                 icon={SolidIcons.gasPump}
+               />
+               }{item.Category ==2 && 
+                <FontAwesome
+                  style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}}
+           
+                 icon={SolidIcons.utensils}
+               />
+               }{item.Category ==3 && 
+                <FontAwesome
+                  style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}}
+           
+                 icon={SolidIcons.moneyCheckAlt}
+               />
+               }{item.Category ==4 && 
+                <FontAwesome
+                  style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}}
+           
+                 icon={SolidIcons.bus}
+               />
+               }{item.Category ==5 && 
+                <FontAwesome
+                  style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}}
+           
+                 icon={SolidIcons.tshirt}
+               />
+               }{item.Category ==6 && 
+                <FontAwesome
+                  style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}}
+           
+                 icon={SolidIcons.wallet}
+               />
+               }
                <Text style={[styles.textFaint,{marginLeft:0,fontStyle:'italic'}]}>{item.Time}</Text>
                <TouchableOpacity onPress={async ()=>this.deleteExpense(item)}>
                <FontAwesome
@@ -2293,7 +2433,8 @@ async setExpensesOfPastMonth(month){
       case 3:
       this.state.buttonModal3 = bool;
       this.state.closeModal3 = !bool;
-      this.setState({buttonModal3:bool,closeModal3:!bool});
+      this.state.selectedCategoryBtn = 6;
+      this.setState({buttonModal3:bool,closeModal3:!bool,selectedCategoryButton:6});
       refSpentToday = this.state.spentTodayState;
       refEuroState = this.state.euroState;
       refNewSpent = '0';
@@ -2527,7 +2668,7 @@ async setExpensesOfPastMonth(month){
     if(spentTodayJson =='[]'){
       addComma='';
     }
-    var newEntry = this.jsonifySpentToday(this.state.newSpent,moment(new Date()).local().format('HH:mm:ss'));
+    var newEntry = this.jsonifySpentToday(this.state.newSpent,moment(new Date()).local().format('HH:mm:ss'),this.state.selectedCategoryBtn);
     
     spentTodayJson = spentTodayJson.substring(0,spentTodayJson.length-1)+addComma+newEntry+']';
     await storageSet('SpentTodayJson',spentTodayJson);
@@ -2540,9 +2681,9 @@ async setExpensesOfPastMonth(month){
         }
     return JSON.parse(spentTodayJson);
   }
-  jsonifySpentToday(spent,time){
+  jsonifySpentToday(spent,time,category){
     var todate =  moment(new Date()).format('YYYY-MM-DD');
-    return '{"Amount":"'+spent+'", "Time":"'+time+'", "Day":"'+todate+'"}';
+    return '{"Amount":"'+spent+'", "Time":"'+time+'", "Day":"'+todate+'", "Category":"'+category+'"}';
   }
   renderExpensesJsonList = ({ item }) => (
     <View style={[styles.rowContainer,{justifyContent:'space-between'}]}>
@@ -2564,7 +2705,7 @@ async setExpensesOfPastMonth(month){
     var newJson = '[';
     for(var i=0; i<this.state.dataSource.length; i++){
       if(this.state.dataSource[i].Time != item.Time){
-        newJson+= this.jsonifySpentToday(this.state.dataSource[i].Amount,this.state.dataSource[i].Time) +','
+        newJson+= this.jsonifySpentToday(this.state.dataSource[i].Amount,this.state.dataSource[i].Time,this.state.dataSource[i].Category) +','
       }
     }
     newJson = newJson.substring(0,newJson.length-1)+']';
@@ -3236,6 +3377,10 @@ modalMainViewSubInfo:{
   marginTop:10,backgroundColor:'#FFFFFD', height:'55%',elevation:0,borderRadius:20
 },drawerButtonText:{
   paddingLeft:5 //gia na min akoympaei sto icon otan de exei xwro
+},categoryButton:{
+  alignSelf:'center',marginTop:3,textAlignVertical:'center',fontSize:20 , padding :3
+},selectedCategoryButton:{
+  alignSelf:'center',marginTop:3,textAlignVertical:'center',fontSize:20 ,padding :3, backgroundColor:'#8d8d8d66'
 }
 
    

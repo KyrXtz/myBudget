@@ -94,10 +94,9 @@ const styles = StyleSheet.create({
     },warningSubText:{
       fontSize:10,
       fontStyle:'italic',
-      alignSelf:'flex-end',
+      alignSelf:'center',
       position : 'absolute',
       bottom:0,
-      right:0,
-      color:'#00000199'
+      color:'#00000188'
     }
   })

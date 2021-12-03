@@ -19,7 +19,7 @@ export const AdMobBannerComponent = ({showAd,callback}) => {
           <AdMobBanner
             adSize="smartBanner"
             adUnitID="ca-app-pub-4278197343444747/9268816553"
-            didFailToReceiveAdWithError={onFailToRecieveAd}
+            onAdFailedToLoad={onFailToRecieveAd}
             onSizeChange = {(x)=>console.log('THIOS IS SIZE CHANGE'+x.width)}
           />
           <TouchableOpacity onPress={callback} >
