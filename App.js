@@ -225,7 +225,7 @@ const locales = RNLocalize.getLocales();
        dataSourcePerDay : "",
        markedDates: {},
        appState: AppState.currentState,
-       selectedCategoryBtn:6
+       selectedCategoryBtn:0
 
 
 
@@ -383,7 +383,7 @@ const locales = RNLocalize.getLocales();
      //ena modal k einai ok to prompt to rate
      
      console.log('ARE ADS REMOVE'+_areAdsRemoved)
-     this.setState({markedDates:_markedDates,dataSourcePerDay:null,dataSource:value9,savingsState:value8,isEditingEuroState:false,newSpent:'0',openSettings:false,openCurrencySelect:false,openLanguageSelect:false,openCoffeeShop:false,removeAdsShop:false,closeModal1:false,closeModal2:false,closeModal3:false,moniesState:value7,spentMonthState: value6,fullDatePaydayState:value5, startingEuroState: value4 ,euroState: value1, paydayState: value2,spentTodayState: value3 , open: false ,cardTutorial:cardTutorial,tutorialViewd:tut,idOfTutToShow:0 , xPx:0,yPx:0,buttonModal1:false,buttonModal2:false,buttonModal3:false,areAdsRemoved:_areAdsRemoved,daysPassed:_daysPassed,stopShowingPromptToRate:_stopShowingPromptToRate, swiperIndex:0,selectedCategoryBtn:6,tutorialText:I18n.t('TutorialText1')}) ;
+     this.setState({markedDates:_markedDates,dataSourcePerDay:null,dataSource:value9,savingsState:value8,isEditingEuroState:false,newSpent:'0',openSettings:false,openCurrencySelect:false,openLanguageSelect:false,openCoffeeShop:false,removeAdsShop:false,closeModal1:false,closeModal2:false,closeModal3:false,moniesState:value7,spentMonthState: value6,fullDatePaydayState:value5, startingEuroState: value4 ,euroState: value1, paydayState: value2,spentTodayState: value3 , open: false ,cardTutorial:cardTutorial,tutorialViewd:tut,idOfTutToShow:0 , xPx:0,yPx:0,buttonModal1:false,buttonModal2:false,buttonModal3:false,areAdsRemoved:_areAdsRemoved,daysPassed:_daysPassed,stopShowingPromptToRate:_stopShowingPromptToRate, swiperIndex:0,selectedCategoryBtn:0,tutorialText:I18n.t('TutorialText1')}) ;
      if(this.state.tutorialViewd == 'false'){
       this.setState({tutorialViewd:'false'});
       intervalId =  setInterval(() => {
@@ -836,7 +836,7 @@ render() {
             </View>
             <View style={styles.slideMain}>
               <Image  onLoad={ () => this.setState({ isImageLoaded1: true }) } style={[styles.ImageTut, { display: (this.state.isImageLoaded1 ? 'flex' : 'none') }]}
-                source={{uri:'https://media.giphy.com/media/uqXENh8fEy4mGemW4O/giphy.gif'}} />
+                source={{uri:'https://media.giphy.com/media/0TbyHGgC4nDz8BcVLX/giphy.gif'}} />
               <ActivityIndicator size = {50} color={'#62CCFF'}
                 style={[styles.loadingTut,{ display: (this.state.isImageLoaded1 ? 'none' : 'flex') }]}
               />
@@ -848,7 +848,7 @@ render() {
             </View>
             <View style={styles.slideMain}>
             <Image  onLoad={ () => this.setState({ isImageLoaded2: true }) } style={[styles.ImageTut, { display: (this.state.isImageLoaded2 ? 'flex' : 'none') }]}
-                source={{uri:'https://media.giphy.com/media/BJuoGHXw4yUd9UgHpF/giphy.gif'}} />
+                source={{uri:'https://media.giphy.com/media/xtnUal2T6VqZjxgUs4/giphy.gif'}} />
               <ActivityIndicator size = {50} color={'#62CCFF'}
                 style={[styles.loadingTut,{ display: (this.state.isImageLoaded2 ? 'none' : 'flex') }]}
               />
@@ -860,7 +860,7 @@ render() {
             </View>
             <View style={styles.slideMain}>
             <Image  onLoad={ () => this.setState({ isImageLoaded3: true }) } style={[styles.ImageTut, { display: (this.state.isImageLoaded3 ? 'flex' : 'none') }]}
-                source={{uri:'https://media.giphy.com/media/mdZGSABzYOIdfH6N13/giphy.gif'}} />
+                source={{uri:'https://media.giphy.com/media/ENx4dpyfDPHHuBJct2/giphy.gif'}} />
               <ActivityIndicator size = {50} color={'#62CCFF'}
                 style={[styles.loadingTut,{ display: (this.state.isImageLoaded3 ? 'none' : 'flex') }]}
               />
@@ -872,7 +872,7 @@ render() {
             </View>
             <View style={styles.slideMain}>
             <Image  onLoad={ () => this.setState({ isImageLoaded4: true }) } style={[styles.ImageTut, { display: (this.state.isImageLoaded4 ? 'flex' : 'none') }]}
-                source={{uri:'https://media.giphy.com/media/mMRvMdql0khLTvl6jZ/giphy.gif'}}  />
+                source={{uri:'https://media.giphy.com/media/uTqatneIHjxK5VmfM3/giphy.gif'}}  />
               <ActivityIndicator size = {50} color={'#62CCFF'}
                 style={[styles.loadingTut,{ display: (this.state.isImageLoaded4 ? 'none' : 'flex') }]}
               />
@@ -884,7 +884,7 @@ render() {
             </View>
             <View style={styles.slideMain}>
             <Image  onLoad={ () => this.setState({ isImageLoaded5: true }) } style={[styles.ImageTut, { display: (this.state.isImageLoaded5 ? 'flex' : 'none') }]}
-                source={{uri:'https://media.giphy.com/media/3yb0PPItGb4aqFbtgb/giphy.gif'}}  />
+                source={{uri:'https://media.giphy.com/media/7DWX67MjlRxVC4rZ7u/giphy.gif'}}  />
               <ActivityIndicator size = {50} color={'#62CCFF'}
                 style={[styles.loadingTut,{ display: (this.state.isImageLoaded5 ? 'none' : 'flex') }]}
               />
@@ -896,7 +896,7 @@ render() {
             </View>
             <View style={styles.slideMain}>
             <Image  onLoad={ () => this.setState({ isImageLoaded6: true }) } style={[styles.ImageTut, { display: (this.state.isImageLoaded6 ? 'flex' : 'none') }]}
-               source={{uri:'https://media.giphy.com/media/kw5ahJeXUZDorrKpE8/giphy.gif'}}   />
+               source={{uri:'https://media.giphy.com/media/AME94xJYs9UWHrISjw/giphy.gif'}}   />
               <ActivityIndicator size = {50} color={'#62CCFF'}
                 style={[styles.loadingTut,{ display: (this.state.isImageLoaded6 ? 'none' : 'flex') }]}
               />
@@ -908,7 +908,7 @@ render() {
             </View>
             <View style={styles.slideMain}>
             <Image  onLoad={ () => this.setState({ isImageLoaded7: true }) } style={[styles.ImageTut, { display: (this.state.isImageLoaded7 ? 'flex' : 'none') }]}
-               source={{uri:'https://media.giphy.com/media/0dpW4OiH09bDUpoOB2/giphy.gif'}}  />
+               source={{uri:'https://media.giphy.com/media/b0xLGGUX2gNvVQtCnj/giphy.gif'}}  />
               <ActivityIndicator size = {50} color={'#62CCFF'}
                 style={[styles.loadingTut,{ display: (this.state.isImageLoaded7 ? 'none' : 'flex') }]}
               />
@@ -943,10 +943,10 @@ render() {
           <TouchableOpacity onPress={()=>this.skipTutorialWarning()} style={{backgroundColor:'#62CCFF',flex:1,borderBottomLeftRadius:60, borderBottomRightRadius:60, height:'100%'}}><Text style={{fontSize:30, alignSelf:'center'}}>{I18n.t("SwiperTutorial11")}</Text></TouchableOpacity>
           }
           {this.state.swiperIndex==8 &&
-          <TouchableOpacity onPress={()=> this._swiperRef.scrollBy(-8,true)} style={{flex:0.49,backgroundColor:'#62CCFF',borderRadius:15, height:'100%'}}><Text style={{fontSize:20, alignSelf:'center'}}>{I18n.t("SwiperTutorial10")}</Text></TouchableOpacity>
+          <TouchableOpacity onPress={()=> this._swiperRef.scrollBy(-8,true)} style={{flex:0.49,backgroundColor:'#62CCFF',borderRadius:15, height:'100%'}}><Text style={{fontSize:20, alignSelf:'center',paddingHorizontal:5}}>{I18n.t("SwiperTutorial10")}</Text></TouchableOpacity>
           }
           {this.state.swiperIndex==8 &&
-          <TouchableOpacity onPress={async ()=> await this.setCardTutorial('true')} style={{flex:0.49,backgroundColor:'#62CCFF',borderRadius:15, height:'100%'}}><Text style={{fontSize:20, alignSelf:'center'}}>{I18n.t("SwiperTutorial9")}</Text></TouchableOpacity>
+          <TouchableOpacity onPress={async ()=> await this.setCardTutorial('true')} style={{flex:0.49,backgroundColor:'#62CCFF',borderRadius:15, height:'100%'}}><Text style={{fontSize:20, alignSelf:'center',paddingHorizontal:5}}>{I18n.t("SwiperTutorial9")}</Text></TouchableOpacity>
           }
           </View>
           <Text style={styles.footerLine}></Text>
@@ -1297,14 +1297,14 @@ render() {
                 <FontAwesome
                   style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}}
            
-                 icon={SolidIcons.coffee}
+                 icon={SolidIcons.wallet}
                />
                }
                {item.Category ==1 && 
                 <FontAwesome
                   style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}}
            
-                 icon={SolidIcons.gasPump}
+                 icon={SolidIcons.coffee}
                />
                }{item.Category ==2 && 
                 <FontAwesome
@@ -1316,13 +1316,14 @@ render() {
                 <FontAwesome
                   style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}}
            
-                 icon={SolidIcons.moneyCheckAlt}
+                 icon={SolidIcons.shoppingCart}
                />
-               }{item.Category ==4 && 
+               }
+               {item.Category ==4 && 
                 <FontAwesome
                   style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}}
            
-                 icon={SolidIcons.bus}
+                 icon={SolidIcons.moneyCheckAlt}
                />
                }{item.Category ==5 && 
                 <FontAwesome
@@ -1334,7 +1335,13 @@ render() {
                 <FontAwesome
                   style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}}
            
-                 icon={SolidIcons.wallet}
+                 icon={SolidIcons.gasPump}
+               />
+               }{item.Category ==7 && 
+                <FontAwesome
+                  style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}}
+           
+                 icon={SolidIcons.bus}
                />
                }
                 <Text style={[styles.textFaint,{marginLeft:0,fontStyle:'italic'}]}>{item.Time}</Text>
@@ -1462,19 +1469,19 @@ render() {
           </View>
         </TouchableOpacity>
         </View>
-        <View style={styles.rowContainer}>
+        <ScrollView style={{marginHorizontal:15, paddingVertical:10,flex:1}} horizontal={true} contentContainerStyle={{justifyContent:'space-between',flex:1}}>
            <TouchableOpacity onPress={()=> this.setState({selectedCategoryBtn:0})}>
                <FontAwesome
                   style={[this.state.selectedCategoryBtn !=0 && styles.categoryButton,this.state.selectedCategoryBtn == 0 && styles.selectedCategoryButton]}
            
-                 icon={SolidIcons.coffee}
+                 icon={SolidIcons.wallet}
                />
            </TouchableOpacity>
            <TouchableOpacity onPress={()=> this.setState({selectedCategoryBtn:1})}>
                <FontAwesome
                   style={[this.state.selectedCategoryBtn !=1 && styles.categoryButton,this.state.selectedCategoryBtn == 1 && styles.selectedCategoryButton]}
            
-                 icon={SolidIcons.gasPump}
+                 icon={SolidIcons.coffee}
                />
            </TouchableOpacity>
            <TouchableOpacity onPress={()=> this.setState({selectedCategoryBtn:2})}>
@@ -1483,19 +1490,19 @@ render() {
            
                  icon={SolidIcons.utensils}
                />
-           </TouchableOpacity>
+           </TouchableOpacity>           
            <TouchableOpacity onPress={()=> this.setState({selectedCategoryBtn:3})}>
                <FontAwesome
                   style={[this.state.selectedCategoryBtn !=3 && styles.categoryButton,this.state.selectedCategoryBtn == 3 && styles.selectedCategoryButton]}
            
-                 icon={SolidIcons.moneyCheckAlt}
+                 icon={SolidIcons.shoppingCart}
                />
            </TouchableOpacity>
            <TouchableOpacity onPress={()=> this.setState({selectedCategoryBtn:4})}>
                <FontAwesome
                   style={[this.state.selectedCategoryBtn !=4 && styles.categoryButton,this.state.selectedCategoryBtn == 4 && styles.selectedCategoryButton]}
            
-                 icon={SolidIcons.bus}
+                 icon={SolidIcons.moneyCheckAlt}
                />
            </TouchableOpacity>
            <TouchableOpacity onPress={()=> this.setState({selectedCategoryBtn:5})}>
@@ -1509,10 +1516,17 @@ render() {
                <FontAwesome
                   style={[this.state.selectedCategoryBtn !=6 && styles.categoryButton,this.state.selectedCategoryBtn == 6 && styles.selectedCategoryButton]}
            
-                 icon={SolidIcons.wallet}
+                 icon={SolidIcons.gasPump}
                />
            </TouchableOpacity>
-        </View>
+           <TouchableOpacity onPress={()=> this.setState({selectedCategoryBtn:7})}>
+               <FontAwesome
+                  style={[this.state.selectedCategoryBtn !=7 && styles.categoryButton,this.state.selectedCategoryBtn == 7 && styles.selectedCategoryButton]}
+           
+                 icon={SolidIcons.bus}
+               />
+           </TouchableOpacity>
+        </ScrollView>
         <View  style={styles.inputInfoColContainer}>
         {(this.state.spentTodayState!='' && this.state.spentTodayState!=null)  &&
         <Text style={styles.modalMainViewSubInfo}>{I18n.t('SpentToday')} {this.stringWithCorrectCurrencyPosition(this.getSpentTodayStateWithCorrectDecimals())}</Text>
@@ -1548,14 +1562,14 @@ render() {
                 <FontAwesome
                   style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}}
            
-                 icon={SolidIcons.coffee}
+                 icon={SolidIcons.wallet}
                />
-               }
+               }         
                {item.Category ==1 && 
                 <FontAwesome
                   style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}}
            
-                 icon={SolidIcons.gasPump}
+                 icon={SolidIcons.coffee}
                />
                }{item.Category ==2 && 
                 <FontAwesome
@@ -1567,13 +1581,14 @@ render() {
                 <FontAwesome
                   style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}}
            
-                 icon={SolidIcons.moneyCheckAlt}
+                 icon={SolidIcons.shoppingCart}
                />
-               }{item.Category ==4 && 
+               }
+               {item.Category ==4 && 
                 <FontAwesome
                   style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}}
            
-                 icon={SolidIcons.bus}
+                 icon={SolidIcons.moneyCheckAlt}
                />
                }{item.Category ==5 && 
                 <FontAwesome
@@ -1585,7 +1600,13 @@ render() {
                 <FontAwesome
                   style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}}
            
-                 icon={SolidIcons.wallet}
+                 icon={SolidIcons.gasPump}
+               />
+               }{item.Category ==7 && 
+                <FontAwesome
+                  style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}}
+           
+                 icon={SolidIcons.bus}
                />
                }
                <Text style={[styles.textFaint,{marginLeft:0,fontStyle:'italic'}]}>{item.Time}</Text>
@@ -1773,6 +1794,118 @@ async setCardTutorial(boolAsString){
   //console.log(this.state.cardTutorial)
 
   //this.render();
+}
+checkInputText(text){
+  let newText = '';
+  let numbers = '0123456789';
+  for (var i=0; i < text.length; i++) {
+    if(numbers.indexOf(text[i]) > -1 ) {
+        newText = newText + text[i];
+    }
+    else {
+        // your call back function
+        //alert("please enter numbers only");
+        if(!(newText.includes('-') || newText.includes('+'))){
+
+         if(text[i]=='-'){
+           //text[i]=='.';
+           newText = newText + '-';
+          
+         }
+         if(!newText.includes('.')){
+
+           if(text[i]==',' || text[i]=='.'){
+             //text[i]=='.';
+             newText = newText + '.';
+            
+           }
+          }
+        }else if(newText.charAt(newText.length-1) == '-'){
+          if(text[i] == '-'){
+            newText = newText.replace('-','+')
+          }
+          
+
+          
+        }else{
+          //allow second dot
+          let char = '';
+          if(newText.includes('-')){
+            char = '-';
+          }
+          if(newText.includes('+')){
+            char = '+';
+          }
+          if(newText.split(char)[0].includes('.')){ //to prwto exei decimal
+            if(!(newText.split('.').length-1>=2)){
+
+              if(text[i]==',' || text[i]=='.'){
+                //text[i]=='.';
+                newText = newText + '.';
+               
+              }
+             }
+          }else{ //den exei decimal point
+            if(!(newText.split('.').length-1>=1)){
+
+              if(text[i]==',' || text[i]=='.'){
+                //text[i]=='.';
+                newText = newText + '.';
+               
+              }
+             }
+          }
+                       
+        }
+        if(!newText.includes('+')){
+          if(text[i]=='+'){
+            newText = newText + '+';
+
+          }
+        }                       
+    }
+}
+if(newText=='.'){
+ newText = '0';
+}
+return newText;
+}
+checkIfAddOrSubNeeded(text: string){
+  if(text.includes('-')){
+    let strArr = text.split('-');
+    if(strArr[0].split('.')[1]?.length>0)
+    {
+      strArr[0] = (parseFloat(strArr[0]).toFixed(2)).toString();
+    }
+    if(strArr[1].split('.')[1]?.length>0)
+    {
+      strArr[1] = (parseFloat(strArr[1]).toFixed(2)).toString();
+    }
+    let newNo = (parseFloat(strArr[0]) - parseFloat(strArr[1])).toString();
+    if(newNo.split('.')[1]?.length>0)
+    {
+      newNo = (parseFloat(newNo).toFixed(2)).toString();
+    }
+    return newNo;
+  }
+  if(text.includes('+')){
+    let strArr = text.split('+');
+    if(strArr[0].split('.')[1]?.length>0)
+    {
+      strArr[0] = (parseFloat(strArr[0]).toFixed(2)).toString();
+    }
+    if(strArr[1].split('.')[1]?.length>0)
+    {
+      strArr[1] = (parseFloat(strArr[1]).toFixed(2)).toString();
+    }
+    let newNo = (parseFloat(strArr[0]) + parseFloat(strArr[1])).toString();
+    if(newNo.split('.')[1]?.length>0)
+    {
+      newNo = (parseFloat(newNo).toFixed(2)).toString();
+    }
+    return newNo;
+  }
+  return text;
 }
 skipTutorialWarning(){
   
@@ -2054,29 +2187,7 @@ async setExpensesOfPastMonth(month){
    }
    onChanged1Savings(text){
      
-    let newText = '';
-    let numbers = '0123456789';
-  
-    for (var i=0; i < text.length; i++) {
-         if(numbers.indexOf(text[i]) > -1 ) {
-             newText = newText + text[i];
-         }
-         else {
-             // your call back function
-             //alert("please enter numbers only");
-             if(!newText.includes('.')){
-
-              if(text[i]==',' || text[i]=='.'){
-                //text[i]=='.';
-                newText = newText + '.';
-               
-              }
-             }
-         }
-     }
-     if(newText=='.'){
-      newText = '0';
-    }
+    let newText = this.checkInputText(text);
     this.state.savingsState = newText;
     this.setState({savingsState: newText });
 
@@ -2113,9 +2224,11 @@ async setExpensesOfPastMonth(month){
       this.state.savingsState = "0";
     }
     let AlertStringToShow ='';
-    
-    if(this.state.savingsState != savings){ // exei kanei ontws edit
-    
+
+    if(this.state.savingsState != savings){ // exei kanei ontws edittu
+    //this.state.savingsState = subtract
+    this.state.savingsState = this.checkIfAddOrSubNeeded(this.state.savingsState);
+
       console.log('EDIT')
       if((parseFloat(this.state.savingsState) - parseFloat(savings))>0){
         //added
@@ -2176,33 +2289,9 @@ async setExpensesOfPastMonth(month){
 
 
     }
-
-  
   }
    onChanged1(text){
-     let newText = '';
-     let numbers = '0123456789';
-   
-     for (var i=0; i < text.length; i++) {
-         if(numbers.indexOf(text[i]) > -1 ) {
-             newText = newText + text[i];
-         }
-         else {
-             // your call back function
-             //alert("please enter numbers only");
-             if(!newText.includes('.')){
-
-              if(text[i]==',' || text[i]=='.'){
-                //text[i]=='.';
-                newText = newText + '.';
-               
-              }
-             }
-         }
-     }
-     if(newText=='.'){
-      newText = '0';
-    }
+    let newText = this.checkInputText(text);
      this.state.euroState = newText;
      this.setState({isEditingEuroState:true, euroState: newText });
     //  await storageSet('Euros',newText);
@@ -2212,6 +2301,7 @@ async setExpensesOfPastMonth(month){
     console.log('END EDIT1')
     isEditingText1 =false;
     if(this.state.euroState!= '' && this.state.euroState != null){
+      this.state.euroState = this.checkIfAddOrSubNeeded(this.state.euroState);
     if(this.state.euroState.split('.')[1]?.length>0)
     {
       this.state.euroState = (parseFloat(this.state.euroState).toFixed(2)).toString();
@@ -2273,37 +2363,7 @@ async setExpensesOfPastMonth(month){
     }
    }
    onChanged3(text){
-     let newText = '';
-     let numbers = '0123456789';
-     
-    //  console.log(text);
-    //  if(String(text).includes('.')) {
-    //   text = String(text).substring(0,String(text).indexOf('.'));
-    //  }
-    //  console.log(text);
-
-     for (var i=0; i < text.length; i++) {
-         if(numbers.indexOf(text[i]) > -1 ) {
-             newText = newText + text[i];
-         }
-         else {
-             // your call back function
-             //alert("please enter numbers only");
-             if(!newText.includes('.')){
-
-             if(text[i]==',' || text[i]=='.'){
-               //text[i]=='.';
-               newText = newText + '.';
-              
-             }
-            }
-
-         }
-     }
-     if(newText=='.'){
-      newText = '0';
-    }
-
+    let newText = this.checkInputText(text);
      this.state.newSpent = newText;
      this.setState({ newSpent: newText });
      
@@ -2328,7 +2388,8 @@ async setExpensesOfPastMonth(month){
     }
     if(this.state.newSpent == null || this.state.newSpent== ''){
       this.state.newSpent = '0';
-    }    
+    }
+    this.state.newSpent= this.checkIfAddOrSubNeeded(this.state.newSpent);
     if(this.state.spentTodayState.split('.')[1]?.length>0)
     {
     this.state.spentTodayState = (parseFloat(this.state.spentTodayState).toFixed(2)).toString();
@@ -2433,8 +2494,8 @@ async setExpensesOfPastMonth(month){
       case 3:
       this.state.buttonModal3 = bool;
       this.state.closeModal3 = !bool;
-      this.state.selectedCategoryBtn = 6;
-      this.setState({buttonModal3:bool,closeModal3:!bool,selectedCategoryButton:6});
+      this.state.selectedCategoryBtn = 0;
+      this.setState({buttonModal3:bool,closeModal3:!bool,selectedCategoryButton:0});
       refSpentToday = this.state.spentTodayState;
       refEuroState = this.state.euroState;
       refNewSpent = '0';
