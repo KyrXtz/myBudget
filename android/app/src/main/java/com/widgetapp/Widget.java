@@ -41,7 +41,7 @@ public class Widget extends AppWidgetProvider {
             views.setTextViewText(R.id.appwidget_text3, appData.getString("text3"));
 
             //edw einai gia na setaroume to on click
-            Intent intent = new Intent(context, MainActivity.class);
+            Intent intent = new Intent(context, MainActivity.class); 
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);       
             PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);   
             views.setOnClickPendingIntent(R.id.widget, pendingIntent);
