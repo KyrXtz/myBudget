@@ -140,14 +140,14 @@ let refCurrency = '';
 let refMinDate = new Date();
 let refExpensesHistoryJson = '';
 let refspentMonthHistory ='';
-let categoryIcon0 = '';
-let categoryIcon1 = '';
-let categoryIcon2 = '';
-let categoryIcon3 = '';
-let categoryIcon4 = '';
-let categoryIcon5 = '';
-let categoryIcon6 = '';
-let categoryIcon7 = '';
+let categoryIcon0 = null;
+let categoryIcon1 = null;
+let categoryIcon2 = null;
+let categoryIcon3 = null;
+let categoryIcon4 = null;
+let categoryIcon5 = null;
+let categoryIcon6 = null;
+let categoryIcon7 = null;
 
 const locales = RNLocalize.getLocales();
 //const currenciesLocal = RNLocalize.getCurrencies();
@@ -1336,52 +1336,52 @@ render() {
                  {item.Category ==0 && 
                       <FontAwesome
                       style={{alignSelf:'flex-end',marginBottom:2}}
-                
-                      icon={parseIconFromClassName(categoryIcon0 == ''?categoryIcon0:'fas fa-wallet')}
+                       
+                      icon={parseIconFromClassName(categoryIcon0 != null?categoryIcon0:'fas fa-wallet')}
                       />
                       }
                       {item.Category ==1 && 
                         <FontAwesome
                         style={{alignSelf:'flex-end',marginBottom:2}}
                   
-                        icon={parseIconFromClassName(categoryIcon1 == ''?categoryIcon1:'fas fa-coffee')}
+                        icon={parseIconFromClassName(categoryIcon1 != null?categoryIcon1:'fas fa-coffee')}
                         />
                       }{item.Category ==2 && 
                         <FontAwesome
                         style={{alignSelf:'flex-end',marginBottom:2}}
                   
-                        icon={parseIconFromClassName(categoryIcon2 == ''?categoryIcon2:'fas fa-utensils')}
+                        icon={parseIconFromClassName(categoryIcon2 != null?categoryIcon2:'fas fa-utensils')}
                         />
                       }{item.Category ==3 && 
                         <FontAwesome
                         style={{alignSelf:'flex-end',marginBottom:2}}
                   
-                        icon={parseIconFromClassName(categoryIcon3 == ''?categoryIcon3:'fas fa-shopping-cart')}
+                        icon={parseIconFromClassName(categoryIcon3 != null?categoryIcon3:'fas fa-shopping-cart')}
                         />
                       }
                       {item.Category ==4 && 
                         <FontAwesome
                         style={{alignSelf:'flex-end',marginBottom:2}}
                   
-                        icon={parseIconFromClassName(categoryIcon4 == ''?categoryIcon4:'fas fa-money-check-alt')}
+                        icon={parseIconFromClassName(categoryIcon4 != null?categoryIcon4:'fas fa-money-check-alt')}
                         />
                       }{item.Category ==5 && 
                         <FontAwesome
                         style={{alignSelf:'flex-end',marginBottom:2}}
                   
-                        icon={parseIconFromClassName(categoryIcon5 == ''?categoryIcon5:'fas fa-tshirt')}
+                        icon={parseIconFromClassName(categoryIcon5 != null?categoryIcon5:'fas fa-tshirt')}
                         />
                       }{item.Category ==6 && 
                         <FontAwesome
                         style={{alignSelf:'flex-end',marginBottom:2}}
                   
-                        icon={parseIconFromClassName(categoryIcon6 == ''?categoryIcon6:'fas fa-gas-pump')}
+                        icon={parseIconFromClassName(categoryIcon6 != null?categoryIcon6:'fas fa-gas-pump')}
                         />
                       }{item.Category ==7 && 
                         <FontAwesome
                         style={{alignSelf:'flex-end',marginBottom:2}}
                   
-                        icon={parseIconFromClassName(categoryIcon7 == ''?categoryIcon7:'fas fa-bus')}
+                        icon={parseIconFromClassName(categoryIcon7 != null?categoryIcon7:'fas fa-bus')}
                         />
                       }
                </View>
@@ -1519,56 +1519,56 @@ render() {
                <FontAwesome
                   style={[this.state.selectedCategoryBtn !=0 && styles.categoryButton,this.state.selectedCategoryBtn == 0 && styles.selectedCategoryButton]}
            
-                 icon={parseIconFromClassName(categoryIcon0 == ''?categoryIcon0:'fas fa-wallet')}
+                 icon={parseIconFromClassName(categoryIcon0 != null?categoryIcon0:'fas fa-wallet')}
                />
            </TouchableOpacity>
            <TouchableOpacity onPress={()=> this.setState({selectedCategoryBtn:1})}>
                <FontAwesome
                   style={[this.state.selectedCategoryBtn !=1 && styles.categoryButton,this.state.selectedCategoryBtn == 1 && styles.selectedCategoryButton]}
            
-                  icon={parseIconFromClassName(categoryIcon1 == ''?categoryIcon1:'fas fa-coffee')}
+                  icon={parseIconFromClassName(categoryIcon1 != null?categoryIcon1:'fas fa-coffee')}
                   />
            </TouchableOpacity>
            <TouchableOpacity onPress={()=> this.setState({selectedCategoryBtn:2})}>
                <FontAwesome
                   style={[this.state.selectedCategoryBtn !=2 && styles.categoryButton,this.state.selectedCategoryBtn == 2 && styles.selectedCategoryButton]}
            
-                  icon={parseIconFromClassName(categoryIcon2 == ''?categoryIcon2:'fas fa-utensils')}
+                  icon={parseIconFromClassName(categoryIcon2 != null?categoryIcon2:'fas fa-utensils')}
                />
            </TouchableOpacity>           
            <TouchableOpacity onPress={()=> this.setState({selectedCategoryBtn:3})}>
                <FontAwesome
                   style={[this.state.selectedCategoryBtn !=3 && styles.categoryButton,this.state.selectedCategoryBtn == 3 && styles.selectedCategoryButton]}
            
-                  icon={parseIconFromClassName(categoryIcon3 == ''?categoryIcon3:'fas fa-shopping-cart')}
+                  icon={parseIconFromClassName(categoryIcon3 != null?categoryIcon3:'fas fa-shopping-cart')}
                />
            </TouchableOpacity>
            <TouchableOpacity onPress={()=> this.setState({selectedCategoryBtn:4})}>
                <FontAwesome
                   style={[this.state.selectedCategoryBtn !=4 && styles.categoryButton,this.state.selectedCategoryBtn == 4 && styles.selectedCategoryButton]}
            
-                  icon={parseIconFromClassName(categoryIcon4 == ''?categoryIcon4:'fas fa-money-check-alt')}
+                  icon={parseIconFromClassName(categoryIcon4 != null?categoryIcon4:'fas fa-money-check-alt')}
                />
            </TouchableOpacity>
            <TouchableOpacity onPress={()=> this.setState({selectedCategoryBtn:5})}>
                <FontAwesome
                   style={[this.state.selectedCategoryBtn !=5 && styles.categoryButton,this.state.selectedCategoryBtn == 5 && styles.selectedCategoryButton]}
            
-                  icon={parseIconFromClassName(categoryIcon5 == ''?categoryIcon5:'fas fa-tshirt')}
+                  icon={parseIconFromClassName(categoryIcon5 != null?categoryIcon5:'fas fa-tshirt')}
                />
            </TouchableOpacity>
            <TouchableOpacity onPress={()=> this.setState({selectedCategoryBtn:6})}>
                <FontAwesome
                   style={[this.state.selectedCategoryBtn !=6 && styles.categoryButton,this.state.selectedCategoryBtn == 6 && styles.selectedCategoryButton]}
            
-                  icon={parseIconFromClassName(categoryIcon6 == ''?categoryIcon6:'fas fa-gas-pump')}
+                  icon={parseIconFromClassName(categoryIcon6 != null?categoryIcon6:'fas fa-gas-pump')}
                />
            </TouchableOpacity>
            <TouchableOpacity onPress={()=> this.setState({selectedCategoryBtn:7})}>
                <FontAwesome
                   style={[this.state.selectedCategoryBtn !=7 && styles.categoryButton,this.state.selectedCategoryBtn == 7 && styles.selectedCategoryButton]}
            
-                  icon={parseIconFromClassName(categoryIcon7 == ''?categoryIcon7:'fas fa-bus')}
+                  icon={parseIconFromClassName(categoryIcon7 != null?categoryIcon7:'fas fa-bus')}
                />
            </TouchableOpacity>
         </ScrollView>
@@ -1607,52 +1607,52 @@ render() {
                       {item.Category ==0 && 
                       <FontAwesome
                       style={{alignSelf:'flex-end',marginBottom:2}}
-                
-                      icon={parseIconFromClassName(categoryIcon0 == ''?categoryIcon0:'fas fa-wallet')}
+                       
+                      icon={parseIconFromClassName(categoryIcon0 != null?categoryIcon0:'fas fa-wallet')}
                       />
                       }
                       {item.Category ==1 && 
                         <FontAwesome
                         style={{alignSelf:'flex-end',marginBottom:2}}
                   
-                        icon={parseIconFromClassName(categoryIcon1 == ''?categoryIcon1:'fas fa-coffee')}
+                        icon={parseIconFromClassName(categoryIcon1 != null?categoryIcon1:'fas fa-coffee')}
                         />
                       }{item.Category ==2 && 
                         <FontAwesome
                         style={{alignSelf:'flex-end',marginBottom:2}}
                   
-                        icon={parseIconFromClassName(categoryIcon2 == ''?categoryIcon2:'fas fa-utensils')}
+                        icon={parseIconFromClassName(categoryIcon2 != null?categoryIcon2:'fas fa-utensils')}
                         />
                       }{item.Category ==3 && 
                         <FontAwesome
                         style={{alignSelf:'flex-end',marginBottom:2}}
                   
-                        icon={parseIconFromClassName(categoryIcon3 == ''?categoryIcon3:'fas fa-shopping-cart')}
+                        icon={parseIconFromClassName(categoryIcon3 != null?categoryIcon3:'fas fa-shopping-cart')}
                         />
                       }
                       {item.Category ==4 && 
                         <FontAwesome
                         style={{alignSelf:'flex-end',marginBottom:2}}
                   
-                        icon={parseIconFromClassName(categoryIcon4 == ''?categoryIcon4:'fas fa-money-check-alt')}
+                        icon={parseIconFromClassName(categoryIcon4 != null?categoryIcon4:'fas fa-money-check-alt')}
                         />
                       }{item.Category ==5 && 
                         <FontAwesome
                         style={{alignSelf:'flex-end',marginBottom:2}}
                   
-                        icon={parseIconFromClassName(categoryIcon5 == ''?categoryIcon5:'fas fa-tshirt')}
+                        icon={parseIconFromClassName(categoryIcon5 != null?categoryIcon5:'fas fa-tshirt')}
                         />
                       }{item.Category ==6 && 
                         <FontAwesome
                         style={{alignSelf:'flex-end',marginBottom:2}}
                   
-                        icon={parseIconFromClassName(categoryIcon6 == ''?categoryIcon6:'fas fa-gas-pump')}
+                        icon={parseIconFromClassName(categoryIcon6 != null?categoryIcon6:'fas fa-gas-pump')}
                         />
                       }{item.Category ==7 && 
                         <FontAwesome
                         style={{alignSelf:'flex-end',marginBottom:2}}
                   
-                        icon={parseIconFromClassName(categoryIcon7 == ''?categoryIcon7:'fas fa-bus')}
+                        icon={parseIconFromClassName(categoryIcon7 != null?categoryIcon7:'fas fa-bus')}
                         />
                       }
                </View>
@@ -2042,7 +2042,7 @@ async setExpensesOfPastMonth(month){
       <View style={styles.drawerContainer}>
       <View style={styles.drawerMainView}>
         <Text style={{fontWeight:'600',fontSize:20,color:'#3d3d3d',height:'10%',alignSelf:'center',textAlignVertical:'bottom'}}>{I18n.t("AppName")}</Text>
-        <Text style={{fontWeight:'300',fontSize:15,color:'#8d8d8d',height:'3%',alignSelf:'center',textAlignVertical:'bottom'}}>{I18n.t("AppSubName")}</Text>
+        <Text style={{fontWeight:'300',fontSize:15,color:'#8d8d8d',alignSelf:'center',textAlignVertical:'bottom',alignSelf:'center'}}>{I18n.t("AppSubName")}</Text>
         <View style={styles.footerLine}/>
          <View style={[styles.twoViewsStartEndContainer,{padding:15}]}>
          <FontAwesome
@@ -2074,21 +2074,18 @@ async setExpensesOfPastMonth(month){
           </View>
         </Modal>
         </View>
-        <View style={[styles.twoViewsStartEndContainer,{padding:15}]}>
+        {/* <View style={[styles.twoViewsStartEndContainer,{padding:15}]}>
          <FontAwesome
        style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}} icon={SolidIcons.database}/>
         <TouchableOpacity  onPress={()=>this.setState({openCategoriesSelect:true})} >
             <Text style={styles.drawerButtonText}>{I18n.t("ChangeCategories")}</Text>
           </TouchableOpacity>
-          <Modal  onBackdropPress={()=>this.setState({openCategoriesSelect:false})} useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.coffeeShopModal}  animationIn = {'slideInUp'} animationOut={'slideOutDown'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.openCategoriesSelect}> 
+          <Modal  onBackdropPress={async ()=> await this.refreshCategoryIcons()} useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.coffeeShopModal}  animationIn = {'slideInUp'} animationOut={'slideOutDown'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.openCategoriesSelect}> 
             <View style={styles.billingWindowStyle}>
-            {/* <Swiper> */}
-          <CategoriesSelect changeCategories={this.changeCategories}/>
-          {/* <LanguageSelect changeLanguage={this.changeLanguage}/>
-          </Swiper> */}
+          <CategoriesSelect changeCategories={this.changeCategories} categoryIcon0={categoryIcon0} categoryIcon1={categoryIcon1}categoryIcon2={categoryIcon2}categoryIcon3={categoryIcon3}categoryIcon4={categoryIcon4}categoryIcon5={categoryIcon5}categoryIcon6={categoryIcon6}categoryIcon7={categoryIcon7}/>       
           </View>
         </Modal>
-        </View>
+        </View> */}
         <View style={styles.footerLine}/>
         <View style={[styles.twoViewsStartEndContainer,{padding:15}]}>
         <FontAwesome
@@ -2151,6 +2148,17 @@ async setExpensesOfPastMonth(month){
     // await storageSet('Currency',currency);
     // refCurrency=currency;
     this.setState({openCategoriesSelect:false})
+  }
+  async refreshCategoryIcons(){
+    categoryIcon0 = await storageGet('categoryIcon0');
+    categoryIcon1 = await storageGet('categoryIcon1');
+    categoryIcon2 = await storageGet('categoryIcon2');
+    categoryIcon3 = await storageGet('categoryIcon3');
+    categoryIcon4 = await storageGet('categoryIcon4');
+    categoryIcon5 = await storageGet('categoryIcon5');
+    categoryIcon6 = await storageGet('categoryIcon6');
+    categoryIcon7 = await storageGet('categoryIcon7');
+    this.setState({openCategoriesSelect:false});
   }
   stringWithCorrectCurrencyPosition(stringToReturn){
     if(stringToReturn ==null){
