@@ -46,8 +46,7 @@
    DebugInstructions,
    ReloadInstructions,
  } from 'react-native/Libraries/NewAppScreen';
-import moment from 'moment';
-import 'moment/locale/el'  // without this line it didn't work
+
 
 import { moduleExpression, stringLiteral, tsParenthesizedType } from '@babel/types';
 import FontAwesome, {
@@ -90,20 +89,31 @@ import {AdMobInterstitial} from 'react-native-admob';
 //LOCALIZATION
 import I18n, { locale } from "i18n-js";
  import * as RNLocalize from "react-native-localize";
+ import moment from 'moment';
+import 'moment/locale/el';  // without this line it didn't work
+import 'moment/locale/de' ;
+import 'moment/locale/zh-cn';
+
+
+
  import enUS from "./android/app/src/main/assets/translations/en-US.json";
  import enGB from "./android/app/src/main/assets/translations/en-GB.json";
  import en from "./android/app/src/main/assets/translations/en.json";
  import el from "./android/app/src/main/assets/translations/el.json";
+ import de from "./android/app/src/main/assets/translations/de.json";
+ import zh from "./android/app/src/main/assets/translations/zh.json";
+
  import currencies from "./android/app/src/main/assets/currencies/currencies.json";
- const availableTranslations = ['en','en-US','en-GB','el'];
- const availableTranslationsRef = [en,enUS,enGB,el];
+ const availableTranslations = ['en','en-US','en-GB','el','de','zh'];
  I18n.fallbacks = true;
  I18n.defaultLocale = 'en';
  I18n.translations = {
     en,
     enUS,
     enGB,
-    el
+    el,
+    de,
+    zh
  };
  //END LOCALIZATION
  const SharedStorage = NativeModules.SharedStorage;
@@ -287,7 +297,7 @@ const locales = RNLocalize.getLocales();
    }
    async init(){
     //AsyncStorage.clear();
-    //await storageSet('CardTutorialViewed','false');
+    //await storageSet('Currency','');
     //this.setState({ debug: "debug" }) ;
      //await storageSet('RemovedAds','false');
     // const latestVersion = await VersionCheck.getLatestVersion()     
@@ -843,13 +853,16 @@ render() {
           ref={(swiper) => {this._swiperRef = swiper;}}
           onIndexChanged = {(index) => this.setState({swiperIndex:index})}
           loop={false} showsButtons={true}>
-
             <View style={styles.slideFirst}>
               <View style={{justifyContent:'space-between'}}>
               {I18n.locale == 'el' &&
               <Image  style={{height:'35%',width:'100%', resizeMode:'stretch'}} source={require('./android/app/src/main/assets/playstoregraphics/FeatureGraphic-EL.png')}/>}
-              {I18n.locale != 'el' && //!= ola ta ypoloipa translations
-              <Image  style={{height:'35%',width:'100%', resizeMode:'stretch'}} source={require('./android/app/src/main/assets/playstoregraphics/FeatureGraphic-EN.png')}/>}
+              {I18n.locale.includes('de') &&
+              <Image  style={{height:'35%',width:'100%', resizeMode:'stretch'}} source={require('./android/app/src/main/assets/playstoregraphics/FeatureGraphic-DE.png')}/>}
+              {I18n.locale.includes('zh') &&
+              <Image  style={{height:'35%',width:'100%', resizeMode:'stretch'}} source={require('./android/app/src/main/assets/playstoregraphics/FeatureGraphic-ZH.png')}/>}
+              {!I18n.locale.includes('el') && !I18n.locale.includes('de') && !I18n.locale.includes('zh') &&
+              <Image  style={{height:'35%',width:'100%', resizeMode:'stretch'}}  source={require('./android/app/src/main/assets/playstoregraphics/FeatureGraphic-EN.png')}/>}
               <View>
               <Text style={[styles.swiperText,{paddingVertical:30,elevation:10,borderRadius:30,backgroundColor:'#FFFFFD',paddingHorizontal:20,fontSize:30,fontWeight:'bold'}]}>{I18n.t("SwiperTutorial0")}</Text>
               <Text style={{fontSize:10,alignSelf:'center', fontStyle:'italic',color:'#FFFFFD99'}}>{I18n.t("InternetConnectionRequired")}</Text>
@@ -1001,9 +1014,13 @@ render() {
 <View style={styles.parentView}>
         { (this.state.loading == false) &&   
          <View style={styles.titleImageWrapper}>
-           {I18n.locale == 'el' &&
+           {I18n.locale.includes('el') &&
            <Image  style={styles.titleImage} source={require('./android/app/src/main/assets/playstoregraphics/FeatureGraphic-EL.png')}/>}
-           {I18n.locale != 'el' && //!= ola ta ypoloipa translations
+           {I18n.locale.includes('de') &&
+           <Image  style={styles.titleImage} source={require('./android/app/src/main/assets/playstoregraphics/FeatureGraphic-DE.png')}/>}
+           {I18n.locale.includes('zh') &&
+           <Image  style={styles.titleImage} source={require('./android/app/src/main/assets/playstoregraphics/FeatureGraphic-ZH.png')}/>}
+           {!I18n.locale.includes('el') && !I18n.locale.includes('de') && !I18n.locale.includes('zh') &&
            <Image  style={styles.titleImage} source={require('./android/app/src/main/assets/playstoregraphics/FeatureGraphic-EN.png')}/>}
            </View>
         }
@@ -1682,10 +1699,10 @@ render() {
             <Text style={{ fontSize:17,alignSelf:'center',paddingHorizontal:10}}>If you do, please take a moment to rate it, it really helps us grow!</Text>
             <Text></Text>
             <View style={{ flexDirection: 'row',justifyContent:'space-around',paddingHorizontal:5}}>
-              <TouchableOpacity style={{width:'30%'}} onPress={async () => await this.stopShowingPrompt()}><Text  style={{fontSize:17,color:'#6cc3c3',textAlign:'center'}}>I have already rated</Text></TouchableOpacity>
+              <TouchableOpacity style={{width:'30%'}} onPress={async () => await this.stopShowingPrompt()}><Text  style={{fontSize:17,color:'#6cc3c3',textAlign:'center'}}>{I18n.t('AlreadyRated')}</Text></TouchableOpacity>
               <Text style={{width:'30%'}}></Text>
-              <TouchableOpacity style={{width:'20%'}} onPress={() => this.setState({daysPassed:0})}><Text style={{fontSize:17,color:'#6cc3c3',textAlign:'center'}}>Maybe later</Text></TouchableOpacity>
-              <TouchableOpacity style={{width:'20%'}} onPress={()=>this.takeUserToRate()}><Text style={{fontSize:17,color:'#6cc3c3',textAlign:'center'}}>Yes please!</Text></TouchableOpacity>
+              <TouchableOpacity style={{width:'20%'}} onPress={() => this.setState({daysPassed:0})}><Text style={{fontSize:17,color:'#6cc3c3',textAlign:'center'}}>{I18n.t('Maybelater')}</Text></TouchableOpacity>
+              <TouchableOpacity style={{width:'20%'}} onPress={()=>this.takeUserToRate()}><Text style={{fontSize:17,color:'#6cc3c3',textAlign:'center'}}>{I18n.t('YesPlease')}</Text></TouchableOpacity>
 
 
       
@@ -2174,6 +2191,8 @@ async setExpensesOfPastMonth(month){
       return SolidIcons.poundSign;
     }else if (currencyInfo[0].currencyCode == "EUR"){
       return SolidIcons.euroSign;
+    }else if (currencyInfo[0].currencyCode == "CNY"){
+      return SolidIcons.yenSign;
     }
   }
    openSettings(shouldOpen){
@@ -2904,7 +2923,12 @@ getLocalisedFullDateString(dateString){
    if(!this.isValid(date)){
      date = new Date();
    }
-   return moment(date).locale(languageCode).format('LL')
+   if(languageCode == 'zh')//special case
+   {
+    languageCode = 'zh-cn';
+   }
+   moment.locale(languageCode); //prepei na kaneis import kai to 'moment/locale/de px.'
+   return moment(date).format('LL')
   // console.log(moment(new Date('2021-11-01')).locale('en').format('MMMM Do YYYY'))
   // console.log(moment(new Date('2021-11-01')).locale('el').format('MMMM Do YYYY'))
 }

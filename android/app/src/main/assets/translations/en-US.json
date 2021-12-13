@@ -19,7 +19,7 @@
     "Cancel":"Cancel",
     "Confirm":"Confirm",
     "Balance": "Balance:",
-    "CurrentBalance":"Current balance: ",
+    "CurrentBalance":"Current balance:",
     "StartingBalance" :"Starting balance:",
     "SavingsBalance":"Savings balance:",
     "SavingsAmount":"Savings amount",
@@ -109,7 +109,7 @@
     "RemainingMonies":"Remaining amount:",
     "AmountOver":"Amount over budget:",
     "AlreadyRated":"I have already rated",
-    "Maybe later":"Maybe later",
+    "Maybelater":"Maybe later",
     "YesPlease":"Yes, please!"
 
 

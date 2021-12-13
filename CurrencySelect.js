@@ -38,6 +38,13 @@ export const CurrencySelect = ({changeCurrency}) => {
             icon={SolidIcons.dollarSign}
           />
       </TouchableOpacity>
+      <TouchableOpacity onPress={async ()=>{changeCurrency('CNY')}}>
+      <FontAwesome
+            style={styles.iconStyle}
+
+            icon={SolidIcons.yenSign}
+          />
+      </TouchableOpacity>
       </View>
       {/* <Text style={styles.thankyou}>{I18n.t('ThankYou')}</Text> */}
 

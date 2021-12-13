@@ -19,7 +19,7 @@
     "Cancel":"Ακύρωση",
     "Confirm":"Αποδοχή",
     "Balance": "Υπόλοιπο:",
-    "CurrentBalance":"Τωρινό υπόλοιπο: ",
+    "CurrentBalance":"Τωρινό υπόλοιπο:",
     "StartingBalance" :"Αρχικό υπόλοιπο:",
     "SavingsBalance":"Αποταμιευμένο ποσό:",
     "SavingsAmount":"Αποταμιευμένο ποσό",
@@ -109,7 +109,7 @@
     "RemainingMonies":"Ποσό που απομένει:",
     "AmountOver":"Ποσό πάνω απο το budget:",
     "AlreadyRated":"Έχω ήδη βαθμολογήσει",
-    "Maybe later":"Ίσως αργότερα",
+    "Maybelater":"Ίσως αργότερα",
     "YesPlease":"Ναι, βεβαίως!"
 
 
