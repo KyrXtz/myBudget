@@ -111,7 +111,11 @@
     "AmountOver": "超过预算的金额:",
     "AlreadyRated": "我已经评分了",
     "Maybelater":"也许以后",
-    "YesPlease": "是的，请!"
+    "YesPlease": "是的，请!",
+    "IncomesHeader":"Incomes",
+    "FixedCostsHeader":"Fixed Costs",
+    "SavingsHeader":"Savings",
+    "VoiceCommandsHeader":"Voice Commands"
 
 
 }

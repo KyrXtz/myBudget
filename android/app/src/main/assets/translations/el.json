@@ -111,7 +111,11 @@
     "AmountOver":"Ποσό πάνω απο το budget:",
     "AlreadyRated":"Έχω ήδη βαθμολογήσει",
     "Maybelater":"Ίσως αργότερα",
-    "YesPlease":"Ναι, βεβαίως!"
+    "YesPlease":"Ναι, βεβαίως!",
+    "IncomesHeader":"Εισοδήματα",
+    "FixedCostsHeader":"Πάγια Έξοδα",
+    "SavingsHeader":"Αποταμίευση",
+    "VoiceCommandsHeader":"Φωνητικές Εντολές"
 
 
     

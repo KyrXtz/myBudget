@@ -15,6 +15,7 @@ import fontawesome from './android/app/src/main/assets/fontawesome.json'
 import AsyncStorage  from '@react-native-community/async-storage';
 
 export const CategoriesSelect = ({changeCategories,categoryIcon0,categoryIcon1,categoryIcon2,categoryIcon3,categoryIcon4,categoryIcon5,categoryIcon6,categoryIcon7}) => {
+  console.log('HEYO')
   return (
     <ScrollView contentContainerStyle={{justifyContent:'center'}}>
       <View style={styles.rowContainer}>
@@ -104,7 +105,7 @@ const styles = StyleSheet.create({
       
 
     },iconStyle: {
-      fontSize: 20,
+      fontSize: 30,
       color: 'black',
       textAlign:'center',
   

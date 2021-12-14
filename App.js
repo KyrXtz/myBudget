@@ -31,7 +31,8 @@
    FlatList,
    Alert,
    ActivityIndicator,
-   AppState  
+   AppState,
+   PanResponder  
  } from 'react-native';
  import CalendarPicker from 'react-native-calendar-picker';
  import Modal from "react-native-modal";
@@ -70,6 +71,7 @@ import { RemoveAds } from './RemoveAds';
 import { LanguageSelect } from './LanguageSelect';
 import { CurrencySelect } from './CurrencySelect';
 import { CategoriesSelect } from './CategoriesSelect';
+import { ProBanner } from './ProBanner';
 
 import {withIAPContext} from 'react-native-iap';
 import { LogBox } from 'react-native';
@@ -104,6 +106,7 @@ import 'moment/locale/zh-cn';
  import zh from "./android/app/src/main/assets/translations/zh.json";
 
  import currencies from "./android/app/src/main/assets/currencies/currencies.json";
+ 
  const availableTranslations = ['en','en-US','en-GB','el','de','zh'];
  I18n.fallbacks = true;
  I18n.defaultLocale = 'en';
@@ -148,6 +151,8 @@ let categoryIcon4 = null;
 let categoryIcon5 = null;
 let categoryIcon6 = null;
 let categoryIcon7 = null;
+
+let positionYRef = 0; //for scrolling drawer
 
 const locales = RNLocalize.getLocales();
 //const currenciesLocal = RNLocalize.getCurrencies();
@@ -201,6 +206,7 @@ const locales = RNLocalize.getLocales();
    
    _calendarRef;
    _swiperRef;
+   _drawerScrollRef;
    constructor(props) {
      super(props);
      this.state = { 
@@ -1136,7 +1142,7 @@ render() {
         <Text style={styles.modalMainViewSubInfo}>{I18n.t('SavingsBalance')} {this.stringWithCorrectCurrencyPosition(this.getSavingsStateWithCorrectDecimals())}</Text>
         }
         </View>
-        <View style={styles.twoViewsStartEndContainer}>
+        {/* <View style={styles.twoViewsStartEndContainer}>
         {(this.state.euroState!='' && this.state.euroState!=null && this.state.isEditingEuroState == false)   &&
         <Text style={styles.modalMainViewSubTitle} >{I18n.t('SetAsideQuestion')} </Text>
         }
@@ -1171,18 +1177,8 @@ render() {
         />
         </View>
         </View>
-        }
-        {/* <View style={styles.twoViewsStartEndContainer}>
-        {(this.state.startingEuroState!='' && this.state.startingEuroState!=null && this.state.euroState != refEuroState && this.state.isEditingEuroState == false)  &&
-        <Text style={styles.modalMainViewSubTitle} >{I18n.t('UpdateStartingBalanceQuestion')}</Text>
-        }
-        {(this.state.startingEuroState!='' && this.state.startingEuroState!=null && this.state.euroState != refEuroState && this.state.isEditingEuroState == false)  &&
-        <BouncyCheckbox  style={styles.BouncyCheckbox}
-        onPress={(isChecked: boolean) => this.checkStateOfCheckBox1(isChecked)}
-        fillColor = {'#6cc3c3'}
-        ></BouncyCheckbox>
-        }
-        </View> */}
+        } */}
+        
         </ScrollView>
 
         </View>
@@ -1699,10 +1695,10 @@ render() {
             <Text style={{ fontSize:17,alignSelf:'center',paddingHorizontal:10}}>If you do, please take a moment to rate it, it really helps us grow!</Text>
             <Text></Text>
             <View style={{ flexDirection: 'row',justifyContent:'space-around',paddingHorizontal:5}}>
-              <TouchableOpacity style={{width:'30%'}} onPress={async () => await this.stopShowingPrompt()}><Text  style={{fontSize:17,color:'#6cc3c3',textAlign:'center'}}>{I18n.t('AlreadyRated')}</Text></TouchableOpacity>
+              <TouchableOpacity style={{width:'30%',flexShrink:1}} onPress={async () => await this.stopShowingPrompt()}><Text  style={{fontSize:17,color:'#6cc3c3',textAlign:'center'}}>I have already rated</Text></TouchableOpacity>
               <Text style={{width:'30%'}}></Text>
-              <TouchableOpacity style={{width:'20%'}} onPress={() => this.setState({daysPassed:0})}><Text style={{fontSize:17,color:'#6cc3c3',textAlign:'center'}}>{I18n.t('Maybelater')}</Text></TouchableOpacity>
-              <TouchableOpacity style={{width:'20%'}} onPress={()=>this.takeUserToRate()}><Text style={{fontSize:17,color:'#6cc3c3',textAlign:'center'}}>{I18n.t('YesPlease')}</Text></TouchableOpacity>
+              <TouchableOpacity style={{width:'20%',flexShrink:1}} onPress={() => this.setState({daysPassed:0})}><Text style={{fontSize:17,color:'#6cc3c3',textAlign:'center'}}>Maybe later</Text></TouchableOpacity>
+              <TouchableOpacity style={{width:'20%',flexShrink:1}} onPress={()=>this.takeUserToRate()}><Text style={{fontSize:17,color:'#6cc3c3',textAlign:'center'}}>Yes please!</Text></TouchableOpacity>
 
 
       
@@ -2035,14 +2031,109 @@ async setExpensesOfPastMonth(month){
 
 
 }
+handleScroll (event){
+ //const positionX = event.nativeEvent.contentOffset.x;
+  positionYRef = event.nativeEvent.contentOffset.y;
+  console.log(positionYRef);
+};
 
    settingsMenuContent = () => {
+     
     return (
       <View style={{flex:1}}>
       <View style={styles.drawerContainer}>
-      <View style={styles.drawerMainView}>
+      <View style={styles.drawerMainView}>        
         <Text style={{fontWeight:'600',fontSize:20,color:'#3d3d3d',height:'10%',alignSelf:'center',textAlignVertical:'bottom'}}>{I18n.t("AppName")}</Text>
         <Text style={{fontWeight:'300',fontSize:15,color:'#8d8d8d',alignSelf:'center',textAlignVertical:'bottom',alignSelf:'center'}}>{I18n.t("AppSubName")}</Text>
+        <View style={styles.footerLine}/>
+        <ScrollView ref={ref => {this._drawerScrollRef = ref}} onScroll={(e) => this.handleScroll(e)}  scrollEventThrottle={16} onTouchStart={e=> this.touchY = e.nativeEvent.pageY}
+        
+        onTouchMove={e => {
+                  if (this.touchY - e.nativeEvent.pageY > 20 || this.touchY - e.nativeEvent.pageY < -20){
+                    console.log('Swiped up MOVE')
+                    //console.log(this._drawerScrollRef)
+                    this._drawerScrollRef.scrollTo({ x: 0, y: positionYRef+(0.1*(this.touchY - e.nativeEvent.pageY)) , animated: false })
+                  }
+                  
+                    
+                }}
+                onTouchEnd={e => {
+                  if (this.touchY - e.nativeEvent.pageY > 20)
+                    console.log('Swiped up END')
+                    //this._drawerScrollRef.scrollTo({ x: 0, y: positionYRef+10, animated: true })
+                    //ΤTODO 
+                    //NA DW AN EXEI GRIGORO SWIPE, KAI NA TOY KANW KI ALLO SCROLL
+
+                    
+                }}>
+          <View >
+          <View style={[styles.twoViewsStartEndContainer,{padding:15}]}>
+        <ProBanner></ProBanner>
+         <FontAwesome
+       style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}} icon={SolidIcons.handHoldingUsd}/>
+        <TouchableOpacity  onPress={()=>this.setState({openIncomesView:true})} >
+            <Text style={styles.drawerButtonText}>{I18n.t("IncomesHeader")}</Text>
+          </TouchableOpacity>
+          <Modal  onBackdropPress={()=>this.setState({openIncomesView:false})} useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.coffeeShopModal}  animationIn = {'slideInUp'} animationOut={'slideOutDown'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.openIncomesView}> 
+            <View style={styles.billingWindowStyle}>
+          <Text>Coming soon</Text>      
+          </View>
+        </Modal>
+        </View>
+        <View style={[styles.twoViewsStartEndContainer,{padding:15}]}>
+        <ProBanner></ProBanner>
+         <FontAwesome
+       style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}} icon={SolidIcons.fileInvoiceDollar}/>
+        <TouchableOpacity  onPress={()=>this.setState({openFixedCostsView:true})} >
+            <Text style={styles.drawerButtonText}>{I18n.t("FixedCostsHeader")}</Text>
+          </TouchableOpacity>
+          <Modal  onBackdropPress={()=>this.setState({openFixedCostsView:false})} useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.coffeeShopModal}  animationIn = {'slideInUp'} animationOut={'slideOutDown'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.openFixedCostsView}> 
+            <View style={styles.billingWindowStyle}>
+            <Text>Coming soon</Text>      
+          </View>
+        </Modal>
+        </View>
+        <View style={[styles.twoViewsStartEndContainer,{padding:15}]}>
+        <ProBanner></ProBanner>
+         <FontAwesome
+       style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}} icon={SolidIcons.piggyBank}/>
+        <TouchableOpacity  onPress={()=>this.setState({openSavingsView:true})} >
+            <Text style={styles.drawerButtonText}>{I18n.t("SavingsHeader")}</Text>
+          </TouchableOpacity>
+          <Modal  onBackdropPress={()=>this.setState({openSavingsView:false})} useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.coffeeShopModal}  animationIn = {'slideInUp'} animationOut={'slideOutDown'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.openSavingsView}> 
+            <View style={styles.billingWindowStyle}>
+              {this.state.euroState != '' && this.state.euroState != null &&
+              <Text style={styles.modalMainViewSubHeader}>{I18n.t('SavingsAmount')}</Text>        
+              }
+              {this.state.euroState == '' || this.state.euroState == null &&
+              <Text style={styles.modalMainViewSubHeader}>SET BALANCE FIRST</Text>        
+              }
+              {this.state.euroState != '' && this.state.euroState != null  &&
+              <View style={styles.inputRowContainer}>
+              <View style={styles.iconContainer}>
+              <FontAwesome style={styles.inputIcon} icon={this.correctFontAwesomeCurrencyIcon()}/>
+              </View>
+              <View style={styles.inputContainer}>
+              <TextInput 
+                  style={styles.input}
+                  keyboardType='numeric'
+                  onChangeText={(text)=> this.onChanged1Savings(text)}
+                  defaultValue={this.state.savingsState}
+                  value={this.state.savingsState}
+                  onTouchStart={()=>this.startEdit1Savings()}
+                  maxLength={10}  //setting limit of input
+                  onEndEditing={()=>this.endEdit1Savings()}
+                  // onTouchStart={()=>this.startEdit1()}
+
+              />
+              </View>              
+              </View>
+              } 
+              
+                  
+          </View>
+        </Modal>
+        </View>
         <View style={styles.footerLine}/>
          <View style={[styles.twoViewsStartEndContainer,{padding:15}]}>
          <FontAwesome
@@ -2074,7 +2165,8 @@ async setExpensesOfPastMonth(month){
           </View>
         </Modal>
         </View>
-        {/* <View style={[styles.twoViewsStartEndContainer,{padding:15}]}>
+        <View style={[styles.twoViewsStartEndContainer,{padding:15}]}>
+        <ProBanner></ProBanner>
          <FontAwesome
        style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}} icon={SolidIcons.database}/>
         <TouchableOpacity  onPress={()=>this.setState({openCategoriesSelect:true})} >
@@ -2085,7 +2177,20 @@ async setExpensesOfPastMonth(month){
           <CategoriesSelect changeCategories={this.changeCategories} categoryIcon0={categoryIcon0} categoryIcon1={categoryIcon1}categoryIcon2={categoryIcon2}categoryIcon3={categoryIcon3}categoryIcon4={categoryIcon4}categoryIcon5={categoryIcon5}categoryIcon6={categoryIcon6}categoryIcon7={categoryIcon7}/>       
           </View>
         </Modal>
-        </View> */}
+        </View>
+        <View style={[styles.twoViewsStartEndContainer,{padding:15}]}>
+        <ProBanner></ProBanner>
+         <FontAwesome
+       style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}} icon={SolidIcons.commentDots}/>
+        <TouchableOpacity  onPress={()=>this.setState({openVoiceCommandsView:true})} >
+            <Text style={styles.drawerButtonText}>{I18n.t("VoiceCommandsHeader")}</Text>
+          </TouchableOpacity>
+          <Modal  onBackdropPress={()=>this.setState({openVoiceCommandsView:false})} useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.coffeeShopModal}  animationIn = {'slideInUp'} animationOut={'slideOutDown'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.openVoiceCommandsView}> 
+            <View style={styles.billingWindowStyle}>
+            <Text>Coming soon</Text>      
+          </View>
+        </Modal>
+        </View>
         <View style={styles.footerLine}/>
         <View style={[styles.twoViewsStartEndContainer,{padding:15}]}>
         <FontAwesome
@@ -2099,6 +2204,7 @@ async setExpensesOfPastMonth(month){
           </View>
       </Modal>
       </View>
+      { this.state.areAdsRemoved != 'true' &&
       <View style={[styles.twoViewsStartEndContainer,{padding:15}]}>
         <FontAwesome
        style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}} icon={SolidIcons.ad}/>
@@ -2111,6 +2217,7 @@ async setExpensesOfPastMonth(month){
           </View>
       </Modal>
       </View>
+      }
       <View style={styles.footerLine}/>
 
       <View style={[styles.twoViewsStartEndContainer,{padding:15}]}>
@@ -2120,7 +2227,12 @@ async setExpensesOfPastMonth(month){
             <Text style={styles.drawerButtonText}>{I18n.t("ReviewTutorial")}</Text>
           </TouchableOpacity>
       </View>
+      
       <View style={[styles.footerLine]}/>
+      <View style={{height:100}}></View>
+      </View>
+      </ScrollView>
+
      </View>
       
       <View style={styles.drawerExitView}>
@@ -2129,6 +2241,7 @@ async setExpensesOfPastMonth(month){
       </TouchableOpacity>
       </View>
       </View>
+
       </View>
     );
   };
@@ -3121,7 +3234,7 @@ isValid(date:Date) {
      //console.log(error);
    }
  }
- 
+
  
 
 // //DE KSERW PWS DOYLEVEI

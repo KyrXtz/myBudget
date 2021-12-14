@@ -1,4 +1,12 @@
 [
+    {"c": "fas fa-wallet", "l": "Adjust"},
+    {"c": "fas fa-coffee", "l": "Adjust"},
+    {"c": "fas fa-utensils", "l": "Adjust"},
+    {"c": "fas fa-shopping-cart", "l": "Adjust"},
+    {"c": "fas fa-money-check-alt", "l": "Adjust"},
+    {"c": "fas fa-tshirt", "l": "Adjust"},
+    {"c": "fas fa-gas-pump", "l": "Adjust"},
+    {"c": "fas fa-bus", "l": "Adjust"},
     {"c": "fa-adjust", "l": "Adjust"},
     {"c": "fa-ambulance", "l": "Ambulance"},
     {"c": "fa-anchor", "l": "Anchor"},

@@ -111,7 +111,11 @@
     "AmountOver":"Amount over budget:",
     "AlreadyRated":"I have already rated",
     "Maybelater":"Maybe later",
-    "YesPlease":"Yes, please!"
+    "YesPlease":"Yes, please!",
+    "IncomesHeader":"Incomes",
+    "FixedCostsHeader":"Fixed Costs",
+    "SavingsHeader":"Savings",
+    "VoiceCommandsHeader":"Voice Commands"
 
 
 

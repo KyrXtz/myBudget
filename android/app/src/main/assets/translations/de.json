@@ -111,7 +111,13 @@
     "AmountOver": "Betrag über dem Budget:",
     "AlreadyRated": "Ich habe bereits bewertet",
     "Maybelater": "Vielleicht später",
-    "YesPlease": "Ja, bitte!"
+    "YesPlease": "Ja, bitte!",
+    "IncomesHeader":"Incomes",
+    "FixedCostsHeader":"Fixed Costs",
+    "SavingsHeader":"Savings",
+    "VoiceCommandsHeader":"Voice Commands"
+
+
 
 
 
