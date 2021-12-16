@@ -1,5 +1,5 @@
 import React from "react"
-import { TouchableOpacity,View, StyleSheet, Text } from "react-native"
+import { TouchableOpacity,View, StyleSheet, Text ,Image} from "react-native"
 import Button from "./android/app/src/lib/components/Button"
 import useInAppPurchase from "./android/app/src/lib/custom_hooks/useInAppPurchase"
 import {withIAP} from 'react-native-iap';
@@ -22,6 +22,7 @@ export const Billing = () => {
     connectionErrorMsg,
     buySmallCoffee,
     buyBigCoffee,
+    buyProCheck
   } = useInAppPurchase();
   return (
     <View style={styles.container}>
@@ -39,13 +40,13 @@ export const Billing = () => {
       ) : null} */}
 
       <View   style={styles.rowContainer}>
-      <TouchableOpacity onPress={buySmallCoffee}>
+      {/* <TouchableOpacity onPress={buySmallCoffee}>
       <FontAwesome
             style={styles.iconStyle}
 
             icon={SolidIcons.coffee}
       />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
       <TouchableOpacity onPress={async ()=>{
           let openInPlayStore = await storageGet('hasReviewdInApp');
           let openInPS = false;
@@ -75,20 +76,21 @@ export const Billing = () => {
           })
         }}>
       <FontAwesome
-            style={[styles.iconStyle,{marginTop:-5}]}
+            style={[styles.iconStyle]}
 
             icon={BrandIcons.googlePlay}
       />
       </TouchableOpacity>
-      <TouchableOpacity onPress={buyBigCoffee}>
-      <FontAwesome
-            style={[styles.iconStyle,{marginTop:-10}]}
-
-            icon={SolidIcons.mugHot}
-      />
+      <TouchableOpacity onPress={buyProCheck}>
+      <Image style={{height:40,width:40,resizeMode:'center',alignSelf:'flex-end'}}  source={require('./android/app/src/main/assets/playstoregraphics/proicon.png')}/>
       </TouchableOpacity>
       </View>
+      {isFullAppPurchased ? (
+        <Text style={styles.thankyou}>{I18n.t('RemoveAdsEndMessage')}</Text>
+      ) : <View>
       <Text style={styles.thankyou}>{I18n.t('ThankYou')}</Text>
+
+      </View>}
       <Text></Text>
       <Text></Text>
       <Text style={styles.warningSubText}>{I18n.t('PaymentsByGoogle')}</Text>
@@ -120,6 +122,7 @@ const styles = StyleSheet.create({
       
       backgroundColor: "transparent",
       padding: 16,
+      width:'100%'
     },
     msg: {
       fontSize: 20,

@@ -78,7 +78,7 @@
     "PerDay":"/Tag",
     "HowMuchDidYouSpendTodayQuestion": "Wie viel haben Sie heute ausgegeben?",
     "Update": "Widget aktualisieren",
-    "ThankYou": "Wenn Sie uns unterstützen möchten, können Sie eine Bewertung und eine Rezension in Google Play hinterlassen oder unseren Entwicklern einen Kaffee spendieren. Vertrauen Sie uns, sie brauchen es!",
+    "ThankYou": "Wenn Sie uns unterstützen möchten, können Sie eine Bewertung und eine Rezension in Google Play hinterlassen oder die Pro-Version der App kaufen, mit der Sie alle Funktionen auf Lebenszeit freischalten! Wenn Sie die Pro-Version in der Vergangenheit gekauft haben, tippen Sie auf die Schaltfläche, um Ihre Lizenz sofort abzurufen.",
     "OpenCoffeeShop": "Zeigen Sie Ihre Unterstützung!",
     "ChangeLanguage": "Sprache ändern",
     "ChangeCurrency": "Währung ändern",
@@ -112,10 +112,10 @@
     "AlreadyRated": "Ich habe bereits bewertet",
     "Maybelater": "Vielleicht später",
     "YesPlease": "Ja, bitte!",
-    "IncomesHeader":"Incomes",
-    "FixedCostsHeader":"Fixed Costs",
-    "SavingsHeader":"Savings",
-    "VoiceCommandsHeader":"Voice Commands"
+    "IncomesHeader":"Einkünfte",
+    "FixedCostsHeader":"Fixe Kosten",
+    "SavingsHeader":"Ersparnisse",
+    "VoiceCommandsHeader":"Sprachbefehle"
 
 
 

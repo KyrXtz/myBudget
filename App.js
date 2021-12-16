@@ -247,6 +247,7 @@ const locales = RNLocalize.getLocales();
        openSettings:false,
        isEditingEuroState:false,
        areAdsRemoved:'false',
+       isPro :'false',
        daysPassed:0,
        stopShowingPromptToRate:'false',
        dataSource : "",
@@ -307,6 +308,8 @@ const locales = RNLocalize.getLocales();
     //this.setState({ debug: "debug" }) ;
      //await storageSet('RemovedAds','false');
     // const latestVersion = await VersionCheck.getLatestVersion()     
+         //await storageSet('IsPro','false');
+
     let currentBuildNo = VersionCheck.getCurrentBuildNumber();
     let savedBuildNo = await storageGet('CurrentBuildNo');
     if(savedBuildNo != currentBuildNo){
@@ -406,12 +409,13 @@ const locales = RNLocalize.getLocales();
      }
 
      let _areAdsRemoved = await storageGet('RemovedAds');
+     let _isPro = await storageGet('IsPro');
      let _daysPassed =parseInt( await storageGet('DaysPassed'));
      let _stopShowingPromptToRate = await storageGet('stopShowingPromptToRate');
      //ena modal k einai ok to prompt to rate
      
      console.log('ARE ADS REMOVE'+_areAdsRemoved)
-     this.setState({markedDates:_markedDates,dataSourcePerDay:null,dataSource:value9,savingsState:value8,isEditingEuroState:false,newSpent:'0',openSettings:false,openCurrencySelect:false,openCategoriesSelect:false,openLanguageSelect:false,openCoffeeShop:false,removeAdsShop:false,closeModal1:false,closeModal2:false,closeModal3:false,moniesState:value7,spentMonthState: value6,fullDatePaydayState:value5, startingEuroState: value4 ,euroState: value1, paydayState: value2,spentTodayState: value3 , open: false ,cardTutorial:cardTutorial,tutorialViewd:tut,idOfTutToShow:0 , xPx:0,yPx:0,buttonModal1:false,buttonModal2:false,buttonModal3:false,areAdsRemoved:_areAdsRemoved,daysPassed:_daysPassed,stopShowingPromptToRate:_stopShowingPromptToRate, swiperIndex:0,selectedCategoryBtn:0,tutorialText:I18n.t('TutorialText1')}) ;
+     this.setState({markedDates:_markedDates,dataSourcePerDay:null,dataSource:value9,savingsState:value8,isEditingEuroState:false,newSpent:'0',openSettings:false,openCurrencySelect:false,openCategoriesSelect:false,openLanguageSelect:false,openCoffeeShop:false,removeAdsShop:false,closeModal1:false,closeModal2:false,closeModal3:false,moniesState:value7,spentMonthState: value6,fullDatePaydayState:value5, startingEuroState: value4 ,euroState: value1, paydayState: value2,spentTodayState: value3 , open: false ,cardTutorial:cardTutorial,tutorialViewd:tut,idOfTutToShow:0 , xPx:0,yPx:0,buttonModal1:false,buttonModal2:false,buttonModal3:false,areAdsRemoved:_areAdsRemoved,isPro:_isPro,daysPassed:_daysPassed,stopShowingPromptToRate:_stopShowingPromptToRate, swiperIndex:0,selectedCategoryBtn:0,tutorialText:I18n.t('TutorialText1')}) ;
      if(this.state.tutorialViewd == 'false'){
       this.setState({tutorialViewd:'false'});
       intervalId =  setInterval(() => {
@@ -1776,7 +1780,10 @@ render() {
      }
     }
    
- 
+ async closeCoffeeShop(){
+   let _isPro = await storageGet('IsPro');
+  this.setState({openCoffeeShop:false,isPro:_isPro});
+ }
  hideThisAd1 = () =>{
    console.log('AD HIIDDEN 1')
    this.setState({hideThisAd1:true});
@@ -2034,7 +2041,7 @@ async setExpensesOfPastMonth(month){
 handleScroll (event){
  //const positionX = event.nativeEvent.contentOffset.x;
   positionYRef = event.nativeEvent.contentOffset.y;
-  console.log(positionYRef);
+  //console.log(positionYRef);
 };
 
    settingsMenuContent = () => {
@@ -2046,11 +2053,12 @@ handleScroll (event){
         <Text style={{fontWeight:'600',fontSize:20,color:'#3d3d3d',height:'10%',alignSelf:'center',textAlignVertical:'bottom'}}>{I18n.t("AppName")}</Text>
         <Text style={{fontWeight:'300',fontSize:15,color:'#8d8d8d',alignSelf:'center',textAlignVertical:'bottom',alignSelf:'center'}}>{I18n.t("AppSubName")}</Text>
         <View style={styles.footerLine}/>
-        <ScrollView ref={ref => {this._drawerScrollRef = ref}} onScroll={(e) => this.handleScroll(e)}  scrollEventThrottle={16} onTouchStart={e=> this.touchY = e.nativeEvent.pageY}
+        <ScrollView ref={ref => {this._drawerScrollRef = ref}} onScroll={(e) => this.handleScroll(e)}  scrollEventThrottle={16} onTouchStart={e=> {this.touchY = e.nativeEvent.pageY
+        this.startTime = e.nativeEvent.timestamp}}
         
         onTouchMove={e => {
                   if (this.touchY - e.nativeEvent.pageY > 20 || this.touchY - e.nativeEvent.pageY < -20){
-                    console.log('Swiped up MOVE')
+                    //console.log('Swiped up MOVE')
                     //console.log(this._drawerScrollRef)
                     this._drawerScrollRef.scrollTo({ x: 0, y: positionYRef+(0.1*(this.touchY - e.nativeEvent.pageY)) , animated: false })
                   }
@@ -2058,9 +2066,15 @@ handleScroll (event){
                     
                 }}
                 onTouchEnd={e => {
-                  if (this.touchY - e.nativeEvent.pageY > 20)
+                  
+                  
+                  //console.log(e.nativeEvent.timestamp - this.startTime);
+                  //console.log(this.touchYend);
+                  if ((this.touchY - e.nativeEvent.pageY > 100 ||  this.touchY - e.nativeEvent.pageY < -100) && (e.nativeEvent.timestamp - this.startTime)<130){
                     console.log('Swiped up END')
-                    //this._drawerScrollRef.scrollTo({ x: 0, y: positionYRef+10, animated: true })
+                    //console.log(this.touchY - e.nativeEvent.pageY)
+                    this._drawerScrollRef.scrollTo({ x: 0, y: positionYRef+((this.touchY - e.nativeEvent.pageY)*2) , animated: true })
+                  }
                     //ΤTODO 
                     //NA DW AN EXEI GRIGORO SWIPE, KAI NA TOY KANW KI ALLO SCROLL
 
@@ -2068,40 +2082,74 @@ handleScroll (event){
                 }}>
           <View >
           <View style={[styles.twoViewsStartEndContainer,{padding:15}]}>
-        <ProBanner></ProBanner>
+        <ProBanner isPro={this.state.isPro}></ProBanner>
          <FontAwesome
        style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}} icon={SolidIcons.handHoldingUsd}/>
         <TouchableOpacity  onPress={()=>this.setState({openIncomesView:true})} >
             <Text style={styles.drawerButtonText}>{I18n.t("IncomesHeader")}</Text>
           </TouchableOpacity>
+          {this.state.isPro!='true' &&
           <Modal  onBackdropPress={()=>this.setState({openIncomesView:false})} useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.coffeeShopModal}  animationIn = {'slideInUp'} animationOut={'slideOutDown'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.openIncomesView}> 
             <View style={styles.billingWindowStyle}>
-          <Text>Coming soon</Text>      
+             <Text style={styles.modalMainViewSubHeader}>THIS IS PRO FEATURE</Text>        
+             </View>
+          </Modal>
+          }
+          {this.state.isPro == 'true' && 
+          <Modal  onBackdropPress={()=>this.setState({openIncomesView:false})} useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.coffeeShopModal}  animationIn = {'slideInUp'} animationOut={'slideOutDown'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.openIncomesView}> 
+            <View style={styles.billingWindowStyle}>
+            <FontAwesome style={[styles.iconStyle,{position:'absolute',right:20}]} icon={SolidIcons.handHoldingUsd}/>
+            <Text style={styles.sideWindowTextBold}>{I18n.t("IncomesHeader")}</Text>
+            <Text style={styles.sideWindowTextFaint}>Set your incomes</Text>                          
           </View>
         </Modal>
+        }
         </View>
         <View style={[styles.twoViewsStartEndContainer,{padding:15}]}>
-        <ProBanner></ProBanner>
+        <ProBanner isPro={this.state.isPro}></ProBanner>
          <FontAwesome
        style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}} icon={SolidIcons.fileInvoiceDollar}/>
         <TouchableOpacity  onPress={()=>this.setState({openFixedCostsView:true})} >
             <Text style={styles.drawerButtonText}>{I18n.t("FixedCostsHeader")}</Text>
           </TouchableOpacity>
+          {this.state.isPro!='true' &&
           <Modal  onBackdropPress={()=>this.setState({openFixedCostsView:false})} useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.coffeeShopModal}  animationIn = {'slideInUp'} animationOut={'slideOutDown'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.openFixedCostsView}> 
             <View style={styles.billingWindowStyle}>
-            <Text>Coming soon</Text>      
+             <Text style={styles.modalMainViewSubHeader}>THIS IS PRO FEATURE</Text>        
+             </View>
+          </Modal>
+          }
+          {this.state.isPro == 'true' && 
+          <Modal  onBackdropPress={()=>this.setState({openFixedCostsView:false})} useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.coffeeShopModal}  animationIn = {'slideInUp'} animationOut={'slideOutDown'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.openFixedCostsView}> 
+            <View style={styles.billingWindowStyle}>
+            <FontAwesome style={[styles.iconStyle,{position:'absolute',right:20}]} icon={SolidIcons.fileInvoiceDollar}/>
+            <Text style={styles.sideWindowTextBold}>{I18n.t("FixedCostsHeader")}</Text>
+            <Text style={styles.sideWindowTextFaint}>Set your fixed costs</Text>                          
           </View>
         </Modal>
+        }
         </View>
         <View style={[styles.twoViewsStartEndContainer,{padding:15}]}>
-        <ProBanner></ProBanner>
+        <ProBanner isPro={this.state.isPro}></ProBanner>
          <FontAwesome
        style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}} icon={SolidIcons.piggyBank}/>
         <TouchableOpacity  onPress={()=>this.setState({openSavingsView:true})} >
             <Text style={styles.drawerButtonText}>{I18n.t("SavingsHeader")}</Text>
           </TouchableOpacity>
+          {this.state.isPro!='true' &&
           <Modal  onBackdropPress={()=>this.setState({openSavingsView:false})} useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.coffeeShopModal}  animationIn = {'slideInUp'} animationOut={'slideOutDown'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.openSavingsView}> 
             <View style={styles.billingWindowStyle}>
+             <Text style={styles.modalMainViewSubHeader}>THIS IS PRO FEATURE</Text>        
+             </View>
+
+          </Modal>
+          }
+          {this.state.isPro == 'true' && 
+          <Modal  onBackdropPress={()=>this.setState({openSavingsView:false})} useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.coffeeShopModal}  animationIn = {'slideInUp'} animationOut={'slideOutDown'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.openSavingsView}> 
+            <View style={styles.billingWindowStyle}>
+            <FontAwesome style={[styles.iconStyle,{position:'absolute',right:20}]} icon={SolidIcons.piggyBank}/>
+            <Text style={styles.sideWindowTextBold}>{I18n.t("SavingsHeader")}</Text>
+            <Text style={styles.sideWindowTextFaint}>Set your savings balances</Text>                
               {this.state.euroState != '' && this.state.euroState != null &&
               <Text style={styles.modalMainViewSubHeader}>{I18n.t('SavingsAmount')}</Text>        
               }
@@ -2129,10 +2177,25 @@ handleScroll (event){
               </View>              
               </View>
               } 
+              <View  style={styles.inputInfoColContainer}>
+              {(this.state.euroState!='' && this.state.euroState!=null)  &&
+              <Text style={styles.modalMainViewSubInfo}>{I18n.t('CurrentBalance')} {this.stringWithCorrectCurrencyPosition(this.getEuroStateWithCorrectDecimals())}</Text>
+              }
+              {/* {(this.state.startingEuroState!='' && this.state.startingEuroState!=null)  &&
+              <Text style={styles.modalMainViewSubInfo}>{I18n.t('StartingBalance')} {this.getEuroStateWithCorrectDecimals()} €</Text>
+              } */}
+              {(this.state.startingEuroState!='' && this.state.startingEuroState!=null)  &&
+              <Text style={styles.modalMainViewSubInfo}>{I18n.t('StartingBalance')} {this.stringWithCorrectCurrencyPosition(this.getStartingEuroStateWithCorrectDecimals())}</Text>
+              }
+              {(this.state.savingsState!='' && this.state.savingsState!=null && this.state.savingsState!='0' || refUpdateSetAmountAside == true)  &&
+              <Text style={styles.modalMainViewSubInfo}>{I18n.t('SavingsBalance')} {this.stringWithCorrectCurrencyPosition(this.getSavingsStateWithCorrectDecimals())}</Text>
+              }
+              </View>
               
                   
           </View>
         </Modal>
+        }
         </View>
         <View style={styles.footerLine}/>
          <View style={[styles.twoViewsStartEndContainer,{padding:15}]}>
@@ -2166,7 +2229,7 @@ handleScroll (event){
         </Modal>
         </View>
         <View style={[styles.twoViewsStartEndContainer,{padding:15}]}>
-        <ProBanner></ProBanner>
+        <ProBanner isPro={this.state.isPro}></ProBanner>
          <FontAwesome
        style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}} icon={SolidIcons.database}/>
         <TouchableOpacity  onPress={()=>this.setState({openCategoriesSelect:true})} >
@@ -2174,12 +2237,12 @@ handleScroll (event){
           </TouchableOpacity>
           <Modal  onBackdropPress={async ()=> await this.refreshCategoryIcons()} useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.coffeeShopModal}  animationIn = {'slideInUp'} animationOut={'slideOutDown'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.openCategoriesSelect}> 
             <View style={styles.billingWindowStyle}>
-          <CategoriesSelect changeCategories={this.changeCategories} categoryIcon0={categoryIcon0} categoryIcon1={categoryIcon1}categoryIcon2={categoryIcon2}categoryIcon3={categoryIcon3}categoryIcon4={categoryIcon4}categoryIcon5={categoryIcon5}categoryIcon6={categoryIcon6}categoryIcon7={categoryIcon7}/>       
+          <CategoriesSelect isPro={this.state.isPro} changeCategories={this.changeCategories} categoryIcon0={categoryIcon0} categoryIcon1={categoryIcon1}categoryIcon2={categoryIcon2}categoryIcon3={categoryIcon3}categoryIcon4={categoryIcon4}categoryIcon5={categoryIcon5}categoryIcon6={categoryIcon6}categoryIcon7={categoryIcon7}/>       
           </View>
         </Modal>
         </View>
         <View style={[styles.twoViewsStartEndContainer,{padding:15}]}>
-        <ProBanner></ProBanner>
+        <ProBanner isPro={this.state.isPro}></ProBanner>
          <FontAwesome
        style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}} icon={SolidIcons.commentDots}/>
         <TouchableOpacity  onPress={()=>this.setState({openVoiceCommandsView:true})} >
@@ -2198,7 +2261,7 @@ handleScroll (event){
        <TouchableOpacity  onPress={()=>this.setState({openCoffeeShop:true})} >
             <Text style={styles.drawerButtonText}>{I18n.t("OpenCoffeeShop")}</Text>
           </TouchableOpacity>
-       <Modal  onBackdropPress={()=>this.setState({openCoffeeShop:false})} useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.coffeeShopModal}  animationIn = {'slideInUp'} animationOut={'slideOutDown'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.openCoffeeShop}>
+       <Modal  onBackdropPress={()=>this.closeCoffeeShop()} useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.coffeeShopModal}  animationIn = {'slideInUp'} animationOut={'slideOutDown'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.openCoffeeShop}>
             <View style={[styles.billingWindowStyle]}>
           <Billing/>
           </View>
@@ -2227,6 +2290,7 @@ handleScroll (event){
             <Text style={styles.drawerButtonText}>{I18n.t("ReviewTutorial")}</Text>
           </TouchableOpacity>
       </View>
+      
       
       <View style={[styles.footerLine]}/>
       <View style={{height:100}}></View>
@@ -3395,6 +3459,18 @@ const deviceHeight =
     marginLeft:12,
     textAlignVertical:'center',
     color:'#000001',
+  },sideWindowTextBold:{
+    fontSize:22,
+    textAlignVertical:'center',
+    color:'#000001',
+    marginLeft:15
+  },
+  sideWindowTextFaint:{
+    marginLeft:15,
+    fontSize:13,
+    textAlignVertical:'center',
+    color:'#b3b3b3',
+    fontStyle:'italic'
   },
    text:{
      fontSize:22,

@@ -1,5 +1,5 @@
 import React from "react"
-import { TouchableOpacity,View, StyleSheet, Text, ScrollView } from "react-native"
+import { TouchableOpacity,View, StyleSheet, Text, ScrollView,Alert } from "react-native"
 import FontAwesome, {
   SolidIcons,
   RegularIcons,
@@ -14,35 +14,35 @@ import I18n from "i18n-js";
 import fontawesome from './android/app/src/main/assets/fontawesome.json'
 import AsyncStorage  from '@react-native-community/async-storage';
 
-export const CategoriesSelect = ({changeCategories,categoryIcon0,categoryIcon1,categoryIcon2,categoryIcon3,categoryIcon4,categoryIcon5,categoryIcon6,categoryIcon7}) => {
+export const CategoriesSelect = ({isPro,changeCategories,categoryIcon0,categoryIcon1,categoryIcon2,categoryIcon3,categoryIcon4,categoryIcon5,categoryIcon6,categoryIcon7}) => {
   console.log('HEYO')
   return (
     <ScrollView contentContainerStyle={{justifyContent:'center'}}>
       <View style={styles.rowContainer}>
         <Text style={styles.thankyou}>{I18n.t('Category')} 1</Text>
-        <CPicker categoryNo={0} categoryIcon={categoryIcon0 != null?categoryIcon0:'fas fa-wallet'}></CPicker>
+        <CPicker isPro ={isPro} categoryNo={0} categoryIcon={categoryIcon0 != null?categoryIcon0:'fas fa-wallet'}></CPicker>
       </View>
       <View style={styles.rowContainer}>
         <Text style={styles.thankyou}>{I18n.t('Category')} 2</Text>
-        <CPicker categoryNo={1} categoryIcon={categoryIcon1 != null?categoryIcon1:'fas fa-coffee'}></CPicker>
+        <CPicker isPro ={isPro}  categoryNo={1} categoryIcon={categoryIcon1 != null?categoryIcon1:'fas fa-coffee'}></CPicker>
       </View><View style={styles.rowContainer}>
         <Text style={styles.thankyou}>{I18n.t('Category')} 3</Text>
-        <CPicker categoryNo={2} categoryIcon={categoryIcon2 != null?categoryIcon2:'fas fa-utensils'}></CPicker>
+        <CPicker isPro ={isPro}  categoryNo={2} categoryIcon={categoryIcon2 != null?categoryIcon2:'fas fa-utensils'}></CPicker>
       </View><View style={styles.rowContainer}>
         <Text style={styles.thankyou}>{I18n.t('Category')} 4</Text>
-        <CPicker categoryNo={3} categoryIcon={categoryIcon3 != null?categoryIcon3:'fas fa-shopping-cart'}></CPicker>
+        <CPicker isPro ={isPro}  categoryNo={3} categoryIcon={categoryIcon3 != null?categoryIcon3:'fas fa-shopping-cart'}></CPicker>
       </View><View style={styles.rowContainer}>
         <Text style={styles.thankyou}>{I18n.t('Category')} 5</Text>
-        <CPicker categoryNo={4} categoryIcon={categoryIcon4 != null?categoryIcon4:'fas fa-money-check-alt'}></CPicker>
+        <CPicker isPro ={isPro}  categoryNo={4} categoryIcon={categoryIcon4 != null?categoryIcon4:'fas fa-money-check-alt'}></CPicker>
       </View><View style={styles.rowContainer}>
         <Text style={styles.thankyou}>{I18n.t('Category')} 6</Text>
-        <CPicker categoryNo={5} categoryIcon={categoryIcon5 != null?categoryIcon5:'fas fa-tshirt'}></CPicker>
+        <CPicker isPro ={isPro}  categoryNo={5} categoryIcon={categoryIcon5 != null?categoryIcon5:'fas fa-tshirt'}></CPicker>
       </View><View style={styles.rowContainer}>
         <Text style={styles.thankyou}>{I18n.t('Category')} 7</Text>
-        <CPicker categoryNo={6} categoryIcon={categoryIcon6 != null?categoryIcon6:'fas fa-gas-pump'}></CPicker>
+        <CPicker isPro ={isPro}  categoryNo={6} categoryIcon={categoryIcon6 != null?categoryIcon6:'fas fa-gas-pump'}></CPicker>
       </View><View style={styles.rowContainer}>
         <Text style={styles.thankyou}>{I18n.t('Category')} 8</Text>
-        <CPicker categoryNo={7} categoryIcon={categoryIcon7 != null?categoryIcon7:'fas fa-bus'}></CPicker>
+        <CPicker isPro ={isPro}  categoryNo={7} categoryIcon={categoryIcon7 != null?categoryIcon7:'fas fa-bus'}></CPicker>
       </View>
 
     </ScrollView>
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
       },
   })
 
-  export const CPicker =({categoryIcon,categoryNo})=>{
+  export const CPicker =({isPro,categoryIcon,categoryNo})=>{
     return(
       <CustomPicker modalAnimationType="slide"
       fieldTemplateProps={{backgroundColor:'red'},{backgroundColor:'blue'}}
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
               const { selectedItem, defaultText, getLabel, clear } = settings
               return (
                 <View>
-                {!selectedItem && (
+                {(!selectedItem) && (
                 <FontAwesome
                       style={styles.iconStyle}
                       icon={parseIconFromClassName(categoryIcon)}
@@ -147,10 +147,16 @@ const styles = StyleSheet.create({
                 )}
                 
                 
-                {selectedItem && (
+                {(selectedItem && isPro=='true') && (
                 <FontAwesome
                       style={styles.iconStyle}
                       icon={parseIconFromClassName(selectedItem.c)}
+                  />
+                )}
+                {(selectedItem && isPro!='true') && (
+                <FontAwesome
+                      style={styles.iconStyle}
+                      icon={parseIconFromClassName(categoryIcon)}
                   />
                 )}
                 </View>
@@ -165,9 +171,15 @@ const styles = StyleSheet.create({
                 )
               }}
             onValueChange={async (value) => {
-              console.log('Selected Item', value || 'No item were selected!');
-              console.log('categoryIcon'+categoryNo,value.c);
-              await AsyncStorage.setItem('categoryIcon'+categoryNo, value.c);
+              if(isPro=='true'){
+                console.log('Selected Item', value || 'No item were selected!');
+                console.log('categoryIcon'+categoryNo,value.c);
+                await AsyncStorage.setItem('categoryIcon'+categoryNo, value.c);
+              }else{
+                console.log('not pro')
+                Alert.alert('Warning','This is pro function!')
+              }
+              
 
             }}
           />

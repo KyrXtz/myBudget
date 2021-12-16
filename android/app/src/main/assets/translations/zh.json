@@ -29,8 +29,8 @@
     "UpdateStartingBalanceQuestion": "更新起始余额？",
     "UpdateCurrentBalanceQuestion": "更新当前余额？",
     "UpdateStartingBalanceFullQuestion": "你想更新你的起始余额吗？",
-    "PayDay": "Payday:",
-    "DaysLeft": "Days left:",
+    "PayDay": "赚钱日子的:",
+    "DaysLeft": "剩余天数:",
     "WhenAreYouGettingPaidQuestion": "你什么时候得到报酬？",
     "January":"一月",
     "February":"二月",
@@ -78,7 +78,7 @@
     "PerDay":"/ 天",
     "HowMuchDidYouSpendTodayQuestion":"你今天花了多少钱？",
     "Update":"更新小部件",
-    "ThankYou": "如果你想支持我们，你可以在谷歌游戏中留下评分和评论，或者给我们的开发者买杯咖啡,相信我们，他们需要它!",
+    "ThankYou":  "如果你想支持我们，你可以在google play留下评分和评论，或者购买专业版的应用程序，终身解锁其所有的功能！如果你在过去购买了专业版，点击按钮立即取回许可证。如果你过去已经购买了专业版，请点击按钮，立即取回你的许可证",
     "OpenCoffeeShop": "展示你的支持!",
     "ChangeLanguage": "改变语言",
     "ChangeCurrency": "改变货币",
@@ -112,10 +112,10 @@
     "AlreadyRated": "我已经评分了",
     "Maybelater":"也许以后",
     "YesPlease": "是的，请!",
-    "IncomesHeader":"Incomes",
-    "FixedCostsHeader":"Fixed Costs",
-    "SavingsHeader":"Savings",
-    "VoiceCommandsHeader":"Voice Commands"
+    "IncomesHeader":"收入",
+    "FixedCostsHeader":"固定成本",
+    "SavingsHeader":"储蓄",
+    "VoiceCommandsHeader":"语音命令"
 
 
 }
