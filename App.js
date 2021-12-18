@@ -2085,67 +2085,42 @@ handleScroll (event){
         <ProBanner isPro={this.state.isPro}></ProBanner>
          <FontAwesome
        style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}} icon={SolidIcons.handHoldingUsd}/>
-        <TouchableOpacity  onPress={()=>this.setState({openIncomesView:true})} >
+        <TouchableOpacity  onPress={()=>this.openIncomesView()} >
             <Text style={styles.drawerButtonText}>{I18n.t("IncomesHeader")}</Text>
           </TouchableOpacity>
-          {this.state.isPro!='true' &&
-          <Modal  onBackdropPress={()=>this.setState({openIncomesView:false})} useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.coffeeShopModal}  animationIn = {'slideInUp'} animationOut={'slideOutDown'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.openIncomesView}> 
-            <View style={styles.billingWindowStyle}>
-             <Text style={styles.modalMainViewSubHeader}>THIS IS PRO FEATURE</Text>        
-             </View>
-          </Modal>
-          }
-          {this.state.isPro == 'true' && 
-          <Modal  onBackdropPress={()=>this.setState({openIncomesView:false})} useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.coffeeShopModal}  animationIn = {'slideInUp'} animationOut={'slideOutDown'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.openIncomesView}> 
+          <Modal onBackdropPress={()=>this.closeIncomesView()} useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.coffeeShopModal}  animationIn = {'slideInUp'} animationOut={'slideOutDown'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.openIncomesView}> 
             <View style={styles.billingWindowStyle}>
             <FontAwesome style={[styles.iconStyle,{position:'absolute',right:20}]} icon={SolidIcons.handHoldingUsd}/>
             <Text style={styles.sideWindowTextBold}>{I18n.t("IncomesHeader")}</Text>
             <Text style={styles.sideWindowTextFaint}>Set your incomes</Text>                          
           </View>
         </Modal>
-        }
+        
         </View>
         <View style={[styles.twoViewsStartEndContainer,{padding:15}]}>
         <ProBanner isPro={this.state.isPro}></ProBanner>
          <FontAwesome
        style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}} icon={SolidIcons.fileInvoiceDollar}/>
-        <TouchableOpacity  onPress={()=>this.setState({openFixedCostsView:true})} >
+        <TouchableOpacity  onPress={()=>this.openFixedCostsView()} >
             <Text style={styles.drawerButtonText}>{I18n.t("FixedCostsHeader")}</Text>
           </TouchableOpacity>
-          {this.state.isPro!='true' &&
-          <Modal  onBackdropPress={()=>this.setState({openFixedCostsView:false})} useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.coffeeShopModal}  animationIn = {'slideInUp'} animationOut={'slideOutDown'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.openFixedCostsView}> 
-            <View style={styles.billingWindowStyle}>
-             <Text style={styles.modalMainViewSubHeader}>THIS IS PRO FEATURE</Text>        
-             </View>
-          </Modal>
-          }
-          {this.state.isPro == 'true' && 
-          <Modal  onBackdropPress={()=>this.setState({openFixedCostsView:false})} useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.coffeeShopModal}  animationIn = {'slideInUp'} animationOut={'slideOutDown'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.openFixedCostsView}> 
+          <Modal  onBackdropPress={()=>this.closeFixedCostsView()} useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.coffeeShopModal}  animationIn = {'slideInUp'} animationOut={'slideOutDown'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.openFixedCostsView}> 
             <View style={styles.billingWindowStyle}>
             <FontAwesome style={[styles.iconStyle,{position:'absolute',right:20}]} icon={SolidIcons.fileInvoiceDollar}/>
             <Text style={styles.sideWindowTextBold}>{I18n.t("FixedCostsHeader")}</Text>
             <Text style={styles.sideWindowTextFaint}>Set your fixed costs</Text>                          
           </View>
         </Modal>
-        }
+        
         </View>
         <View style={[styles.twoViewsStartEndContainer,{padding:15}]}>
         <ProBanner isPro={this.state.isPro}></ProBanner>
          <FontAwesome
        style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}} icon={SolidIcons.piggyBank}/>
-        <TouchableOpacity  onPress={()=>this.setState({openSavingsView:true})} >
+        <TouchableOpacity  onPress={async ()=> await this.openSavingsView()} >
             <Text style={styles.drawerButtonText}>{I18n.t("SavingsHeader")}</Text>
-          </TouchableOpacity>
-          {this.state.isPro!='true' &&
-          <Modal  onBackdropPress={()=>this.setState({openSavingsView:false})} useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.coffeeShopModal}  animationIn = {'slideInUp'} animationOut={'slideOutDown'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.openSavingsView}> 
-            <View style={styles.billingWindowStyle}>
-             <Text style={styles.modalMainViewSubHeader}>THIS IS PRO FEATURE</Text>        
-             </View>
-
-          </Modal>
-          }
-          {this.state.isPro == 'true' && 
-          <Modal  onBackdropPress={()=>this.setState({openSavingsView:false})} useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.coffeeShopModal}  animationIn = {'slideInUp'} animationOut={'slideOutDown'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.openSavingsView}> 
+          </TouchableOpacity>        
+          <Modal  onBackdropPress={async ()=> await this.closeSavingsView()} useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.coffeeShopModal}  animationIn = {'slideInUp'} animationOut={'slideOutDown'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.openSavingsView}> 
             <View style={styles.billingWindowStyle}>
             <FontAwesome style={[styles.iconStyle,{position:'absolute',right:20}]} icon={SolidIcons.piggyBank}/>
             <Text style={styles.sideWindowTextBold}>{I18n.t("SavingsHeader")}</Text>
@@ -2195,7 +2170,7 @@ handleScroll (event){
                   
           </View>
         </Modal>
-        }
+        
         </View>
         <View style={styles.footerLine}/>
          <View style={[styles.twoViewsStartEndContainer,{padding:15}]}>
@@ -2237,7 +2212,7 @@ handleScroll (event){
           </TouchableOpacity>
           <Modal  onBackdropPress={async ()=> await this.refreshCategoryIcons()} useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.coffeeShopModal}  animationIn = {'slideInUp'} animationOut={'slideOutDown'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.openCategoriesSelect}> 
             <View style={styles.billingWindowStyle}>
-          <CategoriesSelect isPro={this.state.isPro} changeCategories={this.changeCategories} categoryIcon0={categoryIcon0} categoryIcon1={categoryIcon1}categoryIcon2={categoryIcon2}categoryIcon3={categoryIcon3}categoryIcon4={categoryIcon4}categoryIcon5={categoryIcon5}categoryIcon6={categoryIcon6}categoryIcon7={categoryIcon7}/>       
+          <CategoriesSelect callback={()=>this.buyProVersionPrompt()} isPro={this.state.isPro} changeCategories={this.changeCategories} categoryIcon0={categoryIcon0} categoryIcon1={categoryIcon1}categoryIcon2={categoryIcon2}categoryIcon3={categoryIcon3}categoryIcon4={categoryIcon4}categoryIcon5={categoryIcon5}categoryIcon6={categoryIcon6}categoryIcon7={categoryIcon7}/>       
           </View>
         </Modal>
         </View>
@@ -2309,6 +2284,79 @@ handleScroll (event){
       </View>
     );
   };
+ 
+  buyProVersionPrompt(){
+    Alert.alert(
+      "Pro version only!",
+      "This feature is not available in the free version. Are you interested in discovering all the features the pro version has to offer?",
+      [
+         // The "No" button
+        // Does nothing but dismiss the dialog when tapped
+        {
+          text: I18n.t("No"),
+          onPress: () =>{
+            
+          }
+          
+        },
+        // The "Yes" button
+        {
+          text: I18n.t("Yes"),
+          onPress:  () => {
+            this.setState({openCoffeeShop:true})
+          },
+        },
+       
+      ]
+    );
+    // this.setState({openCategoriesSelect:false})
+
+  }
+  openSavingsView(){
+    refEuroState = this.state.euroState;
+    refSavingsState = this.state.savingsState;
+    this.setState({openSavingsView:true})
+
+  }
+  async closeSavingsView(){
+    let isPro = await storageGet("IsPro");
+    if(isPro !='true'){
+      this.state.euroState =refEuroState;
+      this.state.savingsState = refSavingsState;
+      this.setState({euroState:this.state.euroState,savingsState:this.state.savingsState,openSavingsView:false});
+      this.buyProVersionPrompt();
+    }else{
+      this.setState({openSavingsView:false})
+    }
+  }
+  openIncomesView(){
+    
+    this.setState({openIncomesView:true})
+
+  }
+  async closeIncomesView(){
+    let isPro = await storageGet("IsPro");
+    if(isPro !='true'){
+      this.setState({openIncomesView:false});
+      this.buyProVersionPrompt();
+    }else{
+      this.setState({openIncomesView:false})
+    }
+  }
+  openFixedCostsView(){
+    
+    this.setState({openFixedCostsView:true})
+
+  }
+  async closeFixedCostsView(){
+    let isPro = await storageGet("IsPro");
+    if(isPro !='true'){
+      this.setState({openFixedCostsView:false});
+      this.buyProVersionPrompt();
+    }else{
+      this.setState({openFixedCostsView:false})
+    }
+  }
    changeLanguage = async (languageCode)=>{
     I18n.locale = languageCode;
     await storageSet('LanguageCode',languageCode);
