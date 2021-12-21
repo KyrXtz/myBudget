@@ -32,7 +32,8 @@
    Alert,
    ActivityIndicator,
    AppState,
-   PanResponder  
+   PanResponder,
+   KeyboardAvoidingView  
  } from 'react-native';
  import CalendarPicker from 'react-native-calendar-picker';
  import Modal from "react-native-modal";
@@ -138,11 +139,13 @@ let checkIfSpentTodayEdited='';
 let checkIfSavingsEdited ='';
 let intervalId = 0;
 let setPointerEventsOfDrawer = 'none';
+let setPointerEventsOfDesc = 'none';
 let selectedLocale ='';
 let refCurrency = '';
 let refMinDate = new Date();
 let refExpensesHistoryJson = '';
 let refspentMonthHistory ='';
+let refSavingsData ='';
 let categoryIcon0 = null;
 let categoryIcon1 = null;
 let categoryIcon2 = null;
@@ -207,6 +210,8 @@ const locales = RNLocalize.getLocales();
    _calendarRef;
    _swiperRef;
    _drawerScrollRef;
+   _textInputRefs : Array = [];
+   _descRef = null;
    constructor(props) {
      super(props);
      this.state = { 
@@ -252,9 +257,11 @@ const locales = RNLocalize.getLocales();
        stopShowingPromptToRate:'false',
        dataSource : "",
        dataSourcePerDay : "",
+       dataSourceSavings: "",
        markedDates: {},
        appState: AppState.currentState,
-       selectedCategoryBtn:0
+       selectedCategoryBtn:0,
+       savingsValues : []
 
 
 
@@ -369,6 +376,7 @@ const locales = RNLocalize.getLocales();
 
      let value9 = await this.fetchJsonExpenses();
      let value10 = await storageGet('FirstDate');
+     let value11 = JSON.parse(await storageGet('DataSourceSavings'));
      refExpensesHistoryJson = await storageGet('ExpensesHistoryJson');
      if(value10 != '' && value10 !=null){
        refMinDate = new Date(value10);
@@ -415,7 +423,7 @@ const locales = RNLocalize.getLocales();
      //ena modal k einai ok to prompt to rate
      
      console.log('ARE ADS REMOVE'+_areAdsRemoved)
-     this.setState({markedDates:_markedDates,dataSourcePerDay:null,dataSource:value9,savingsState:value8,isEditingEuroState:false,newSpent:'0',openSettings:false,openCurrencySelect:false,openCategoriesSelect:false,openLanguageSelect:false,openCoffeeShop:false,removeAdsShop:false,closeModal1:false,closeModal2:false,closeModal3:false,moniesState:value7,spentMonthState: value6,fullDatePaydayState:value5, startingEuroState: value4 ,euroState: value1, paydayState: value2,spentTodayState: value3 , open: false ,cardTutorial:cardTutorial,tutorialViewd:tut,idOfTutToShow:0 , xPx:0,yPx:0,buttonModal1:false,buttonModal2:false,buttonModal3:false,areAdsRemoved:_areAdsRemoved,isPro:_isPro,daysPassed:_daysPassed,stopShowingPromptToRate:_stopShowingPromptToRate, swiperIndex:0,selectedCategoryBtn:0,tutorialText:I18n.t('TutorialText1')}) ;
+     this.setState({markedDates:_markedDates,dataSourceSavings:value11,dataSourcePerDay:null,dataSource:value9,savingsState:value8,isEditingEuroState:false,newSpent:'0',openSettings:false,openCurrencySelect:false,openCategoriesSelect:false,openLanguageSelect:false,openCoffeeShop:false,removeAdsShop:false,closeModal1:false,closeModal2:false,closeModal3:false,moniesState:value7,spentMonthState: value6,fullDatePaydayState:value5, startingEuroState: value4 ,euroState: value1, paydayState: value2,spentTodayState: value3 , open: false ,cardTutorial:cardTutorial,tutorialViewd:tut,idOfTutToShow:0 , xPx:0,yPx:0,buttonModal1:false,buttonModal2:false,buttonModal3:false,areAdsRemoved:_areAdsRemoved,isPro:_isPro,daysPassed:_daysPassed,stopShowingPromptToRate:_stopShowingPromptToRate, swiperIndex:0,selectedCategoryBtn:0,tutorialText:I18n.t('TutorialText1')}) ;
      if(this.state.tutorialViewd == 'false'){
       this.setState({tutorialViewd:'false'});
       intervalId =  setInterval(() => {
@@ -1078,7 +1086,12 @@ render() {
           {/* { end TUTORIAL} */}
 
          <View style={styles.colContainer}>
-         <Text style={styles.textBold}>{I18n.t('Balance')} {this.stringWithCorrectCurrencyPosition(this.getEuroStateWithCorrectDecimals())}</Text>  
+         { parseFloat(this.state.euroState) <0 &&
+         <Text style={[styles.textBold,{color:'#FF2D00DD'}]}>{I18n.t('Balance')} {this.stringWithCorrectCurrencyPosition(this.getEuroStateWithCorrectDecimals())}</Text>
+        }
+         { parseFloat(this.state.euroState) >=0 &&
+         <Text style={styles.textBold}>{I18n.t('Balance')} {this.stringWithCorrectCurrencyPosition(this.getEuroStateWithCorrectDecimals())}</Text>
+        }   
          <Text style={styles.textFaint}>{I18n.t('StartingBalance')} {this.stringWithCorrectCurrencyPosition(this.getStartingEuroStateWithCorrectDecimals())}</Text>
          {(this.state.savingsState!='' && this.state.savingsState!=null && this.state.savingsState!='0')  &&
          <Text style={styles.textFaint}>{I18n.t('SavingsBalance')} {this.stringWithCorrectCurrencyPosition(this.getSavingsStateWithCorrectDecimals())}</Text>
@@ -2121,40 +2134,85 @@ handleScroll (event){
             <Text style={styles.drawerButtonText}>{I18n.t("SavingsHeader")}</Text>
           </TouchableOpacity>        
           <Modal  onBackdropPress={async ()=> await this.closeSavingsView()} useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.coffeeShopModal}  animationIn = {'slideInUp'} animationOut={'slideOutDown'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.openSavingsView}> 
-            <View style={styles.billingWindowStyle}>
+            <View style={[styles.billingWindowStyle,{justifyContent:'space-around'}]}>
             <FontAwesome style={[styles.iconStyle,{position:'absolute',right:20}]} icon={SolidIcons.piggyBank}/>
             <Text style={styles.sideWindowTextBold}>{I18n.t("SavingsHeader")}</Text>
-            <Text style={styles.sideWindowTextFaint}>Set your savings balances</Text>                
-              {this.state.euroState != '' && this.state.euroState != null &&
-              <Text style={styles.modalMainViewSubHeader}>{I18n.t('SavingsAmount')}</Text>        
-              }
+            <Text style={styles.sideWindowTextFaint}>Set your savings balances</Text>
               {this.state.euroState == '' || this.state.euroState == null &&
               <Text style={styles.modalMainViewSubHeader}>SET BALANCE FIRST</Text>        
               }
-              {this.state.euroState != '' && this.state.euroState != null  &&
-              <View style={styles.inputRowContainer}>
-              <View style={styles.iconContainer}>
-              <FontAwesome style={styles.inputIcon} icon={this.correctFontAwesomeCurrencyIcon()}/>
-              </View>
-              <View style={styles.inputContainer}>
-              <TextInput 
-                  style={styles.input}
-                  keyboardType='numeric'
-                  onChangeText={(text)=> this.onChanged1Savings(text)}
-                  defaultValue={this.state.savingsState}
-                  value={this.state.savingsState}
-                  onTouchStart={()=>this.startEdit1Savings()}
-                  maxLength={10}  //setting limit of input
-                  onEndEditing={()=>this.endEdit1Savings()}
-                  // onTouchStart={()=>this.startEdit1()}
+              
+              {this.state.dataSourceSavings!=null && this.state.dataSourceSavings.length !=0 && this.state.euroState != '' && this.state.euroState != null &&
+                <ScrollView style={{  maxHeight:'70%' }}>
+                    {/* <Text>timestamp</Text>
+                    <Text>amount</Text>
+                    <Text>delete button</Text>     */}  
+                    {/* <FlatList style={styles.ExpensesList}
+                      data={this.state.dataSource}
+                      renderItem={this.renderExpensesJsonList}
+                    /> */}
+                    
+                { this.state.dataSourceSavings.map((item) => (
+                  <View>
+                  <Text style={styles.modalMainViewSubHeader}>{I18n.t('SavingsAmount')}</Text>        
+                  
+                  <View style={styles.inputRowContainer}>
+                  <View style={styles.iconContainer}>
+                  <FontAwesome style={styles.inputIcon} icon={this.correctFontAwesomeCurrencyIcon()}/>
+                  </View>
+                  <View style={styles.inputContainer}>
+                  <TextInput 
+                      style={styles.input}
+                      keyboardType='numeric'
+                      // onChangeText={(text)=> this.onChanged1Savings(text)}
+                      defaultValue={item.Amount}
+                     //value={this.state.savingsState}
+                      //onTouchStart={()=>this.startEdit1Savings()}
+                      maxLength={10}  //setting limit of input
+                     // onEndEditing={()=>this.endEdit1Savings()}
+                      // onTouchStart={()=>this.startEdit1()}
+                      onChangeText={(text)=> this.onChangeGenericSavings(text,item.Number)}
+                      onEndEditing={()=>this.onEndEditGenericSavings(item.Number)}
+                      value={this.state.savingsValues[item.Number]}
 
-              />
-              </View>              
-              </View>
-              } 
+
+                  />
+                  </View>                              
+                  </View>
+                  <View style={[styles.rowContainer,{paddingVertical:0,paddingHorizontal:20}]}>
+                    <View style={styles.descriptionInputContainer} 
+                    //pointerEvents={setPointerEventsOfDesc}
+                    >
+
+                    <TextInput
+                      style={styles.descriptionInput}
+                      maxLength={30}
+                      defaultValue={item.Description}
+                     // onFocus={()=>this.setTouchOfDescriptionInput(true)}                     
+                      ref={ref => {this._textInputRefs[item.Number] = ref}} 
+                      onChangeText={(text)=> this.onChangeGenericSavingsDescription(text)}
+                      onEndEditing={()=>this.onEndEditGenericSavingsDescription(item.Number)}
+                      placeholder='Description'
+                      
+                    />
+                    </View>
+                    <TouchableOpacity onPress={()=>this._textInputRefs[item.Number].focus()}>
+                    <FontAwesome style={styles.editIcon} icon={SolidIcons.edit}></FontAwesome>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={()=>this.deleteSavingsField(item.Number)}>
+                    <FontAwesome style={styles.editIcon} icon={SolidIcons.trash}></FontAwesome>
+                    </TouchableOpacity>
+                  </View>  
+                  </View>
+             
+                
+                ))}
+                </ScrollView>
+              }
+              <View style={styles.rowContainer}>
               <View  style={styles.inputInfoColContainer}>
               {(this.state.euroState!='' && this.state.euroState!=null)  &&
-              <Text style={styles.modalMainViewSubInfo}>{I18n.t('CurrentBalance')} {this.stringWithCorrectCurrencyPosition(this.getEuroStateWithCorrectDecimals())}</Text>
+              <Text style={styles.modalMainViewSubInfo}>{I18n.t('CurrentBalance')} {this.stringWithCorrectCurrencyPosition(this.getAdditionOfTwoFloats(parseFloat(this.state.euroState),(parseFloat(this.state.savingsState)-this.getNewSavingsAmountFloat())))}</Text>
               }
               {/* {(this.state.startingEuroState!='' && this.state.startingEuroState!=null)  &&
               <Text style={styles.modalMainViewSubInfo}>{I18n.t('StartingBalance')} {this.getEuroStateWithCorrectDecimals()} €</Text>
@@ -2162,11 +2220,14 @@ handleScroll (event){
               {(this.state.startingEuroState!='' && this.state.startingEuroState!=null)  &&
               <Text style={styles.modalMainViewSubInfo}>{I18n.t('StartingBalance')} {this.stringWithCorrectCurrencyPosition(this.getStartingEuroStateWithCorrectDecimals())}</Text>
               }
-              {(this.state.savingsState!='' && this.state.savingsState!=null && this.state.savingsState!='0' || refUpdateSetAmountAside == true)  &&
-              <Text style={styles.modalMainViewSubInfo}>{I18n.t('SavingsBalance')} {this.stringWithCorrectCurrencyPosition(this.getSavingsStateWithCorrectDecimals())}</Text>
+              {(this.state.euroState!='' && this.state.euroState!=null)  &&
+              <Text style={styles.modalMainViewSubInfo}>{I18n.t('SavingsBalance')} {this.stringWithCorrectCurrencyPosition(this.getNewSavingsAmountFloat())}</Text>
               }
               </View>
-              
+              <TouchableOpacity onPress={()=>this.createEmptySavingsField()}>
+              <FontAwesome style={{textAlign:'auto',paddingHorizontal:5,fontSize:35,color:'#000001'}} icon={SolidIcons.plusCircle}></FontAwesome>
+              </TouchableOpacity>
+              </View>
                   
           </View>
         </Modal>
@@ -2312,21 +2373,243 @@ handleScroll (event){
     // this.setState({openCategoriesSelect:false})
 
   }
-  openSavingsView(){
+  //to dataSourceSavings exei to jsondata, opws to refExpenseHistoryJson
+  //to refSavingsData exei to dataSourceSavings, tha xreiastei an theloyme na kanoyme cancel
+  //to _textInputRefs exei ta refs twn inputs, gia na kanoyme ref[arithmos].focus()
+  //to savingsValues exei ta values se array, (antistoixo toy textInputRefs) , gia na mporoyme na kanoyme elegxo OnChangeText kai onEndEdit
+  //to dataSourceSavings fortwnei mia fora sto init, prepei na to kanoyme storageSet sto closeSavingsView , kai setState
+  //otan anoigei me openSavingsView, to refSavingsData pairnei oti prepei na parei apo to dataSourceSavings
+  //to _textInputRefs that parei thn swsth timh otan ftiaxnetai (ref={ref => {this._textInputRefs[item.Number] = ref}})
+  //todo: to savingsValues[] logika thelei arxikopoihsh , mporei kai oxi epeidh tha kanw storageSet to  dataSourceSavings sto closeSavingsView 99% den xreiazetai
+  //todo: sto end edit toy textInput kai toy posoy kai toy description , tha kanw update to refSavingsData , gia na to xrisimopoihsw meta sto closeSavingsView
+  //todo: sto closeSavingsView tha ginetai o ypologismos tou savingsState
+    openSavingsView(){
     refEuroState = this.state.euroState;
     refSavingsState = this.state.savingsState;
+      if(this.state.dataSourceSavings == null || this.state.dataSourceSavings == ''){
+        refSavingsData = '[]'
+      }else{
+        refSavingsData = JSON.stringify(this.state.dataSourceSavings);
+      }
+    
     this.setState({openSavingsView:true})
-
   }
   async closeSavingsView(){
+    this._textInputRefs = [];
+
     let isPro = await storageGet("IsPro");
     if(isPro !='true'){
       this.state.euroState =refEuroState;
       this.state.savingsState = refSavingsState;
-      this.setState({euroState:this.state.euroState,savingsState:this.state.savingsState,openSavingsView:false});
+      this.setState({euroState:this.state.euroState,savingsState:this.state.savingsState,openSavingsView:false,dataSourceSavings:'',savingsValues:[]});
       this.buyProVersionPrompt();
     }else{
-      this.setState({openSavingsView:false})
+      //setState to dataSourceSavings , oti theloyme to exoyme sto refSavingsData      
+      var json = JSON.parse(refSavingsData);
+      let indx = 0;
+      let newAmount = 0;
+      for(var i=0; i< Object.keys(json).length; i++){
+          if(json[i].isEdited ){
+            console.log("found "+ i)
+            console.log() //me thn seira ta pairnoyme opote to indx einai swsto
+            // amountToAddOrSub += parseFloat(this._savingsValuesChangeAmount[indx]);
+            // console.log(this._savingsValuesChangeAmount[indx])
+            json[i].isEdited = false;
+            indx+=1;
+            //newJson+= this.jsonifySpentToday(this.state.dataSource[i].Amount,this.state.dataSource[i].Time,this.state.dataSource[i].Category) +','
+          }
+          newAmount += parseFloat(json[i].Amount);
+          json[i].isEdited = false;
+
+
+      }
+      this._savingsValuesChangeAmount = [];
+      this.state.savingsValues =[];
+      this.showAlertSavings(newAmount);
+      console.log(refSavingsState)
+      console.log(newAmount)
+      this.state.dataSourceSavings = json;
+      await storageSet("DataSourceSavings", JSON.stringify(json));
+     // await storageSet("Savings", ''); //debug
+      this.setState({openSavingsView:false,dataSourceSavings:this.state.dataSourceSavings,savingsValues:this.state.savingsValues })
+    }
+  }
+  createEmptySavingsField(){    
+    var addComma = ',';
+    if(refSavingsData =='[]'){
+      addComma='';
+    }
+    var count = Object.keys(JSON.parse(refSavingsData)).length;
+    var newEntry = this.jsonifyInputField(0,'Savings','',count,true); 
+    refSavingsData = refSavingsData.substring(0,refSavingsData.length-1)+addComma+newEntry+']';
+    console.log(refSavingsData);
+    //await storageSet('SpentTodayJson',spentTodayJson); //ayto ginetai sto DataSourceSavings, an ginei confirm
+    this.setState({dataSourceSavings:JSON.parse(refSavingsData)});
+  }
+  deleteSavingsField(no){
+    var json = JSON.parse(refSavingsData);
+    //otan kanei delete na vlepw pio number einai , kai ola ta epomena na ta kanw -1
+    for(var i=0; i< Object.keys(json).length; i++){
+      if(json[i].Number == no ){
+        json.splice(i,1);
+        console.log(json)
+        break;
+      } 
+    }
+    for(var i=0; i< Object.keys(json).length; i++){
+      if(json[i].Number > no){
+        json[i].Number = (parseInt(json[i].Number - 1)).toString();
+      
+      }
+    }
+    refSavingsData = JSON.stringify(json);
+    this._textInputRefs = [];
+    this._savingsValuesChangeAmount = [];
+    this.state.savingsValues =[];
+    this.state.dataSourceSavings = json;
+    this.setState({dataSourceSavings:json,savingsValues:this.state.savingsValues});
+  }
+  onChangeGenericSavings(text,no){
+    let newText = this.checkInputText(text);
+    this.state.savingsValues[no] = newText;
+    // var json = JSON.parse(refSavingsData);
+    // this._savingsValuesChangeAmount[no] = (parseFloat(json[no].Amount) - parseFloat(newText)).toString();
+    // console.log( this._savingsValuesChangeAmount[no])
+    this.setState({savingsValues: this.state.savingsValues });
+
+   }
+   onEndEditGenericSavings(no){
+    if(this.state.savingsValues[no]){
+      this.state.savingsValues[no] = this.checkIfAddOrSubNeeded(this.state.savingsValues[no]); //ayto to kanw gia na fainetai to swsto value sto UI
+      this.setState({savingsValues: this.state.savingsValues });
+      var json : JSON = JSON.parse(refSavingsData);
+      json[no].isEdited = true;
+      json[no].Amount = this.state.savingsValues[no] ;
+      
+      refSavingsData = JSON.stringify(json);
+      console.log(refSavingsData);
+      // for(var i=0; i< Object.keys(json).length; i++){
+      //   if(json[i].Number == no){
+      //     console.log("found "+ i)
+      //     //newJson+= this.jsonifySpentToday(this.state.dataSource[i].Amount,this.state.dataSource[i].Time,this.state.dataSource[i].Category) +','
+      //   }
+      // }
+    }
+  }
+  
+   onChangeGenericSavingsDescription(text){
+    this._descRef = text;
+    console.log('MPAINEI EDW')
+
+   }
+   onEndEditGenericSavingsDescription(no){
+    var json = JSON.parse(refSavingsData);
+    if(this._descRef!=null){
+      if(this._descRef!=json[no].Description ){
+        json[no].isEdited = true;
+        json[no].Description = this._descRef;
+        refSavingsData = JSON.stringify(json);
+        console.log(refSavingsData);
+        this._descRef = null;
+      }
+    //this.setTouchOfDescriptionInput(false);
+
+    }
+      
+    
+  }
+  showAlertSavings(newAmount){
+    if(this.state.savingsState==null || this.state.savingsState ==''){
+      this.state.savingsState = '0';
+    }
+    let AlertStringToShow ='';
+    let diff  = parseFloat(this.state.savingsState) - parseFloat(newAmount);
+    console.log(parseFloat(this.state.savingsState) - parseFloat(newAmount))
+    if((diff)>0){
+      //added
+      AlertStringToShow =  I18n.t("AddAmount");
+    }else{
+      //subbed
+      AlertStringToShow = I18n.t("SubtractAmount");
+
+    }
+    //this.setState({ savingsState: this.state.savingsState ,euroState: this.state.euroState  });
+    //prepi na kanw save edw gia na min ksanaafairesei to neo yparxon poso
+    this.state.savingsState = (parseFloat(newAmount)).toString();
+    if(this.state.savingsState.split('.')[1]?.length>0)
+    {
+    this.state.savingsState = (parseFloat(this.state.savingsState).toFixed(2)).toString();
+    }
+    if(diff!=0){
+    Alert.alert(
+      I18n.t("UpdateCurrentBalanceQuestion"),
+      AlertStringToShow,
+      [
+         // The "No" button
+        // Does nothing but dismiss the dialog when tapped
+        {
+          text: I18n.t("No"),
+          onPress: async () =>{
+            
+            this.setState({ savingsState: this.state.savingsState ,euroState: this.state.euroState  });
+            //checkIfSavingsEdited = this.state.savingsState;
+            await this.saveData();
+          }
+          
+        },
+        // The "Yes" button
+        {
+          text: I18n.t("Yes"),
+          onPress: async () => {           
+            if(this.state.euroState =="" || this.state.euroState == null){
+
+            }else{
+              
+            this.state.euroState  = (parseFloat(this.state.euroState) + (diff)).toString();
+              
+          }
+          this.setState({ savingsState: this.state.savingsState ,euroState: this.state.euroState  });
+          //checkIfSavingsEdited = this.state.savingsState;
+          await this.saveData();
+          
+          return;
+          },
+        },
+       
+      ]
+    );
+    }
+  }
+  getNewSavingsAmountFloat(){
+    try{
+      var json = JSON.parse(refSavingsData);    
+      console.log(json);
+      let newAmount = 0;
+        for(var i=0; i< Object.keys(json).length; i++){        
+            newAmount += parseFloat(json[i].Amount);
+        }
+        var index = this.state.startingEuroState.indexOf('.');
+        if (index >= 0) {
+          return (parseFloat(newAmount).toFixed(2)).toString();
+        } else {
+          return newAmount;
+        }
+    }
+    catch{
+      return this.state.savingsState;
+    }
+    
+  }
+  
+  setTouchOfDescriptionInput(shouldEdit){
+    console.log('HELLOOOOOO')
+    switch(shouldEdit){
+      case true:
+        setPointerEventsOfDesc = 'box-none'
+        break;
+      case false:
+        setPointerEventsOfDesc = 'none'
+        break;
     }
   }
   openIncomesView(){
@@ -2488,6 +2771,11 @@ handleScroll (event){
      this.setState({moniesState:this.state.moniesState})
      
    }
+   
+    
+    //edw mporw na allaksw thn eggrafi sto refSavingsData
+
+   
    onChanged1Savings(text){
      
     let newText = this.checkInputText(text);
@@ -2512,17 +2800,8 @@ handleScroll (event){
   startEdit1Savings(){
     isEditingText1Savings =true;
    }
-  endEdit1Savings(){ 
-    isEditingTextSavings1 =false;
-
-    if(checkIfSavingsEdited =='' || checkIfSavingsEdited == null){
-      checkIfSavingsEdited ='0'   ;
-    }
-    let savings= checkIfSavingsEdited;
-    let addedOrSubbed = 0;
-    if(savings == null){
-      savings = "0";
-    }
+  endEdit1Savings(savings){ 
+    
     if (this.state.savingsState == "" || this.state.savingsState == null){
       this.state.savingsState = "0";
     }
@@ -2531,7 +2810,6 @@ handleScroll (event){
     if(this.state.savingsState != savings){ // exei kanei ontws edittu
     //this.state.savingsState = subtract
     this.state.savingsState = this.checkIfAddOrSubNeeded(this.state.savingsState);
-
       console.log('EDIT')
       if((parseFloat(this.state.savingsState) - parseFloat(savings))>0){
         //added
@@ -3049,6 +3327,9 @@ handleScroll (event){
     var todate =  moment(new Date()).format('YYYY-MM-DD');
     return '{"Amount":"'+spent+'", "Time":"'+time+'", "Day":"'+todate+'", "Category":"'+category+'"}';
   }
+  jsonifyInputField(amount,type,description,number,isEdited){
+    return '{"Amount":"'+amount+'", "Type":"'+type+'", "Description":"'+description+'","Number":"'+number+'","isEdited":'+isEdited+'}';
+  }
   renderExpensesJsonList = ({ item }) => (
     <View style={[styles.rowContainer,{justifyContent:'space-between'}]}>
     <Text style={[styles.textFaint,{marginLeft:0,fontStyle:'italic'}]}>{this.stringWithCorrectCurrencyPosition(item.Amount)}</Text>
@@ -3094,6 +3375,16 @@ handleScroll (event){
     //checkIfSpentTodayEdited =refSpentToday;
     this.setState({euroState:this.state.euroState,spentTodayState:this.state.spentTodayState,dataSource:this.state.dataSource})
 
+  }
+  
+  getAdditionOfTwoFloats(float1,float2){
+    let res = (float1 + float2);
+    var index = this.state.savingsState.indexOf('.');
+    if (index >= 0) {
+      return res.toFixed(2).toString();
+    } else {
+      return res;
+    }
   }
   getSavingsStateWithCorrectDecimals(){
     if(this.state.savingsState=='' || this.state.savingsState==null){
@@ -3705,6 +3996,17 @@ modalMainViewSubInfo:{
   padding:10
 }, input: {
   // borderRadius:10,
+ 
+},descriptionInput:{
+  fontSize:11,
+  textAlignVertical:'center',
+  paddingVertical:0,paddingHorizontal:20,
+  fontStyle:'italic',color:'gray'
+},editIcon:{
+  // borderRadius:10,
+  textAlignVertical:'center',
+  fontSize:17,
+  marginLeft:-20
 },inputContainer:{
   borderWidth: 0.7,
   height:'80%',
@@ -3712,6 +4014,12 @@ modalMainViewSubInfo:{
   borderColor:'#D3D3D3',
   borderTopRightRadius:10,
   borderBottomRightRadius:10,
+},descriptionInputContainer:{
+  borderWidth: 0.7,
+  height:'80%',
+  width:'80%',
+  borderColor:'#D3D3D3',
+  borderRadius:10
 },iconContainer:{
   borderWidth: 0.7,
   height:'80%',

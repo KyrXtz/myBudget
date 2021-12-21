@@ -11,7 +11,7 @@ import I18n from "i18n-js";
 
 
 export const ProBanner = ({isPro}) => {
-  console.log('ispro'+isPro);
+  //console.log('ispro'+isPro);
   if (isPro =='true'){
     return(<></>)
 
