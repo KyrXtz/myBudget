@@ -115,7 +115,8 @@
     "IncomesHeader":"Einkünfte",
     "FixedCostsHeader":"Fixe Kosten",
     "SavingsHeader":"Ersparnisse",
-    "VoiceCommandsHeader":"Sprachbefehle"
+    "VoiceCommandsHeader":"Sprachbefehle",
+    "ConfiguredBalance":"Konfigurierte Balance:"
 
 
 

@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
       fieldTemplateProps={{backgroundColor:'red'},{backgroundColor:'blue'}}
       backdropStyle={{backgroundColor:'transparent'}}
       modalStyle={{borderRadius:10}}
-      maxHeight={'80%'}
+      maxHeight={'84%'}
       
             options={fontawesome}
             getLabel={item => item.l}

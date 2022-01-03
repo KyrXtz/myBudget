@@ -115,7 +115,8 @@
     "IncomesHeader":"收入",
     "FixedCostsHeader":"固定成本",
     "SavingsHeader":"储蓄",
-    "VoiceCommandsHeader":"语音命令"
+    "VoiceCommandsHeader":"语音命令",
+    "ConfiguredBalance":"配置的:"
 
 
 }

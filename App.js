@@ -33,7 +33,8 @@
    ActivityIndicator,
    AppState,
    PanResponder,
-   KeyboardAvoidingView  
+   KeyboardAvoidingView,
+     
  } from 'react-native';
  import CalendarPicker from 'react-native-calendar-picker';
  import Modal from "react-native-modal";
@@ -57,6 +58,8 @@ import FontAwesome, {
   BrandIcons,
   parseIconFromClassName,
 } from 'react-native-fontawesome';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import {Picker} from '@react-native-picker/picker';
 
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 
@@ -146,6 +149,8 @@ let refMinDate = new Date();
 let refExpensesHistoryJson = '';
 let refspentMonthHistory ='';
 let refSavingsData ='';
+let refFixedCostsData ='';
+
 let categoryIcon0 = null;
 let categoryIcon1 = null;
 let categoryIcon2 = null;
@@ -258,10 +263,13 @@ const locales = RNLocalize.getLocales();
        dataSource : "",
        dataSourcePerDay : "",
        dataSourceSavings: "",
+       dataSourceFixedCosts: "",
        markedDates: {},
        appState: AppState.currentState,
        selectedCategoryBtn:0,
-       savingsValues : []
+       savingsValues : [],
+       fixedCostsValues : [],
+       fixedCostsDateValues : [],
 
 
 
@@ -377,6 +385,7 @@ const locales = RNLocalize.getLocales();
      let value9 = await this.fetchJsonExpenses();
      let value10 = await storageGet('FirstDate');
      let value11 = JSON.parse(await storageGet('DataSourceSavings'));
+     let value12 = JSON.parse(await storageGet('DataSourceFixedCosts'));
      refExpensesHistoryJson = await storageGet('ExpensesHistoryJson');
      if(value10 != '' && value10 !=null){
        refMinDate = new Date(value10);
@@ -423,7 +432,7 @@ const locales = RNLocalize.getLocales();
      //ena modal k einai ok to prompt to rate
      
      console.log('ARE ADS REMOVE'+_areAdsRemoved)
-     this.setState({markedDates:_markedDates,dataSourceSavings:value11,dataSourcePerDay:null,dataSource:value9,savingsState:value8,isEditingEuroState:false,newSpent:'0',openSettings:false,openCurrencySelect:false,openCategoriesSelect:false,openLanguageSelect:false,openCoffeeShop:false,removeAdsShop:false,closeModal1:false,closeModal2:false,closeModal3:false,moniesState:value7,spentMonthState: value6,fullDatePaydayState:value5, startingEuroState: value4 ,euroState: value1, paydayState: value2,spentTodayState: value3 , open: false ,cardTutorial:cardTutorial,tutorialViewd:tut,idOfTutToShow:0 , xPx:0,yPx:0,buttonModal1:false,buttonModal2:false,buttonModal3:false,areAdsRemoved:_areAdsRemoved,isPro:_isPro,daysPassed:_daysPassed,stopShowingPromptToRate:_stopShowingPromptToRate, swiperIndex:0,selectedCategoryBtn:0,tutorialText:I18n.t('TutorialText1')}) ;
+     this.setState({markedDates:_markedDates,dataSourceSavings:value11,dataSourceFixedCosts:value12,dataSourcePerDay:null,dataSource:value9,savingsState:value8,isEditingEuroState:false,newSpent:'0',openSettings:false,openCurrencySelect:false,openCategoriesSelect:false,openLanguageSelect:false,openCoffeeShop:false,removeAdsShop:false,closeModal1:false,closeModal2:false,closeModal3:false,moniesState:value7,spentMonthState: value6,fullDatePaydayState:value5, startingEuroState: value4 ,euroState: value1, paydayState: value2,spentTodayState: value3 , open: false ,cardTutorial:cardTutorial,tutorialViewd:tut,idOfTutToShow:0 , xPx:0,yPx:0,buttonModal1:false,buttonModal2:false,buttonModal3:false,areAdsRemoved:_areAdsRemoved,isPro:_isPro,daysPassed:_daysPassed,stopShowingPromptToRate:_stopShowingPromptToRate, swiperIndex:0,selectedCategoryBtn:0,tutorialText:I18n.t('TutorialText1')}) ;
      if(this.state.tutorialViewd == 'false'){
       this.setState({tutorialViewd:'false'});
       intervalId =  setInterval(() => {
@@ -462,7 +471,7 @@ const locales = RNLocalize.getLocales();
     }
     return JSON.parse(json);
    }
-   onDateChange(passedDate) {
+   onDateChange(passedDate,calledFromMonthChange : Boolean) {
   //  let date = moment(MomentDate).toDate();
     console.log(passedDate)
     let date = new Date(passedDate.dateString)
@@ -479,32 +488,16 @@ const locales = RNLocalize.getLocales();
      this.setState({markedDates:_markedDates2,dataSourcePerDay : selectedDaysData, selectedDayExpensesString:_selectedDayExpensesString});
      return;
     }
-  //   let nowmonth = new Date().getMonth()+1; //DE KSERW GIATI THELEI +1
-  //   let paymonth = date.getMonth()+1; //DE KSERW GIATI THELEI +1
-  //   if(paymonth<=nowmonth){ //mono otan einai next year
-  //    let nowyear = new Date().getFullYear();
-  //    let payyear = date.getFullYear();
-  //    paymonth += (payyear-nowyear)*12;
-
-  //   }
-  //   let diff = paymonth-nowmonth;
-  //  //this.state.selectedDayExpensesString = date;
-  //  this.state.paydayState = (date.getDate() + diff*30).toString();
-   // allagi edw
-  //  this.state.fullDatePaydayState = moment(date).format('MMMM Do YYYY')
   this.state.fullDatePaydayState = passedDate.dateString;
-  // var given = moment(passedDate.dateString, "YYYY-MM-DD");
-  // var current = moment(new Date() ,"YYYY-MM-DD");
-  // console.log('given ' + given) ;
-  // console.log('current '+ current) ;
   var a = moment(passedDate.dateString);
-  var b = moment(moment(new Date()).format("YYYY-MM-DD"));
-  
-  
+  var b = moment(moment(new Date()).format("YYYY-MM-DD")); 
   //Difference in number of days
   console.log('dif '+a.diff(b, 'days')  ) ;
   this.state.paydayState = (a.diff(b, 'days')).toString() ;
   console.log(this.state.paydayState);
+  if(!calledFromMonthChange){
+  storageSet('OverflowPayDay',passedDate.day.toString());
+  }
 
 
   let _markedDates = {};
@@ -655,6 +648,30 @@ const locales = RNLocalize.getLocales();
         this.state.paydayState = (a.diff(b, 'days')).toString() ;
         //this.state.paydayState = (parseInt(payday) - 30*monthDiff).toString();
         //allagi edw
+        console.log(paydayString)
+        if(this.state.paydayState<0){
+          
+          var nextMonthStr  = moment(paydayString).add(1, 'month').format('YYYY-MM-DD');
+          var nextMonthDays = moment(nextMonthStr).daysInMonth();
+          var payDayFromString = parseInt(paydayString.split('-')[2]);
+          var checkForOldPayDay = await storageGet('OverflowPayDay');
+          console.log(checkForOldPayDay + 'FOUNDS')
+          if(checkForOldPayDay != null){ //check gia devices poy kanane update
+            payDayFromString = parseInt(checkForOldPayDay);
+          }
+          while(payDayFromString >nextMonthDays){
+            payDayFromString = payDayFromString -1;
+            console.log('remove one')
+          }
+          //this.state.paydayState = payDayFromString;
+          console.log('THIS IS IT ' +nextMonthStr.split('-')[0]+'-'+nextMonthStr.split('-')[1] + '-'+payDayFromString)//'prepei na mpei sto px sto 2022-01-31'
+          var datetopass = {
+            "dateString" : nextMonthStr.split('-')[0]+'-'+nextMonthStr.split('-')[1] + '-'+payDayFromString ,
+            "day":payDayFromString
+          }
+          this.onDateChange(datetopass,true);
+          await this.saveData();
+        }
         await storageSet('PayDay',this.state.paydayState);
         
         
@@ -2025,7 +2042,9 @@ async setExpensesOfPastMonth(month){
   // if(month.year +'-'+month.month == moment(new Date()).format("YYYY-MM")){ // an o minas einai o mellontikos
   //   return; //TODO
   // }
-  if((month.year +'-'+month.month == moment(new Date()).format("YYYY-MM"))){ // an o minas einai o twrinos
+
+  var monthViewd = month.year +'-'+(month.month.toString().length == 1 ?'0'+month.month:month.month); //ayto epeidh ta months me ena psifio einai px. 3 kai oxi 03
+  if((monthViewd == moment(new Date()).format("YYYY-MM"))){ // an o minas einai o twrinos
     this.state.spentPastMonth = this.getSpentThisMonth();
     this.setState({spentPastMonth:this.state.spentPastMonth})
     return;
@@ -2114,14 +2133,139 @@ handleScroll (event){
         <ProBanner isPro={this.state.isPro}></ProBanner>
          <FontAwesome
        style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}} icon={SolidIcons.fileInvoiceDollar}/>
-        <TouchableOpacity  onPress={()=>this.openFixedCostsView()} >
+        <TouchableOpacity  onPress={async ()=> await this.openFixedCostsView()} >
             <Text style={styles.drawerButtonText}>{I18n.t("FixedCostsHeader")}</Text>
-          </TouchableOpacity>
-          <Modal  onBackdropPress={()=>this.closeFixedCostsView()} useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.coffeeShopModal}  animationIn = {'slideInUp'} animationOut={'slideOutDown'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.openFixedCostsView}> 
-            <View style={styles.billingWindowStyle}>
-            <FontAwesome style={[styles.iconStyle,{position:'absolute',right:20}]} icon={SolidIcons.fileInvoiceDollar}/>
+          </TouchableOpacity> 
+          <Modal  onBackdropPress={async ()=> await this.closeFixedCostsView()} useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.coffeeShopModal}  animationIn = {'slideInUp'} animationOut={'slideOutDown'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.openFixedCostsView}> 
+          <View style={[styles.billingWindowStyle,{justifyContent:'space-around'}]}>
+            <FontAwesome style={[styles.iconStyle,{position:'absolute',right:26}]} icon={SolidIcons.fileInvoiceDollar}/>
             <Text style={styles.sideWindowTextBold}>{I18n.t("FixedCostsHeader")}</Text>
-            <Text style={styles.sideWindowTextFaint}>Set your fixed costs</Text>                          
+            <Text style={styles.sideWindowTextFaint}>Set your fixed costs</Text>                  
+            {this.state.euroState == '' || this.state.euroState == null &&
+              <Text style={styles.modalMainViewSubHeader}>SET BALANCE FIRST</Text>        
+            }
+            {this.state.dataSourceFixedCosts!=null && this.state.dataSourceFixedCosts.length !=0 && this.state.euroState != '' && this.state.euroState != null &&
+                <ScrollView style={{  maxHeight:'70%' }}>                  
+                { this.state.dataSourceFixedCosts.map((item) => (
+                  
+                <View>
+                  <View>                  
+                  {/* <View>
+                  <Button onPress={()=>this.setState({showDatePicker:item.Number})} title="Show time picker!" />
+                  </View>
+                  {(this.state.showDatePicker == item.Number) && (
+                    <DateTimePicker
+                      value={this._datePickerValues[item.Number]!=undefined ? this._datePickerValues[item.Number]:new Date()}
+                      mode='date'
+                      is24Hour={true}
+                      display='default'
+                      onChange={(event, selectedDate) => this.datePickedFixedCostsView(event,selectedDate,item.Number)}
+                    />
+                  )} */}
+                  <Picker                 
+                    selectedValue={this.state.fixedCostsDateValues[item.Number]!=undefined ? this.state.fixedCostsDateValues[item.Number]:item.Day}
+                    onValueChange={(itemValue, itemIndex) => this.datePickedFixedCostsView(itemIndex,item.Number)
+                    }>
+                    <Picker.Item label="Pick a day pls" value={0} />
+                    <Picker.Item label={moment(new Date(1970,0,1)).format('Do')} value={1} />
+                    <Picker.Item label={moment(new Date(1970,0,2)).format('Do')} value={2} />
+                    <Picker.Item label={moment(new Date(1970,0,3)).format('Do')} value={3} />
+                    <Picker.Item label={moment(new Date(1970,0,4)).format('Do')} value={4} />
+                    <Picker.Item label={moment(new Date(1970,0,5)).format('Do')} value={5} />
+                    <Picker.Item label={moment(new Date(1970,0,6)).format('Do')} value={6} />
+                    <Picker.Item label={moment(new Date(1970,0,7)).format('Do')} value={7} />
+                    <Picker.Item label={moment(new Date(1970,0,8)).format('Do')} value={8} />
+                    <Picker.Item label={moment(new Date(1970,0,9)).format('Do')} value={9} />
+                    <Picker.Item label={moment(new Date(1970,0,10)).format('Do')} value={10} />
+                    <Picker.Item label={moment(new Date(1970,0,11)).format('Do')} value={11} />
+                    <Picker.Item label={moment(new Date(1970,0,12)).format('Do')} value={12} />
+                    <Picker.Item label={moment(new Date(1970,0,13)).format('Do')} value={13} />
+                    <Picker.Item label={moment(new Date(1970,0,14)).format('Do')} value={14} />
+                    <Picker.Item label={moment(new Date(1970,0,15)).format('Do')} value={15} />
+                    <Picker.Item label={moment(new Date(1970,0,16)).format('Do')} value={16} />
+                    <Picker.Item label={moment(new Date(1970,0,17)).format('Do')} value={17} />
+                    <Picker.Item label={moment(new Date(1970,0,18)).format('Do')} value={18} />
+                    <Picker.Item label={moment(new Date(1970,0,19)).format('Do')} value={19} />
+                    <Picker.Item label={moment(new Date(1970,0,20)).format('Do')} value={20} />
+                    <Picker.Item label={moment(new Date(1970,0,21)).format('Do')} value={21} />
+                    <Picker.Item label={moment(new Date(1970,0,22)).format('Do')} value={22} />
+                    <Picker.Item label={moment(new Date(1970,0,23)).format('Do')} value={23} />
+                    <Picker.Item label={moment(new Date(1970,0,24)).format('Do')} value={24} />
+                    <Picker.Item label={moment(new Date(1970,0,25)).format('Do')} value={25} />
+                    <Picker.Item label={moment(new Date(1970,0,26)).format('Do')} value={26} />
+                    <Picker.Item label={moment(new Date(1970,0,27)).format('Do')} value={27} />
+                    <Picker.Item label={moment(new Date(1970,0,28)).format('Do')} value={28} />
+                    <Picker.Item label={moment(new Date(1970,0,29)).format('Do')} value={29} />
+                    <Picker.Item label={moment(new Date(1970,0,30)).format('Do')} value={30} />
+                    <Picker.Item label={moment(new Date(1970,0,31)).format('Do')} value={31} />
+                  </Picker>
+                </View>
+                  <Text style={styles.modalMainViewSubHeader}>{I18n.t('Amount')}</Text>        
+                  
+                  <View style={styles.inputRowContainer}>
+                  <View style={styles.iconContainer}>
+                  <FontAwesome style={styles.inputIcon} icon={this.correctFontAwesomeCurrencyIcon()}/>
+                  </View>
+                  <View style={styles.inputContainer}>
+                  <TextInput 
+                      style={styles.input}
+                      keyboardType='numeric'
+                      defaultValue={item.Amount}
+                      maxLength={10}  //setting limit of input
+                      onChangeText={(text)=> this.onChangeGenericFixedCosts(text,item.Number)}
+                      onEndEditing={()=>this.onEndEditGenericFixedCosts(item.Number)}
+                      value={this.state.fixedCostsValues[item.Number]}
+
+
+                  />
+                  </View>                              
+                  </View>
+                  <View style={[styles.rowContainer,{paddingVertical:0,paddingHorizontal:20}]}>
+                    <View style={styles.descriptionInputContainer} 
+                    >
+
+                    <TextInput
+                      style={styles.descriptionInput}
+                      maxLength={30}
+                      defaultValue={item.Description}
+                      ref={ref => {this._textInputRefs[item.Number] = ref}} 
+                      onChangeText={(text)=> this.onChangeGenericFixedCostsDescription(text)}
+                      onEndEditing={()=>this.onEndEditGenericFixedCostsDescription(item.Number)}
+                      placeholder='Description'
+                      
+                    />
+                    </View>
+                    <TouchableOpacity onPress={()=>this._textInputRefs[item.Number].focus()}>
+                    <FontAwesome style={styles.editIcon} icon={SolidIcons.edit}></FontAwesome>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={()=>this.deleteFixedCostsField(item.Number)}>
+                    <FontAwesome style={styles.editIcon} icon={SolidIcons.trash}></FontAwesome>
+                    </TouchableOpacity>
+                  </View>  
+                  </View>
+                             
+                ))}
+                </ScrollView>
+              }
+              <View style={styles.rowContainer}>
+              <View  style={styles.inputInfoColContainer}>
+              {(this.state.euroState!='' && this.state.euroState!=null)  &&
+              <Text style={styles.modalMainViewSubInfo}>{I18n.t('ConfiguredBalance')} {this.stringWithCorrectCurrencyPosition(this.getAdditionOfTwoFloats(parseFloat(this.state.euroState),(parseFloat(this.state.savingsState)-this.getNewSavingsAmountFloat())))}</Text>
+              }
+              {(this.state.startingEuroState!='' && this.state.startingEuroState!=null)  &&
+              <Text style={styles.modalMainViewSubInfo}>{I18n.t('CurrentBalance')} {this.stringWithCorrectCurrencyPosition(this.getEuroStateWithCorrectDecimals())}</Text>
+              }
+              {(this.state.startingEuroState!='' && this.state.startingEuroState!=null)  &&
+              <Text style={styles.modalMainViewSubInfo}>{I18n.t('StartingBalance')} {this.stringWithCorrectCurrencyPosition(this.getStartingEuroStateWithCorrectDecimals())}</Text>
+              }
+              {(this.state.euroState!='' && this.state.euroState!=null)  &&
+              <Text style={styles.modalMainViewSubInfo}>{I18n.t('SavingsBalance')} {this.stringWithCorrectCurrencyPosition(this.getNewSavingsAmountFloat())}</Text>
+              }
+              </View>
+              <TouchableOpacity onPress={async ()=>await this.createEmptyFixedCostsField()}>
+              <FontAwesome style={{textAlign:'auto',paddingHorizontal:5,fontSize:35,color:'#000001'}} icon={SolidIcons.plusCircle}></FontAwesome>
+              </TouchableOpacity>
+              </View>        
           </View>
         </Modal>
         
@@ -2212,11 +2356,11 @@ handleScroll (event){
               <View style={styles.rowContainer}>
               <View  style={styles.inputInfoColContainer}>
               {(this.state.euroState!='' && this.state.euroState!=null)  &&
-              <Text style={styles.modalMainViewSubInfo}>{I18n.t('CurrentBalance')} {this.stringWithCorrectCurrencyPosition(this.getAdditionOfTwoFloats(parseFloat(this.state.euroState),(parseFloat(this.state.savingsState)-this.getNewSavingsAmountFloat())))}</Text>
+              <Text style={styles.modalMainViewSubInfo}>{I18n.t('ConfiguredBalance')} {this.stringWithCorrectCurrencyPosition(this.getAdditionOfTwoFloats(parseFloat(this.state.euroState),(parseFloat(this.state.savingsState)-this.getNewSavingsAmountFloat())))}</Text>
               }
-              {/* {(this.state.startingEuroState!='' && this.state.startingEuroState!=null)  &&
-              <Text style={styles.modalMainViewSubInfo}>{I18n.t('StartingBalance')} {this.getEuroStateWithCorrectDecimals()} €</Text>
-              } */}
+              {(this.state.startingEuroState!='' && this.state.startingEuroState!=null)  &&
+              <Text style={styles.modalMainViewSubInfo}>{I18n.t('CurrentBalance')} {this.stringWithCorrectCurrencyPosition(this.getEuroStateWithCorrectDecimals())}</Text>
+              }
               {(this.state.startingEuroState!='' && this.state.startingEuroState!=null)  &&
               <Text style={styles.modalMainViewSubInfo}>{I18n.t('StartingBalance')} {this.stringWithCorrectCurrencyPosition(this.getStartingEuroStateWithCorrectDecimals())}</Text>
               }
@@ -2224,7 +2368,7 @@ handleScroll (event){
               <Text style={styles.modalMainViewSubInfo}>{I18n.t('SavingsBalance')} {this.stringWithCorrectCurrencyPosition(this.getNewSavingsAmountFloat())}</Text>
               }
               </View>
-              <TouchableOpacity onPress={()=>this.createEmptySavingsField()}>
+              <TouchableOpacity onPress={async ()=>await this.createEmptySavingsField()}>
               <FontAwesome style={{textAlign:'auto',paddingHorizontal:5,fontSize:35,color:'#000001'}} icon={SolidIcons.plusCircle}></FontAwesome>
               </TouchableOpacity>
               </View>
@@ -2397,8 +2541,9 @@ handleScroll (event){
   async closeSavingsView(){
     this._textInputRefs = [];
 
-    let isPro = await storageGet("IsPro");
-    if(isPro !='true'){
+    //let isPro = await storageGet("IsPro");
+    // if(isPro !='true'){
+    if(false){
       this.state.euroState =refEuroState;
       this.state.savingsState = refSavingsState;
       this.setState({euroState:this.state.euroState,savingsState:this.state.savingsState,openSavingsView:false,dataSourceSavings:'',savingsValues:[]});
@@ -2434,13 +2579,18 @@ handleScroll (event){
       this.setState({openSavingsView:false,dataSourceSavings:this.state.dataSourceSavings,savingsValues:this.state.savingsValues })
     }
   }
-  createEmptySavingsField(){    
+  async createEmptySavingsField(){    
+    let isPro = await storageGet("IsPro");
+    var count = Object.keys(JSON.parse(refSavingsData)).length;
+    if(count > 0 && isPro != 'true'){
+      this.buyProVersionPrompt();
+      return;
+    }
     var addComma = ',';
     if(refSavingsData =='[]'){
       addComma='';
     }
-    var count = Object.keys(JSON.parse(refSavingsData)).length;
-    var newEntry = this.jsonifyInputField(0,'Savings','',count,true); 
+    var newEntry = this.jsonifyInputSavingsField(0,'Savings','',count,true); 
     refSavingsData = refSavingsData.substring(0,refSavingsData.length-1)+addComma+newEntry+']';
     console.log(refSavingsData);
     //await storageSet('SpentTodayJson',spentTodayJson); //ayto ginetai sto DataSourceSavings, an ginei confirm
@@ -2583,12 +2733,12 @@ handleScroll (event){
   getNewSavingsAmountFloat(){
     try{
       var json = JSON.parse(refSavingsData);    
-      console.log(json);
+     // console.log(json);
       let newAmount = 0;
         for(var i=0; i< Object.keys(json).length; i++){        
             newAmount += parseFloat(json[i].Amount);
         }
-        var index = this.state.startingEuroState.indexOf('.');
+        var index = newAmount.toString().indexOf('.');
         if (index >= 0) {
           return (parseFloat(newAmount).toFixed(2)).toString();
         } else {
@@ -2596,6 +2746,8 @@ handleScroll (event){
         }
     }
     catch{
+      //console.log('caught getNewSavingsAmountFlot')
+      //console.log(': Line ' + console.trace())
       return this.state.savingsState;
     }
     
@@ -2618,28 +2770,173 @@ handleScroll (event){
 
   }
   async closeIncomesView(){
-    let isPro = await storageGet("IsPro");
-    if(isPro !='true'){
+    // let isPro = await storageGet("IsPro");
+    // if(isPro !='true'){
+    if(false){
       this.setState({openIncomesView:false});
       this.buyProVersionPrompt();
     }else{
       this.setState({openIncomesView:false})
     }
   }
-  openFixedCostsView(){
+
+ 
+  async openFixedCostsView(){
+    refEuroState = this.state.euroState;
+      if(this.state.dataSourceFixedCosts == null || this.state.dataSourceFixedCosts == ''){
+        refFixedCostsData = '[]'
+      }else{
+        refFixedCostsData = JSON.stringify(this.state.dataSourceFixedCosts);
+      }
     
     this.setState({openFixedCostsView:true})
-
   }
   async closeFixedCostsView(){
-    let isPro = await storageGet("IsPro");
-    if(isPro !='true'){
-      this.setState({openFixedCostsView:false});
+    this._textInputRefs = [];
+    
+    //let isPro = await storageGet("IsPro");
+    // if(isPro !='true'){
+    if(false){
+      this.state.euroState =refEuroState;
+      this.setState({euroState:this.state.euroState,openFixedCostsView:false,dataSourceFixedCosts:''});
       this.buyProVersionPrompt();
     }else{
-      this.setState({openFixedCostsView:false})
+      //setState to dataSourceSavings , oti theloyme to exoyme sto refSavingsData      
+      var json = JSON.parse(refFixedCostsData);
+      // let indx = 0;
+      // let newAmount = 0;
+      // for(var i=0; i< Object.keys(json).length; i++){
+      //     if(json[i].isEdited ){
+      //       console.log("found "+ i)
+      //       console.log() //me thn seira ta pairnoyme opote to indx einai swsto
+      //       // amountToAddOrSub += parseFloat(this._savingsValuesChangeAmount[indx]);
+      //       // console.log(this._savingsValuesChangeAmount[indx])
+      //       json[i].isEdited = false;
+      //       indx+=1;
+      //       //newJson+= this.jsonifySpentToday(this.state.dataSource[i].Amount,this.state.dataSource[i].Time,this.state.dataSource[i].Category) +','
+      //     }
+      //     newAmount += parseFloat(json[i].Amount);
+      //     json[i].isEdited = false;
+
+
+      // }
+      console.log(refFixedCostsData);
+      this.state.fixedCostsValues =[];
+      this.state.fixedCostsDateValues = [];
+      //this.showAlertSavings(newAmount);
+      this.state.dataSourceFixedCosts = json;
+      await storageSet("DataSourceFixedCosts", JSON.stringify(json));
+     // await storageSet("Savings", ''); //debug
+      this.setState({openFixedCostsView:false,dataSourceFixedCosts:this.state.dataSourceFixedCosts,fixedCostsValues:this.state.fixedCostsValues,fixedCostsDateValues:this.state.fixedCostsDateValues})
     }
   }
+  async createEmptyFixedCostsField(){    
+    let isPro = await storageGet("IsPro");
+    var count = Object.keys(JSON.parse(refFixedCostsData)).length;
+    if(count > 0 && isPro != 'false'){
+      this.buyProVersionPrompt();
+      return;
+    }
+    var addComma = ',';
+    if(refFixedCostsData =='[]'){
+      addComma='';
+    }
+    var newEntry = this.jsonifyInputFixedCostsField(0,'FixedCosts','',count,0,true); 
+    refFixedCostsData = refFixedCostsData.substring(0,refFixedCostsData.length-1)+addComma+newEntry+']';
+    console.log(refFixedCostsData);
+    //await storageSet('SpentTodayJson',spentTodayJson); //ayto ginetai sto DataSourceSavings, an ginei confirm
+    this.setState({dataSourceFixedCosts:JSON.parse(refFixedCostsData)}); //,showDatePicker:-1
+    console.log(refFixedCostsData)
+  }
+  deleteFixedCostsField(no){
+    var json = JSON.parse(refFixedCostsData);
+    //otan kanei delete na vlepw pio number einai , kai ola ta epomena na ta kanw -1
+    for(var i=0; i< Object.keys(json).length; i++){
+      if(json[i].Number == no ){
+        json.splice(i,1);
+        console.log(json)
+        break;
+      } 
+    }
+    for(var i=0; i< Object.keys(json).length; i++){
+      if(json[i].Number > no){
+        json[i].Number = (parseInt(json[i].Number - 1)).toString();
+      
+      }
+    }
+    refFixedCostsData = JSON.stringify(json);
+    this._textInputRefs = [];
+    
+    //this._savingsValuesChangeAmount = [];
+    this.state.fixedCostsValues =[];
+    this.state.fixedCostsDateValues = [];
+    this.state.dataSourceFixedCosts = json;
+    this.setState({dataSourceFixedCosts:json,fixedCostsValues:this.state.fixedCostsValues,fixedCostsDateValues:this.state.fixedCostsDateValues});
+  }
+  onChangeGenericFixedCosts(text,no){
+    let newText = this.checkInputText(text);
+    this.state.fixedCostsValues[no] = newText;
+    // var json = JSON.parse(refSavingsData);
+    // this._savingsValuesChangeAmount[no] = (parseFloat(json[no].Amount) - parseFloat(newText)).toString();
+    // console.log( this._savingsValuesChangeAmount[no])
+    this.setState({fixedCostsValues: this.state.fixedCostsValues });
+
+   }
+   onEndEditGenericFixedCosts(no){
+    if(this.state.fixedCostsValues[no]){
+      this.state.fixedCostsValues[no] = this.checkIfAddOrSubNeeded(this.state.fixedCostsValues[no]); //ayto to kanw gia na fainetai to swsto value sto UI
+      this.setState({fixedCostsValues: this.state.fixedCostsValues });
+      var json : JSON = JSON.parse(refFixedCostsData);
+      json[no].isEdited = true;
+      json[no].Amount = this.state.fixedCostsValues[no] ;
+      
+      refFixedCostsData = JSON.stringify(json);
+      console.log(refFixedCostsData);
+      // for(var i=0; i< Object.keys(json).length; i++){
+      //   if(json[i].Number == no){
+      //     console.log("found "+ i)
+      //     //newJson+= this.jsonifySpentToday(this.state.dataSource[i].Amount,this.state.dataSource[i].Time,this.state.dataSource[i].Category) +','
+      //   }
+      // }
+    }
+  }
+  
+   onChangeGenericFixedCostsDescription(text){
+    this._descRef = text;
+    console.log('MPAINEI EDW')
+
+   }
+   onEndEditGenericFixedCostsDescription(no){
+    var json = JSON.parse(refFixedCostsData);
+    if(this._descRef!=null){
+      if(this._descRef!=json[no].Description ){
+        json[no].isEdited = true;
+        json[no].Description = this._descRef;
+        refFixedCostsData = JSON.stringify(json);
+        console.log(refFixedCostsData);
+        this._descRef = null;
+      }
+    //this.setTouchOfDescriptionInput(false);
+
+    }
+      
+    
+  }
+  datePickedFixedCostsView(selectedDayIndex,itemNumber){
+    console.log(selectedDayIndex)
+    console.log(itemNumber)
+    this.state.fixedCostsDateValues[itemNumber] = selectedDayIndex;
+    this.setState({fixedCostsDateValues: this.state.fixedCostsDateValues });
+
+    var json = JSON.parse(refFixedCostsData);
+    json[itemNumber].isEdited = true;
+    json[itemNumber].Day = selectedDayIndex;
+    refFixedCostsData = JSON.stringify(json);
+    console.log(refFixedCostsData);
+
+
+  }
+
    changeLanguage = async (languageCode)=>{
     I18n.locale = languageCode;
     await storageSet('LanguageCode',languageCode);
@@ -2684,9 +2981,9 @@ handleScroll (event){
       currencyInfo[0] = currencies[0]; //FALLBACK GIA AN DEN EXOYME TO CURRENCY POY EINAI LOCAL TOY
     }
     if(currencyInfo[0].Position == "first"){
-      return currencyInfo[0].Symbol + " " +stringToReturn;
+      return currencyInfo[0].Symbol + "" +stringToReturn;
     }else if (currencyInfo[0].Position == "last"){
-      return stringToReturn + " " + currencyInfo[0].Symbol;
+      return stringToReturn + "" + currencyInfo[0].Symbol;
     }
   }
   correctFontAwesomeCurrencyIcon(){
@@ -3327,8 +3624,11 @@ handleScroll (event){
     var todate =  moment(new Date()).format('YYYY-MM-DD');
     return '{"Amount":"'+spent+'", "Time":"'+time+'", "Day":"'+todate+'", "Category":"'+category+'"}';
   }
-  jsonifyInputField(amount,type,description,number,isEdited){
+  jsonifyInputSavingsField(amount,type,description,number,isEdited){
     return '{"Amount":"'+amount+'", "Type":"'+type+'", "Description":"'+description+'","Number":"'+number+'","isEdited":'+isEdited+'}';
+  }
+  jsonifyInputFixedCostsField(amount,type,description,number,dayNum,isEdited){
+    return '{"Amount":"'+amount+'", "Type":"'+type+'", "Description":"'+description+'","Number":"'+number+'","Day":'+dayNum+',"isEdited":'+isEdited+'}';
   }
   renderExpensesJsonList = ({ item }) => (
     <View style={[styles.rowContainer,{justifyContent:'space-between'}]}>
@@ -3378,8 +3678,19 @@ handleScroll (event){
   }
   
   getAdditionOfTwoFloats(float1,float2){
-    let res = (float1 + float2);
-    var index = this.state.savingsState.indexOf('.');
+    //console.log('FLOAT 1 :'+float1)
+    //console.log('FLOAT 2 :'+float2)
+    if(!float1){
+     //console.log('FLOAT1 UNDEFINED! SETTING TO 0')
+      float1= 0;
+    }
+    if(!float2){
+      //console.log('FLOAT2 UNDEFINED! SETTING TO 0')
+      float2= 0;
+    }
+  
+    let res = (float1 + float2).toString();
+    var index = res.indexOf('.');
     if (index >= 0) {
       return res.toFixed(2).toString();
     } else {
@@ -3470,7 +3781,7 @@ isValid(date:Date) {
     //let today = new Date().getDate();
     
     let remainingDays = parseInt(pd);
-    console.log('THIS IS REAL DAYS LEFT'+remainingDays)
+    //console.log('THIS IS REAL DAYS LEFT'+remainingDays)
     if(remainingDays <0){
       remainingDays = 0;
     }
@@ -3780,7 +4091,8 @@ const deviceHeight =
     backgroundColor: '#FFFFFD',
     width:'65%',
     borderRadius:20,
-      height:'130%',
+    height:'130%',
+    paddingHorizontal:2
 
     // flexDirection:'row'
 

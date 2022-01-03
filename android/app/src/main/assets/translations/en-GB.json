@@ -115,7 +115,8 @@
     "IncomesHeader":"Incomes",
     "FixedCostsHeader":"Fixed Costs",
     "SavingsHeader":"Savings",
-    "VoiceCommandsHeader":"Voice Commands"
+    "VoiceCommandsHeader":"Voice Commands",
+    "ConfiguredBalance":"Configured Balance:"
 
 
 

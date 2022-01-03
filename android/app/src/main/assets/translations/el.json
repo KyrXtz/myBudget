@@ -115,7 +115,8 @@
     "IncomesHeader":"Εισοδήματα",
     "FixedCostsHeader":"Πάγια Έξοδα",
     "SavingsHeader":"Αποταμίευση",
-    "VoiceCommandsHeader":"Φωνητικές Εντολές"
+    "VoiceCommandsHeader":"Φωνητικές Εντολές",
+    "ConfiguredBalance":"Διαμορφωμένο Υπόλοιπο:"
 
 
     
