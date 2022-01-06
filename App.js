@@ -150,7 +150,7 @@ let refExpensesHistoryJson = '';
 let refspentMonthHistory ='';
 let refSavingsData ='';
 let refFixedCostsData ='';
-
+let refIncomesData='';
 let categoryIcon0 = null;
 let categoryIcon1 = null;
 let categoryIcon2 = null;
@@ -264,12 +264,16 @@ const locales = RNLocalize.getLocales();
        dataSourcePerDay : "",
        dataSourceSavings: "",
        dataSourceFixedCosts: "",
+       dataSourceIncomes:"",
        markedDates: {},
        appState: AppState.currentState,
        selectedCategoryBtn:0,
        savingsValues : [],
        fixedCostsValues : [],
        fixedCostsDateValues : [],
+       incomesValues : [],
+       incomesDateValues : [],
+
 
 
 
@@ -386,6 +390,7 @@ const locales = RNLocalize.getLocales();
      let value10 = await storageGet('FirstDate');
      let value11 = JSON.parse(await storageGet('DataSourceSavings'));
      let value12 = JSON.parse(await storageGet('DataSourceFixedCosts'));
+     let value13 = JSON.parse(await storageGet('DataSourceIncomes'));
      refExpensesHistoryJson = await storageGet('ExpensesHistoryJson');
      if(value10 != '' && value10 !=null){
        refMinDate = new Date(value10);
@@ -432,7 +437,7 @@ const locales = RNLocalize.getLocales();
      //ena modal k einai ok to prompt to rate
      
      console.log('ARE ADS REMOVE'+_areAdsRemoved)
-     this.setState({markedDates:_markedDates,dataSourceSavings:value11,dataSourceFixedCosts:value12,dataSourcePerDay:null,dataSource:value9,savingsState:value8,isEditingEuroState:false,newSpent:'0',openSettings:false,openCurrencySelect:false,openCategoriesSelect:false,openLanguageSelect:false,openCoffeeShop:false,removeAdsShop:false,closeModal1:false,closeModal2:false,closeModal3:false,moniesState:value7,spentMonthState: value6,fullDatePaydayState:value5, startingEuroState: value4 ,euroState: value1, paydayState: value2,spentTodayState: value3 , open: false ,cardTutorial:cardTutorial,tutorialViewd:tut,idOfTutToShow:0 , xPx:0,yPx:0,buttonModal1:false,buttonModal2:false,buttonModal3:false,areAdsRemoved:_areAdsRemoved,isPro:_isPro,daysPassed:_daysPassed,stopShowingPromptToRate:_stopShowingPromptToRate, swiperIndex:0,selectedCategoryBtn:0,tutorialText:I18n.t('TutorialText1')}) ;
+     this.setState({markedDates:_markedDates,dataSourceSavings:value11,dataSourceFixedCosts:value12,dataSourceIncomes:value13,dataSourcePerDay:null,dataSource:value9,savingsState:value8,isEditingEuroState:false,newSpent:'0',openSettings:false,openCurrencySelect:false,openCategoriesSelect:false,openLanguageSelect:false,openCoffeeShop:false,removeAdsShop:false,closeModal1:false,closeModal2:false,closeModal3:false,moniesState:value7,spentMonthState: value6,fullDatePaydayState:value5, startingEuroState: value4 ,euroState: value1, paydayState: value2,spentTodayState: value3 , open: false ,cardTutorial:cardTutorial,tutorialViewd:tut,idOfTutToShow:0 , xPx:0,yPx:0,buttonModal1:false,buttonModal2:false,buttonModal3:false,areAdsRemoved:_areAdsRemoved,isPro:_isPro,daysPassed:_daysPassed,stopShowingPromptToRate:_stopShowingPromptToRate, swiperIndex:0,selectedCategoryBtn:0,tutorialText:I18n.t('TutorialText1')}) ;
      if(this.state.tutorialViewd == 'false'){
       this.setState({tutorialViewd:'false'});
       intervalId =  setInterval(() => {
@@ -1106,7 +1111,7 @@ render() {
          { parseFloat(this.state.euroState) <0 &&
          <Text style={[styles.textBold,{color:'#FF2D00DD'}]}>{I18n.t('Balance')} {this.stringWithCorrectCurrencyPosition(this.getEuroStateWithCorrectDecimals())}</Text>
         }
-         { parseFloat(this.state.euroState) >=0 &&
+         { (parseFloat(this.state.euroState) >=0 || this.state.euroState == null)&&
          <Text style={styles.textBold}>{I18n.t('Balance')} {this.stringWithCorrectCurrencyPosition(this.getEuroStateWithCorrectDecimals())}</Text>
         }   
          <Text style={styles.textFaint}>{I18n.t('StartingBalance')} {this.stringWithCorrectCurrencyPosition(this.getStartingEuroStateWithCorrectDecimals())}</Text>
@@ -2120,11 +2125,139 @@ handleScroll (event){
         <TouchableOpacity  onPress={()=>this.openIncomesView()} >
             <Text style={styles.drawerButtonText}>{I18n.t("IncomesHeader")}</Text>
           </TouchableOpacity>
-          <Modal onBackdropPress={()=>this.closeIncomesView()} useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.coffeeShopModal}  animationIn = {'slideInUp'} animationOut={'slideOutDown'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.openIncomesView}> 
-            <View style={styles.billingWindowStyle}>
-            <FontAwesome style={[styles.iconStyle,{position:'absolute',right:20}]} icon={SolidIcons.handHoldingUsd}/>
+          <Modal  onBackdropPress={async ()=> await this.closeIncomesView()} useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.coffeeShopModal}  animationIn = {'slideInUp'} animationOut={'slideOutDown'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.openIncomesView}> 
+          <View style={[styles.billingWindowStyle,{justifyContent:'space-around'}]}>
+            <FontAwesome style={[styles.iconStyle,{position:'absolute',right:26}]} icon={SolidIcons.handHoldingUsd}/>
             <Text style={styles.sideWindowTextBold}>{I18n.t("IncomesHeader")}</Text>
-            <Text style={styles.sideWindowTextFaint}>Set your incomes</Text>                          
+            <Text style={styles.sideWindowTextFaint}>Set your incomes</Text>                  
+            {this.state.euroState == '' || this.state.euroState == null &&
+              <Text style={styles.modalMainViewSubHeader}>SET BALANCE FIRST</Text>        
+            }
+            {this.state.dataSourceIncomes!=null && this.state.dataSourceIncomes.length !=0 && this.state.euroState != '' && this.state.euroState != null &&
+                <ScrollView style={{  maxHeight:'70%',paddingHorizontal:25 }}>                  
+                { this.state.dataSourceIncomes.map((item) => (
+                  
+                <View>
+                <View style={{flexDirection:'row',justifyContent:'flex-start'}}>                  
+                  {/* <View>
+                  <Button onPress={()=>this.setState({showDatePicker:item.Number})} title="Show time picker!" />
+                  </View>
+                  {(this.state.showDatePicker == item.Number) && (
+                    <DateTimePicker
+                      value={this._datePickerValues[item.Number]!=undefined ? this._datePickerValues[item.Number]:new Date()}
+                      mode='date'
+                      is24Hour={true}
+                      display='default'
+                      onChange={(event, selectedDate) => this.datePickedIncomesView(event,selectedDate,item.Number)}
+                    />
+                  )} */}
+                  <Text style={styles.dayTextLabel}>Every ... </Text>
+                  <Picker
+                    style = {styles.dayPicker}                 
+                    selectedValue={this.state.incomesDateValues[item.Number]!=undefined ? this.state.incomesDateValues[item.Number]:item.Day}
+                    onValueChange={(itemValue, itemIndex) => this.datePickedIncomesView(itemIndex,item.Number)
+                    }>
+                    <Picker.Item label="Pick a day pls" value={0} />
+                    <Picker.Item label={moment(new Date(1970,0,1)).format('Do')} value={1} />
+                    <Picker.Item label={moment(new Date(1970,0,2)).format('Do')} value={2} />
+                    <Picker.Item label={moment(new Date(1970,0,3)).format('Do')} value={3} />
+                    <Picker.Item label={moment(new Date(1970,0,4)).format('Do')} value={4} />
+                    <Picker.Item label={moment(new Date(1970,0,5)).format('Do')} value={5} />
+                    <Picker.Item label={moment(new Date(1970,0,6)).format('Do')} value={6} />
+                    <Picker.Item label={moment(new Date(1970,0,7)).format('Do')} value={7} />
+                    <Picker.Item label={moment(new Date(1970,0,8)).format('Do')} value={8} />
+                    <Picker.Item label={moment(new Date(1970,0,9)).format('Do')} value={9} />
+                    <Picker.Item label={moment(new Date(1970,0,10)).format('Do')} value={10} />
+                    <Picker.Item label={moment(new Date(1970,0,11)).format('Do')} value={11} />
+                    <Picker.Item label={moment(new Date(1970,0,12)).format('Do')} value={12} />
+                    <Picker.Item label={moment(new Date(1970,0,13)).format('Do')} value={13} />
+                    <Picker.Item label={moment(new Date(1970,0,14)).format('Do')} value={14} />
+                    <Picker.Item label={moment(new Date(1970,0,15)).format('Do')} value={15} />
+                    <Picker.Item label={moment(new Date(1970,0,16)).format('Do')} value={16} />
+                    <Picker.Item label={moment(new Date(1970,0,17)).format('Do')} value={17} />
+                    <Picker.Item label={moment(new Date(1970,0,18)).format('Do')} value={18} />
+                    <Picker.Item label={moment(new Date(1970,0,19)).format('Do')} value={19} />
+                    <Picker.Item label={moment(new Date(1970,0,20)).format('Do')} value={20} />
+                    <Picker.Item label={moment(new Date(1970,0,21)).format('Do')} value={21} />
+                    <Picker.Item label={moment(new Date(1970,0,22)).format('Do')} value={22} />
+                    <Picker.Item label={moment(new Date(1970,0,23)).format('Do')} value={23} />
+                    <Picker.Item label={moment(new Date(1970,0,24)).format('Do')} value={24} />
+                    <Picker.Item label={moment(new Date(1970,0,25)).format('Do')} value={25} />
+                    <Picker.Item label={moment(new Date(1970,0,26)).format('Do')} value={26} />
+                    <Picker.Item label={moment(new Date(1970,0,27)).format('Do')} value={27} />
+                    <Picker.Item label={moment(new Date(1970,0,28)).format('Do')} value={28} />
+                    <Picker.Item label={moment(new Date(1970,0,29)).format('Do')} value={29} />
+                    <Picker.Item label={moment(new Date(1970,0,30)).format('Do')} value={30} />
+                    <Picker.Item label={moment(new Date(1970,0,31)).format('Do')} value={31} />
+                  </Picker>
+                </View>
+                <View style={{flexDirection:'row',justifyContent:'flex-start'}}>                  
+                  <Text style={styles.dayTextLabel}>Recieve ... </Text>
+                  <View style={[styles.inputRowContainer,{marginLeft:30}]}>
+                    <View style={styles.iconContainer}>
+                    <FontAwesome style={styles.inputIcon} icon={this.correctFontAwesomeCurrencyIcon()}/>
+                    </View>
+                    <View style={[styles.inputContainer,{width:'60%'}]}>
+                    <TextInput 
+                        style={styles.input}
+                        keyboardType='numeric'
+                        defaultValue={item.Amount}
+                        maxLength={10}  //setting limit of input
+                        onChangeText={(text)=> this.onChangeGenericIncomes(text,item.Number)}
+                        onEndEditing={()=>this.onEndEditGenericIncomes(item.Number)}
+                        value={this.state.incomesValues[item.Number]}
+
+
+                    />
+                    </View>                              
+                  </View>
+                </View>
+                  <View style={[styles.rowContainer,{paddingVertical:0,paddingHorizontal:20}]}>
+                    <View style={styles.descriptionInputContainer} 
+                    >
+
+                    <TextInput
+                      style={styles.descriptionInput}
+                      maxLength={30}
+                      defaultValue={item.Description}
+                      ref={ref => {this._textInputRefs[item.Number] = ref}} 
+                      onChangeText={(text)=> this.onChangeGenericIncomesDescription(text)}
+                      onEndEditing={()=>this.onEndEditGenericIncomesDescription(item.Number)}
+                      placeholder='Description'
+                      
+                    />
+                    </View>
+                    <TouchableOpacity onPress={()=>this._textInputRefs[item.Number].focus()}>
+                    <FontAwesome style={styles.editIcon} icon={SolidIcons.edit}></FontAwesome>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={()=>this.deleteIncomesField(item.Number)}>
+                    <FontAwesome style={styles.editIcon} icon={SolidIcons.trash}></FontAwesome>
+                    </TouchableOpacity>
+                  </View>  
+                  </View>
+                             
+                ))}
+                </ScrollView>
+              }
+              <View style={styles.rowContainer}>
+              <View  style={styles.inputInfoColContainer}>
+              {(this.state.euroState!='' && this.state.euroState!=null)  &&
+              <Text style={styles.modalMainViewSubInfo}>{I18n.t('ConfiguredBalance')} {this.stringWithCorrectCurrencyPosition(this.getAdditionOfTwoFloats(parseFloat(this.state.euroState),(parseFloat(this.state.savingsState)-this.getNewSavingsAmountFloat())))}</Text>
+              }
+              {(this.state.startingEuroState!='' && this.state.startingEuroState!=null)  &&
+              <Text style={styles.modalMainViewSubInfo}>{I18n.t('CurrentBalance')} {this.stringWithCorrectCurrencyPosition(this.getEuroStateWithCorrectDecimals())}</Text>
+              }
+              {(this.state.startingEuroState!='' && this.state.startingEuroState!=null)  &&
+              <Text style={styles.modalMainViewSubInfo}>{I18n.t('StartingBalance')} {this.stringWithCorrectCurrencyPosition(this.getStartingEuroStateWithCorrectDecimals())}</Text>
+              }
+              {(this.state.euroState!='' && this.state.euroState!=null)  &&
+              <Text style={styles.modalMainViewSubInfo}>{I18n.t('SavingsBalance')} {this.stringWithCorrectCurrencyPosition(this.getNewSavingsAmountFloat())}</Text>
+              }
+              </View>
+              <TouchableOpacity onPress={async ()=>await this.createEmptyIncomesField()}>
+              <FontAwesome style={{textAlign:'auto',paddingHorizontal:5,fontSize:35,color:'#000001'}} icon={SolidIcons.plusCircle}></FontAwesome>
+              </TouchableOpacity>
+              </View>        
           </View>
         </Modal>
         
@@ -2763,21 +2896,163 @@ handleScroll (event){
         break;
     }
   }
-  openIncomesView(){
+  async openIncomesView(){
+    refEuroState = this.state.euroState;
+      if(this.state.dataSourceIncomes == null || this.state.dataSourceIncomes == ''){
+        refIncomesData = '[]'
+      }else{
+        refIncomesData = JSON.stringify(this.state.dataSourceIncomes);
+      }
     
     this.setState({openIncomesView:true})
-
   }
   async closeIncomesView(){
-    // let isPro = await storageGet("IsPro");
+    this._textInputRefs = [];
+    
+    //let isPro = await storageGet("IsPro");
     // if(isPro !='true'){
     if(false){
-      this.setState({openIncomesView:false});
+      this.state.euroState =refEuroState;
+      this.setState({euroState:this.state.euroState,openIncomesView:false,dataSourceIncomes:''});
       this.buyProVersionPrompt();
     }else{
-      this.setState({openIncomesView:false})
+      //setState to dataSourceSavings , oti theloyme to exoyme sto refSavingsData      
+      var json = JSON.parse(refIncomesData);
+      // let indx = 0;
+      // let newAmount = 0;
+      // for(var i=0; i< Object.keys(json).length; i++){
+      //     if(json[i].isEdited ){
+      //       console.log("found "+ i)
+      //       console.log() //me thn seira ta pairnoyme opote to indx einai swsto
+      //       // amountToAddOrSub += parseFloat(this._savingsValuesChangeAmount[indx]);
+      //       // console.log(this._savingsValuesChangeAmount[indx])
+      //       json[i].isEdited = false;
+      //       indx+=1;
+      //       //newJson+= this.jsonifySpentToday(this.state.dataSource[i].Amount,this.state.dataSource[i].Time,this.state.dataSource[i].Category) +','
+      //     }
+      //     newAmount += parseFloat(json[i].Amount);
+      //     json[i].isEdited = false;
+
+
+      // }
+      console.log(refIncomesData);
+      this.state.incomesValues =[];
+      this.state.incomesDateValues = [];
+      //this.showAlertSavings(newAmount);
+      this.state.dataSourceIncomes = json;
+      await storageSet("DataSourceIncomes", JSON.stringify(json));
+     // await storageSet("Savings", ''); //debug
+      this.setState({openIncomesView:false,dataSourceIncomes:this.state.dataSourceIncomes,incomesValues:this.state.incomesValues,incomesDateValues:this.state.incomesDateValues})
     }
   }
+  async createEmptyIncomesField(){    
+    let isPro = await storageGet("IsPro");
+    var count = Object.keys(JSON.parse(refIncomesData)).length;
+    if(count > 0 && isPro != 'false'){
+      this.buyProVersionPrompt();
+      return;
+    }
+    var addComma = ',';
+    if(refIncomesData =='[]'){
+      addComma='';
+    }
+    var newEntry = this.jsonifyInputIncomesField(0,'Incomes','',count,0,true); 
+    refIncomesData = refIncomesData.substring(0,refIncomesData.length-1)+addComma+newEntry+']';
+    console.log(refIncomesData);
+    //await storageSet('SpentTodayJson',spentTodayJson); //ayto ginetai sto DataSourceSavings, an ginei confirm
+    this.setState({dataSourceIncomes:JSON.parse(refIncomesData)}); //,showDatePicker:-1
+    console.log(refIncomesData)
+  }
+  deleteIncomesField(no){
+    var json = JSON.parse(refIncomesData);
+    //otan kanei delete na vlepw pio number einai , kai ola ta epomena na ta kanw -1
+    for(var i=0; i< Object.keys(json).length; i++){
+      if(json[i].Number == no ){
+        json.splice(i,1);
+        console.log(json)
+        break;
+      } 
+    }
+    for(var i=0; i< Object.keys(json).length; i++){
+      if(json[i].Number > no){
+        json[i].Number = (parseInt(json[i].Number - 1)).toString();
+      
+      }
+    }
+    refIncomesData = JSON.stringify(json);
+    this._textInputRefs = [];
+    
+    //this._savingsValuesChangeAmount = [];
+    this.state.incomesValues =[];
+    this.state.incomesDateValues = [];
+    this.state.dataSourceIncomes = json;
+    this.setState({dataSourceIncomes:json,incomesValues:this.state.incomesValues,incomesDateValues:this.state.incomesDateValues});
+  }
+  onChangeGenericIncomes(text,no){
+    let newText = this.checkInputText(text);
+    this.state.incomesValues[no] = newText;
+    // var json = JSON.parse(refSavingsData);
+    // this._savingsValuesChangeAmount[no] = (parseFloat(json[no].Amount) - parseFloat(newText)).toString();
+    // console.log( this._savingsValuesChangeAmount[no])
+    this.setState({incomesValues: this.state.incomesValues });
+
+   }
+   onEndEditGenericIncomes(no){
+    if(this.state.incomesValues[no]){
+      this.state.incomesValues[no] = this.checkIfAddOrSubNeeded(this.state.incomesValues[no]); //ayto to kanw gia na fainetai to swsto value sto UI
+      this.setState({incomesValues: this.state.incomesValues });
+      var json : JSON = JSON.parse(refIncomesData);
+      json[no].isEdited = true;
+      json[no].Amount = this.state.incomesValues[no] ;
+      
+      refIncomesData = JSON.stringify(json);
+      console.log(refIncomesData);
+      // for(var i=0; i< Object.keys(json).length; i++){
+      //   if(json[i].Number == no){
+      //     console.log("found "+ i)
+      //     //newJson+= this.jsonifySpentToday(this.state.dataSource[i].Amount,this.state.dataSource[i].Time,this.state.dataSource[i].Category) +','
+      //   }
+      // }
+    }
+  }
+  
+   onChangeGenericIncomesDescription(text){
+    this._descRef = text;
+    console.log('MPAINEI EDW')
+
+   }
+   onEndEditGenericIncomesDescription(no){
+    var json = JSON.parse(refIncomesData);
+    if(this._descRef!=null){
+      if(this._descRef!=json[no].Description ){
+        json[no].isEdited = true;
+        json[no].Description = this._descRef;
+        refIncomesData = JSON.stringify(json);
+        console.log(refIncomesData);
+        this._descRef = null;
+      }
+    //this.setTouchOfDescriptionInput(false);
+
+    }
+      
+    
+  }
+  datePickedIncomesView(selectedDayIndex,itemNumber){
+    console.log(selectedDayIndex)
+    console.log(itemNumber)
+    this.state.incomesDateValues[itemNumber] = selectedDayIndex;
+    this.setState({incomesDateValues: this.state.incomesDateValues });
+
+    var json = JSON.parse(refIncomesData);
+    json[itemNumber].isEdited = true;
+    json[itemNumber].Day = selectedDayIndex;
+    refIncomesData = JSON.stringify(json);
+    console.log(refIncomesData);
+
+
+  }
+
+
 
  
   async openFixedCostsView(){
@@ -3626,6 +3901,9 @@ handleScroll (event){
   jsonifyInputSavingsField(amount,type,description,number,isEdited){
     return '{"Amount":"'+amount+'", "Type":"'+type+'", "Description":"'+description+'","Number":"'+number+'","isEdited":'+isEdited+'}';
   }
+  jsonifyInputIncomesField(amount,type,description,number,dayNum,isEdited){
+    return '{"Amount":"'+amount+'", "Type":"'+type+'", "Description":"'+description+'","Number":"'+number+'","Day":'+dayNum+',"isEdited":'+isEdited+'}';
+  }
   jsonifyInputFixedCostsField(amount,type,description,number,dayNum,isEdited){
     return '{"Amount":"'+amount+'", "Type":"'+type+'", "Description":"'+description+'","Number":"'+number+'","Day":'+dayNum+',"isEdited":'+isEdited+'}';
   }
@@ -4381,6 +4659,16 @@ modalMainViewSubInfo:{
   alignSelf:'center',marginTop:3,textAlignVertical:'center',fontSize:20 , padding :3
 },selectedCategoryButton:{
   alignSelf:'center',marginTop:3,textAlignVertical:'center',fontSize:20 ,padding :3, backgroundColor:'#8d8d8d66'
+},dayPicker:{
+  width:'50%',
+  marginLeft:30
+  
+},dayTextLabel:{
+  fontSize:18,
+  textAlignVertical:'center',
+  color:'#000001',
+  width:'30%',
+  fontWeight:'400'
 }
 
    
