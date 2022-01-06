@@ -2248,10 +2248,7 @@ handleScroll (event){
                 </ScrollView>
               }
               <View style={styles.rowContainer}>
-              <View  style={styles.inputInfoColContainer}>
-              {(this.state.euroState!='' && this.state.euroState!=null)  &&
-              <Text style={styles.modalMainViewSubInfo}>{I18n.t('ConfiguredBalance')} {this.stringWithCorrectCurrencyPosition(this.getAdditionOfTwoFloats(parseFloat(this.state.euroState),(parseFloat(this.state.savingsState)-this.getNewSavingsAmountFloat())))}</Text>
-              }
+              <View  style={styles.inputInfoColContainer}>            
               {(this.state.startingEuroState!='' && this.state.startingEuroState!=null)  &&
               <Text style={styles.modalMainViewSubInfo}>{I18n.t('CurrentBalance')} {this.stringWithCorrectCurrencyPosition(this.getEuroStateWithCorrectDecimals())}</Text>
               }
@@ -2355,9 +2352,9 @@ handleScroll (event){
               }
               <View style={styles.rowContainer}>
               <View  style={styles.inputInfoColContainer}>
-              {(this.state.euroState!='' && this.state.euroState!=null)  &&
+              {/* {(this.state.euroState!='' && this.state.euroState!=null)  &&
               <Text style={styles.modalMainViewSubInfo}>{I18n.t('ConfiguredBalance')} {this.stringWithCorrectCurrencyPosition(this.getAdditionOfTwoFloats(parseFloat(this.state.euroState),(parseFloat(this.state.savingsState)-this.getNewSavingsAmountFloat())))}</Text>
-              }
+              } */}
               {(this.state.startingEuroState!='' && this.state.startingEuroState!=null)  &&
               <Text style={styles.modalMainViewSubInfo}>{I18n.t('CurrentBalance')} {this.stringWithCorrectCurrencyPosition(this.getEuroStateWithCorrectDecimals())}</Text>
               }
@@ -2563,16 +2560,15 @@ handleScroll (event){
             indx+=1;
             //newJson+= this.jsonifySpentToday(this.state.dataSource[i].Amount,this.state.dataSource[i].Time,this.state.dataSource[i].Category) +','
           }
-          newAmount += parseFloat(json[i].Amount);
+         // newAmount += parseFloat(json[i].Amount);
           json[i].isEdited = false;
 
 
       }
+      //this.showAlertSavings(newAmount);
       this._savingsValuesChangeAmount = [];
       this.state.savingsValues =[];
-      this.showAlertSavings(newAmount);
       console.log(refSavingsState)
-      console.log(newAmount)
       this.state.dataSourceSavings = json;
       await storageSet("DataSourceSavings", JSON.stringify(json));
      // await storageSet("Savings", ''); //debug
@@ -2606,13 +2602,15 @@ handleScroll (event){
         break;
       } 
     }
+    let newAmount = 0;
     for(var i=0; i< Object.keys(json).length; i++){
       if(json[i].Number > no){
-        json[i].Number = (parseInt(json[i].Number - 1)).toString();
-      
+        json[i].Number = (parseInt(json[i].Number - 1)).toString();      
       }
+      newAmount += parseFloat(json[i].Amount);
     }
-    refSavingsData = JSON.stringify(json);
+    this.showAlertSavings(newAmount);
+    refSavingsData = JSON.stringify(json);     
     this._textInputRefs = [];
     this._savingsValuesChangeAmount = [];
     this.state.savingsValues =[];
@@ -2635,16 +2633,14 @@ handleScroll (event){
       var json : JSON = JSON.parse(refSavingsData);
       json[no].isEdited = true;
       json[no].Amount = this.state.savingsValues[no] ;
-      
       refSavingsData = JSON.stringify(json);
       console.log(refSavingsData);
-      // for(var i=0; i< Object.keys(json).length; i++){
-      //   if(json[i].Number == no){
-      //     console.log("found "+ i)
-      //     //newJson+= this.jsonifySpentToday(this.state.dataSource[i].Amount,this.state.dataSource[i].Time,this.state.dataSource[i].Category) +','
-      //   }
-      // }
-    }
+      let newAmount = 0;
+      for(var i=0; i< Object.keys(json).length; i++){     
+        newAmount += parseFloat(json[i].Amount);
+      }
+      this.showAlertSavings(newAmount);
+      }
   }
   
    onChangeGenericSavingsDescription(text){
@@ -2673,15 +2669,18 @@ handleScroll (event){
       this.state.savingsState = '0';
     }
     let AlertStringToShow ='';
+    let newEuroState = '';
     let diff  = parseFloat(this.state.savingsState) - parseFloat(newAmount);
-    console.log(parseFloat(this.state.savingsState) - parseFloat(newAmount))
+    if(this.state.euroState =="" || this.state.euroState == null){
+    }else{    
+      newEuroState = (parseFloat(this.state.euroState) + (diff)).toString();     
+    }
     if((diff)>0){
       //added
-      AlertStringToShow =  I18n.t("AddAmount");
+      AlertStringToShow =  I18n.t("AddAmount") + newEuroState;
     }else{
       //subbed
-      AlertStringToShow = I18n.t("SubtractAmount");
-
+      AlertStringToShow = I18n.t("SubtractAmount") + newEuroState;
     }
     //this.setState({ savingsState: this.state.savingsState ,euroState: this.state.euroState  });
     //prepi na kanw save edw gia na min ksanaafairesei to neo yparxon poso
@@ -2717,7 +2716,7 @@ handleScroll (event){
               
             this.state.euroState  = (parseFloat(this.state.euroState) + (diff)).toString();
               
-          }
+            }
           this.setState({ savingsState: this.state.savingsState ,euroState: this.state.euroState  });
           //checkIfSavingsEdited = this.state.savingsState;
           await this.saveData();
