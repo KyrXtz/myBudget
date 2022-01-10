@@ -411,10 +411,11 @@ const locales = RNLocalize.getLocales();
 
      if(value3 == null){
       value3 = '0';
-      }
-      if(value6 == null){
-        value6 = '0';
-        }
+     }
+     if(value6 == null){
+      value6 = '0';
+     }
+     //CHECK IF DAY CHANGED
      if(today != todayrly){
        console.log("DAY DCHANGED ON INIT");
         await this.DayChanged(todayrly);
@@ -423,7 +424,24 @@ const locales = RNLocalize.getLocales();
         value9 = await this.fetchJsonExpenses(); // ksanapairnoyme to value9
         value2 = await storageGet('PayDay'); //to theloyme pali
         value7 = await this.CalculateEuroPerDay();//allakse i mera
-
+        // check ta DataSourceIncomes kai DataSourceFixedCosts
+        let paydayString = await storageGet('fullDatePayday');       
+        var nextMonthStr  = moment(paydayString).add(1, 'month').format('YYYY-MM-DD');
+        var nextMonthDays = moment(nextMonthStr).daysInMonth();
+        //anti gia to payDayFromString thelw to Day apo to DataSourceIncomes
+        let json =value13;
+        for(var i=0; i< Object.keys(json).length; i++){
+          let dayOfEntry = json[i].Day;
+          while(dayOfEntry >nextMonthDays){ 
+            dayOfEntry = dayOfEntry -1;
+            console.log('remove one')
+          }
+          console.log('THISD IS DAY OF ENTRY: '+dayOfEntry);
+          //check edw an to day exei perasei
+          //an nai na dw sto json thn eggrafi, an exei idi ginei remove
+           //prepei na valw sto json aythn thn eggrafi, px. AlreadyRemoved : true
+           // na vlepw an exoyn perasei k mines
+       }
 
      }else{
       //
@@ -2134,11 +2152,11 @@ handleScroll (event){
               <Text style={styles.modalMainViewSubHeader}>SET BALANCE FIRST</Text>        
             }
             {this.state.dataSourceIncomes!=null && this.state.dataSourceIncomes.length !=0 && this.state.euroState != '' && this.state.euroState != null &&
-                <ScrollView style={{  maxHeight:'70%',paddingHorizontal:25 }}>                  
+                <ScrollView style={styles.scrollViewManagerStyle}>                  
                 { this.state.dataSourceIncomes.map((item) => (
-                  
                 <View>
-                <View style={{flexDirection:'row',justifyContent:'flex-start'}}>                  
+                <View style={styles.viewManagerStyle}>
+                <View style={styles.rowContainerManager}>                  
                   {/* <View>
                   <Button onPress={()=>this.setState({showDatePicker:item.Number})} title="Show time picker!" />
                   </View>
@@ -2151,7 +2169,7 @@ handleScroll (event){
                       onChange={(event, selectedDate) => this.datePickedIncomesView(event,selectedDate,item.Number)}
                     />
                   )} */}
-                  <Text style={styles.dayTextLabel}>Every ... </Text>
+                  <Text numberOfLines={1} style={styles.dayTextLabel}>Every ... </Text>
                   <Picker
                     style = {styles.dayPicker}                 
                     selectedValue={this.state.incomesDateValues[item.Number]!=undefined ? this.state.incomesDateValues[item.Number]:item.Day}
@@ -2191,8 +2209,8 @@ handleScroll (event){
                     <Picker.Item label={moment(new Date(1970,0,31)).format('Do')} value={31} />
                   </Picker>
                 </View>
-                <View style={{flexDirection:'row',justifyContent:'flex-start'}}>                  
-                  <Text style={styles.dayTextLabel}>Recieve ... </Text>
+                <View style={styles.rowContainerManager}>                  
+                  <Text numberOfLines={1} style={styles.dayTextLabel}>Recieve ... </Text>
                   <View style={[styles.inputRowContainer,{marginLeft:30}]}>
                     <View style={styles.iconContainer}>
                     <FontAwesome style={styles.inputIcon} icon={this.correctFontAwesomeCurrencyIcon()}/>
@@ -2235,15 +2253,16 @@ handleScroll (event){
                     </TouchableOpacity>
                   </View>  
                   </View>
-                             
-                ))}
+                  <Text></Text>
+                  </View>               
+                         
+                ))
+                }
                 </ScrollView>
               }
               <View style={styles.rowContainer}>
               <View  style={styles.inputInfoColContainer}>
-              {(this.state.euroState!='' && this.state.euroState!=null)  &&
-              <Text style={styles.modalMainViewSubInfo}>{I18n.t('ConfiguredBalance')} {this.stringWithCorrectCurrencyPosition(this.getAdditionOfTwoFloats(parseFloat(this.state.euroState),(parseFloat(this.state.savingsState)-this.getNewSavingsAmountFloat())))}</Text>
-              }
+              
               {(this.state.startingEuroState!='' && this.state.startingEuroState!=null)  &&
               <Text style={styles.modalMainViewSubInfo}>{I18n.t('CurrentBalance')} {this.stringWithCorrectCurrencyPosition(this.getEuroStateWithCorrectDecimals())}</Text>
               }
@@ -2278,11 +2297,11 @@ handleScroll (event){
               <Text style={styles.modalMainViewSubHeader}>SET BALANCE FIRST</Text>        
             }
             {this.state.dataSourceFixedCosts!=null && this.state.dataSourceFixedCosts.length !=0 && this.state.euroState != '' && this.state.euroState != null &&
-                <ScrollView style={{  maxHeight:'70%' }}>                  
+                <ScrollView style={styles.scrollViewManagerStyle}>                  
                 { this.state.dataSourceFixedCosts.map((item) => (
-                  
                 <View>
-                  <View>                  
+                <View style={styles.viewManagerStyle}>
+                <View style={styles.rowContainerManager}>                  
                   {/* <View>
                   <Button onPress={()=>this.setState({showDatePicker:item.Number})} title="Show time picker!" />
                   </View>
@@ -2295,7 +2314,9 @@ handleScroll (event){
                       onChange={(event, selectedDate) => this.datePickedFixedCostsView(event,selectedDate,item.Number)}
                     />
                   )} */}
-                  <Picker                 
+                  <Text numberOfLines={1} style={styles.dayTextLabel}>Every ... </Text>
+                  <Picker
+                    style = {styles.dayPicker}                 
                     selectedValue={this.state.fixedCostsDateValues[item.Number]!=undefined ? this.state.fixedCostsDateValues[item.Number]:item.Day}
                     onValueChange={(itemValue, itemIndex) => this.datePickedFixedCostsView(itemIndex,item.Number)
                     }>
@@ -2333,26 +2354,27 @@ handleScroll (event){
                     <Picker.Item label={moment(new Date(1970,0,31)).format('Do')} value={31} />
                   </Picker>
                 </View>
-                  <Text style={styles.modalMainViewSubHeader}>{I18n.t('Amount')}</Text>        
-                  
-                  <View style={styles.inputRowContainer}>
-                  <View style={styles.iconContainer}>
-                  <FontAwesome style={styles.inputIcon} icon={this.correctFontAwesomeCurrencyIcon()}/>
-                  </View>
-                  <View style={styles.inputContainer}>
-                  <TextInput 
-                      style={styles.input}
-                      keyboardType='numeric'
-                      defaultValue={item.Amount}
-                      maxLength={10}  //setting limit of input
-                      onChangeText={(text)=> this.onChangeGenericFixedCosts(text,item.Number)}
-                      onEndEditing={()=>this.onEndEditGenericFixedCosts(item.Number)}
-                      value={this.state.fixedCostsValues[item.Number]}
+                <View style={styles.rowContainerManager}>                  
+                  <Text numberOfLines={1} style={styles.dayTextLabel}>Recieve ... </Text>
+                  <View style={[styles.inputRowContainer,{marginLeft:30}]}>
+                    <View style={styles.iconContainer}>
+                    <FontAwesome style={styles.inputIcon} icon={this.correctFontAwesomeCurrencyIcon()}/>
+                    </View>
+                    <View style={[styles.inputContainer,{width:'60%'}]}>
+                    <TextInput 
+                        style={styles.input}
+                        keyboardType='numeric'
+                        defaultValue={item.Amount}
+                        maxLength={10}  //setting limit of input
+                        onChangeText={(text)=> this.onChangeGenericFixedCosts(text,item.Number)}
+                        onEndEditing={()=>this.onEndEditGenericFixedCosts(item.Number)}
+                        value={this.state.fixedCostsValues[item.Number]}
 
 
-                  />
-                  </View>                              
+                    />
+                    </View>                              
                   </View>
+                </View>
                   <View style={[styles.rowContainer,{paddingVertical:0,paddingHorizontal:20}]}>
                     <View style={styles.descriptionInputContainer} 
                     >
@@ -2376,8 +2398,11 @@ handleScroll (event){
                     </TouchableOpacity>
                   </View>  
                   </View>
-                             
-                ))}
+                  <Text></Text>
+                  </View>               
+                         
+                ))
+                }
                 </ScrollView>
               }
               <View style={styles.rowContainer}>
@@ -2417,7 +2442,7 @@ handleScroll (event){
               }
               
               {this.state.dataSourceSavings!=null && this.state.dataSourceSavings.length !=0 && this.state.euroState != '' && this.state.euroState != null &&
-                <ScrollView style={{  maxHeight:'70%' }}>
+                <ScrollView style={styles.scrollViewManagerStyle}>
                     {/* <Text>timestamp</Text>
                     <Text>amount</Text>
                     <Text>delete button</Text>     */}  
@@ -2428,7 +2453,8 @@ handleScroll (event){
                     
                 { this.state.dataSourceSavings.map((item) => (
                   <View>
-                  <Text style={styles.modalMainViewSubHeader}>{I18n.t('SavingsAmount')}</Text>        
+                  <View style={styles.viewManagerStyle}>
+                  <Text style={[styles.modalMainViewSubHeader,{marginTop:5}]}>{I18n.t('SavingsAmount')}</Text>        
                   
                   <View style={styles.inputRowContainer}>
                   <View style={styles.iconContainer}>
@@ -2478,7 +2504,8 @@ handleScroll (event){
                     </TouchableOpacity>
                   </View>  
                   </View>
-             
+                  <Text></Text>
+                  </View>
                 
                 ))}
                 </ScrollView>
@@ -2948,7 +2975,7 @@ handleScroll (event){
   async createEmptyIncomesField(){    
     let isPro = await storageGet("IsPro");
     var count = Object.keys(JSON.parse(refIncomesData)).length;
-    if(count > 0 && isPro != 'false'){
+    if(count > 0 && isPro != 'true'){
       this.buyProVersionPrompt();
       return;
     }
@@ -3107,7 +3134,7 @@ handleScroll (event){
   async createEmptyFixedCostsField(){    
     let isPro = await storageGet("IsPro");
     var count = Object.keys(JSON.parse(refFixedCostsData)).length;
-    if(count > 0 && isPro != 'false'){
+    if(count > 0 && isPro != 'true'){
       this.buyProVersionPrompt();
       return;
     }
@@ -4664,14 +4691,20 @@ modalMainViewSubInfo:{
   marginLeft:30
   
 },dayTextLabel:{
-  fontSize:18,
+  fontSize:16,
   textAlignVertical:'center',
   color:'#000001',
   width:'30%',
-  fontWeight:'400'
+  fontWeight:'400',
+  paddingHorizontal:5
+},scrollViewManagerStyle:{
+  maxHeight:'70%',width:'98%',paddingHorizontal:25,paddingTop:10
+},viewManagerStyle:{
+  borderColor:'#8d8d8d55',borderWidth:1,borderRadius:10
+},rowContainerManager:{
+  flexDirection:'row',justifyContent:'flex-start'
 }
 
-   
- });
+});
 
  export default withIAPContext(App);
