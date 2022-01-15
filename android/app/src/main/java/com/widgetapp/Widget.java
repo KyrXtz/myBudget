@@ -19,7 +19,7 @@ import android.widget.RemoteViews;
 import android.content.SharedPreferences;
 
 import java.io.Console;
-
+import android.util.TypedValue;
 import org.json.JSONException;
 import org.json.JSONObject;
 import android.widget.Toast;
@@ -39,6 +39,10 @@ public class Widget extends AppWidgetProvider {
 			views.setTextViewText(R.id.appwidget_text1, appData.getString("text1"));
             views.setTextViewText(R.id.appwidget_text2, appData.getString("text2"));
             views.setTextViewText(R.id.appwidget_text3, appData.getString("text3"));
+           // views.setTextViewTextSize(R.id.appwidget_text1,TypedValue.COMPLEX_UNIT_SP, 5f);
+
+            // TextView t = (TextView)findViewById(R.id.appwidget_text1);
+            // t.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f);
 
             //edw einai gia na setaroume to on click
             Intent intent = new Intent(context, MainActivity.class);

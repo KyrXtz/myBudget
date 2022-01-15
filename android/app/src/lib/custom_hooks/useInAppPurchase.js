@@ -193,6 +193,7 @@ const useInAppPurchase = () => {
       if(isPurchased){
         console.log('dont buy')
         await storageSet('IsPro','true');
+        await storageSet('RemovedAds','true');
         setAndStoreFullAppPurchase(true)
         
       }else{

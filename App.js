@@ -36,6 +36,11 @@
    KeyboardAvoidingView,
      
  } from 'react-native';
+Text.defaultProps = Text.defaultProps || {};
+Text.defaultProps.allowFontScaling = false;
+TextInput.defaultProps = TextInput.defaultProps || {};
+TextInput.defaultProps.allowFontScaling = false;
+
  import CalendarPicker from 'react-native-calendar-picker';
  import Modal from "react-native-modal";
 //  import Spinner from 'react-native-loading-spinner-overlay';
@@ -159,6 +164,14 @@ let categoryIcon4 = null;
 let categoryIcon5 = null;
 let categoryIcon6 = null;
 let categoryIcon7 = null;
+let categoryName0 = null;
+let categoryName1 = null;
+let categoryName2 = null;
+let categoryName3 = null;
+let categoryName4 = null;
+let categoryName5 = null;
+let categoryName6 = null;
+let categoryName7 = null;
 
 let positionYRef = 0; //for scrolling drawer
 
@@ -173,17 +186,29 @@ const locales = RNLocalize.getLocales();
     if(availableTranslations.includes(lanTag)){
       // exoyme translation tou styl en-US    
       I18n.locale = lanTag.replace('-','');
-      LocaleConfig.defaultLocale = lanTag.replace('-','');
+      LocaleConfig.defaultLocale = lanTag.replace('-',''); 
     }else if (availableTranslations.includes(lanCode)){
       //exoume translation tou styl en
       I18n.locale = lanCode;
-      LocaleConfig.defaultLocale = lanCode;
+      LocaleConfig.defaultLocale = lanCode;     
     }else{
       //vazoume to fallback
       I18n.locale = 'en';
       LocaleConfig.defaultLocale = 'en';
     }
+
+    
     console.log('THIS IS SET CODE '+I18n.locale)
+    //SET MOMENT LOCALE
+    var momLocale = I18n.locale;
+    if(I18n.locale.length>2){
+      momLocale = momLocale[0] + momLocale[1]; // an einai en-US krata to en 
+    }
+    if(momLocale == 'zh')//special case
+    {
+      momLocale = 'zh-cn';
+    }
+    moment.locale(momLocale); 
     //  if(locales[0].languageTag.includes('-')){
     //   I18n.locale = locales[0].languageCode+locales[0].languageTag.split('-')[1] ;
     //   LocaleConfig.defaultLocale = locales[0].languageCode+locales[0].languageTag.split('-')[1] ; //gia to calendar
@@ -195,6 +220,7 @@ const locales = RNLocalize.getLocales();
     
     //  });
  }
+
  
  
  //I18n.locale = 'el';     
@@ -273,6 +299,8 @@ const locales = RNLocalize.getLocales();
        fixedCostsDateValues : [],
        incomesValues : [],
        incomesDateValues : [],
+       shouldShowFixedCosts : false,
+       shouldShowIncomes : false
 
 
 
@@ -390,7 +418,9 @@ const locales = RNLocalize.getLocales();
      let value10 = await storageGet('FirstDate');
      let value11 = JSON.parse(await storageGet('DataSourceSavings'));
      let value12 = JSON.parse(await storageGet('DataSourceFixedCosts'));
+     this.state.shouldShowFixedCosts = (value12 == null ? false :!(Object.keys(value12).length ==0) )
      let value13 = JSON.parse(await storageGet('DataSourceIncomes'));
+     this.state.shouldShowIncomes = (value13 == null ? false :!(Object.keys(value13).length ==0) )
      refExpensesHistoryJson = await storageGet('ExpensesHistoryJson');
      if(value10 != '' && value10 !=null){
        refMinDate = new Date(value10);
@@ -423,25 +453,56 @@ const locales = RNLocalize.getLocales();
         value3 = '0';
         value9 = await this.fetchJsonExpenses(); // ksanapairnoyme to value9
         value2 = await storageGet('PayDay'); //to theloyme pali
+        value5 = await storageGet('fullDatePayday'); //pali
         value7 = await this.CalculateEuroPerDay();//allakse i mera
+
         // check ta DataSourceIncomes kai DataSourceFixedCosts
-        let paydayString = await storageGet('fullDatePayday');       
-        var nextMonthStr  = moment(paydayString).add(1, 'month').format('YYYY-MM-DD');
-        var nextMonthDays = moment(nextMonthStr).daysInMonth();
+        var oldMonth = moment(new Date(today).valueOf()).toDate();
+        var thisMonth = moment(new Date(todayrly).valueOf()).toDate();
+        var thisMonthDays = moment(new Date(todayrly).valueOf()).daysInMonth();
+        let monthDiff = thisMonth.getMonth() - oldMonth.getMonth() + (12 * (thisMonth.getFullYear() - oldMonth.getFullYear()));
+        console.log(monthDiff);
+        var json13 =value13; //incomes POINTER , epeidh einai json object
+        var json12 =value12; //fixedcosts POINTER
         //anti gia to payDayFromString thelw to Day apo to DataSourceIncomes
-        let json =value13;
-        for(var i=0; i< Object.keys(json).length; i++){
-          let dayOfEntry = json[i].Day;
-          while(dayOfEntry >nextMonthDays){ 
-            dayOfEntry = dayOfEntry -1;
-            console.log('remove one')
+        if (monthDiff > 0){//allakse o minas prepei na ginoyn shouldUpdate ola
+          console.log('ALLAKSE O MINAS, UPDATE OLA')
+          if(json13 != null){ //INCOMES
+            var retObj = this.updatePastMonthData(json13,thisMonth,value1);
+            json13 = retObj.json;
+            value1 = retObj.returnValue;          
+            //console.log(refIncomesData)
           }
-          console.log('THISD IS DAY OF ENTRY: '+dayOfEntry);
-          //check edw an to day exei perasei
-          //an nai na dw sto json thn eggrafi, an exei idi ginei remove
-           //prepei na valw sto json aythn thn eggrafi, px. AlreadyRemoved : true
-           // na vlepw an exoyn perasei k mines
-       }
+          if(json12 != null){ //FIXED COSTS
+            var retObj = this.updatePastMonthData(json12,thisMonth,value1);
+            json12 = retObj.json;
+            value1 = retObj.returnValue;          
+           // console.log(refFixedCostsData)
+          }
+        }
+        if(json13 != null){
+          var retObj2 = this.checkForBalanceUpdates(json13,thisMonthDays,value1);
+          json13 = retObj2.json;
+          value1 = retObj2.returnValue;
+          //refIncomesData = JSON.stringify(json13);
+          await storageSet('DataSourceIncomes',JSON.stringify(json13))
+          value13 = json13;
+          //console.log(refIncomesData)
+
+        }
+        if(json12!=null){
+          var retObj2 = this.checkForBalanceUpdates(json12,thisMonthDays,value1);
+          json12 = retObj2.json;
+          value1 = retObj2.returnValue;
+          //refFixedCostsData = JSON.stringify(json12);
+          await storageSet('DataSourceFixedCosts',JSON.stringify(json12))
+          value12 = json12;
+          //console.log(refFixedCostsData)
+
+        }
+        
+       
+       
 
      }else{
       //
@@ -455,7 +516,7 @@ const locales = RNLocalize.getLocales();
      //ena modal k einai ok to prompt to rate
      
      console.log('ARE ADS REMOVE'+_areAdsRemoved)
-     this.setState({markedDates:_markedDates,dataSourceSavings:value11,dataSourceFixedCosts:value12,dataSourceIncomes:value13,dataSourcePerDay:null,dataSource:value9,savingsState:value8,isEditingEuroState:false,newSpent:'0',openSettings:false,openCurrencySelect:false,openCategoriesSelect:false,openLanguageSelect:false,openCoffeeShop:false,removeAdsShop:false,closeModal1:false,closeModal2:false,closeModal3:false,moniesState:value7,spentMonthState: value6,fullDatePaydayState:value5, startingEuroState: value4 ,euroState: value1, paydayState: value2,spentTodayState: value3 , open: false ,cardTutorial:cardTutorial,tutorialViewd:tut,idOfTutToShow:0 , xPx:0,yPx:0,buttonModal1:false,buttonModal2:false,buttonModal3:false,areAdsRemoved:_areAdsRemoved,isPro:_isPro,daysPassed:_daysPassed,stopShowingPromptToRate:_stopShowingPromptToRate, swiperIndex:0,selectedCategoryBtn:0,tutorialText:I18n.t('TutorialText1')}) ;
+     this.setState({shouldShowFixedCosts:this.state.shouldShowFixedCosts,shouldShowIncomes:this.state.shouldShowIncomes,markedDates:_markedDates,dataSourceSavings:value11,dataSourceFixedCosts:value12,dataSourceIncomes:value13,dataSourcePerDay:null,dataSource:value9,savingsState:value8,isEditingEuroState:false,newSpent:'0',openSettings:false,openCurrencySelect:false,openCategoriesSelect:false,openLanguageSelect:false,openCoffeeShop:false,removeAdsShop:false,closeModal1:false,closeModal2:false,closeModal3:false,moniesState:value7,spentMonthState: value6,fullDatePaydayState:value5, startingEuroState: value4 ,euroState: value1, paydayState: value2,spentTodayState: value3 , open: false ,cardTutorial:cardTutorial,tutorialViewd:tut,idOfTutToShow:0 , xPx:0,yPx:0,buttonModal1:false,buttonModal2:false,buttonModal3:false,areAdsRemoved:_areAdsRemoved,isPro:_isPro,daysPassed:_daysPassed,stopShowingPromptToRate:_stopShowingPromptToRate, swiperIndex:0,selectedCategoryBtn:0,tutorialText:I18n.t('TutorialText1')}) ;
      if(this.state.tutorialViewd == 'false'){
       this.setState({tutorialViewd:'false'});
       intervalId =  setInterval(() => {
@@ -478,6 +539,14 @@ const locales = RNLocalize.getLocales();
     categoryIcon5 = await storageGet('categoryIcon5');
     categoryIcon6 = await storageGet('categoryIcon6');
     categoryIcon7 = await storageGet('categoryIcon7');
+    categoryName0 = await storageGet('categoryName0');
+    categoryName1 = await storageGet('categoryName1');
+    categoryName2 = await storageGet('categoryName2');
+    categoryName3 = await storageGet('categoryName3');
+    categoryName4 = await storageGet('categoryName4');
+    categoryName5 = await storageGet('categoryName5');
+    categoryName6 = await storageGet('categoryName6');
+    categoryName7 = await storageGet('categoryName7');
 
 
     this.isLoading();
@@ -487,6 +556,50 @@ const locales = RNLocalize.getLocales();
      // this.state.euroState = value1;
      // this.state.paydayState;
    }
+   updatePastMonthData(json,thisMonth : Date,returnValue){
+    for(var i=0; i< Object.keys(json).length; i++){
+        //na dw posoi mines perasan gia na to prosthesw toses fores
+      var lastUpdatedDate = moment(new Date(json[i].lastUpdated+'-01').valueOf()).toDate();
+      let monthDiff2 = thisMonth.getMonth() - lastUpdatedDate.getMonth() + (12 * (thisMonth.getFullYear() - lastUpdatedDate.getFullYear()));
+      while (monthDiff2>1){
+        //json13[i].Amount = (parseFloat(json13[i].Amount) + 10).toString();
+        //edit to returnValue
+        //check to json[i].Type
+        console.log('UPDATE TO POSO gia past month TYPE = '+ json[i].Type)
+
+        monthDiff2 = monthDiff2 - 1 ;
+      }
+      json[i].lastUpdated =  moment(new Date()).subtract(1,'month').format('YYYY-MM');
+      json[i].shouldUpdate = true;                             
+    }
+    return {json:json , returnValue:returnValue};
+   }
+   checkForBalanceUpdates(json,thisMonthDays,returnValue){
+    for(var i=0; i< Object.keys(json).length; i++){       
+      let dayOfEntry = json[i].Day;
+      while(parseInt(dayOfEntry) >parseInt(thisMonthDays)){ //ayto edw an o minas den exei 31 meres 
+        dayOfEntry = parseInt(dayOfEntry) -1;
+        console.log('remove one')
+      }
+      dayOfEntry = dayOfEntry.toString().length == 1 ?'0'+dayOfEntry:dayOfEntry; //prosthiki tou 0 an einai monopsifios
+      if(json[i].shouldUpdate && new Date(moment(new Date()).format('YYYY-MM')+'-'+dayOfEntry) <= new Date()){           
+        console.log('THISD IS DAY OF ENTRY: '+dayOfEntry);
+        json[i].lastUpdated =  moment(new Date()).format('YYYY-MM');
+        json[i].shouldUpdate = false;
+        console.log('UPDATE TO POSO TYPE = '+ json[i].Type)
+
+        //check to json[i].Type
+        //json13[i].Amount = (parseFloat(json13[i].Amount) + 10).toString();
+         //molis teliwsw refIncomesData = JSON.stringify(json);
+       
+      } 
+      //check edw an to day exei perasei
+      //an nai na dw sto json thn eggrafi, an exei idi ginei remove
+      //prepei na valw sto json aythn thn eggrafi, px. AlreadyRemoved : true
+      // na vlepw an exoyn perasei k mines
+    }
+    return {json:json , returnValue:returnValue};
+   } 
    async fetchJsonExpenses(){
     var json = await storageGet('SpentTodayJson');
     if(json ==null ){
@@ -662,6 +775,9 @@ const locales = RNLocalize.getLocales();
           value2 ='0';
          
         }
+        let dateFrom = new Date(savedToday);
+        let dateTo = new Date();
+        let monthDiff = dateTo.getMonth() - dateFrom.getMonth() + (12 * (dateTo.getFullYear() - dateFrom.getFullYear()));
         //enimerwsi payday
         let paydayString = await storageGet('fullDatePayday');
         var a = moment(paydayString);
@@ -673,8 +789,8 @@ const locales = RNLocalize.getLocales();
         //allagi edw
         console.log(paydayString)
         if(this.state.paydayState<0){
-          
-          var nextMonthStr  = moment(paydayString).add(1, 'month').format('YYYY-MM-DD');
+          let checkBool = moment(paydayString).add(monthDiff, 'month') < moment(new Date())
+          var nextMonthStr  = moment(paydayString).add(checkBool?monthDiff+1:monthDiff, 'month').format('YYYY-MM-DD');
           var nextMonthDays = moment(nextMonthStr).daysInMonth();
           var payDayFromString = parseInt(paydayString.split('-')[2]);
           var checkForOldPayDay = await storageGet('OverflowPayDay');
@@ -693,14 +809,13 @@ const locales = RNLocalize.getLocales();
             "day":payDayFromString
           }
           this.onDateChange(datetopass,true);
-          await this.saveData();
+          await storageSet('fullDatePayday',this.state.fullDatePaydayState); //apo to onDateChange exei setaristei, to idio kai to PayDay, alla to kanw set apo katw outws i allws
+          //await this.saveData();
         }
         await storageSet('PayDay',this.state.paydayState);
+
         
         
-        let dateFrom = new Date(savedToday);
-        let dateTo = new Date();
-        let monthDiff = dateTo.getMonth() - dateFrom.getMonth() + (12 * (dateTo.getFullYear() - dateFrom.getFullYear()));
         let spentMonthF = parseFloat(value1) + parseFloat(value2);
         await storageSet('SpentToday','0');
         if(monthDiff >0) { //month changed
@@ -750,13 +865,59 @@ const locales = RNLocalize.getLocales();
     //  let month = (new Date().getMonth()+1).toString();
     //  let year = new Date().getFullYear().toString();
     let todayrly = new Date().toLocaleDateString();
+    let today = await storageGet('today');
     // let todayrly = day+month+year;
     await this.DayChanged(todayrly);
     let value1 = await storageGet('SpentMonthBeforeToday');
     let value9 = await this.fetchJsonExpenses(); // ksanapairnoyme to value9
     let value7 = await this.CalculateEuroPerDay();
     let value2 = await storageGet('PayDay'); //to theloyme pali
-    this.setState({spentMonthState:value1, spentTodayState:'0' , dataSource:value9,moniesState:value7, paydayState:value2});
+    let value12 = JSON.parse(await storageGet('DataSourceFixedCosts'));
+    let value13 = JSON.parse(await storageGet('DataSourceIncomes'));
+    // check ta DataSourceIncomes kai DataSourceFixedCosts
+    var oldMonth = moment(new Date(today).valueOf()).toDate();
+    var thisMonth = moment(new Date(todayrly).valueOf()).toDate();
+    var thisMonthDays = moment(new Date(todayrly).valueOf()).daysInMonth();
+    let monthDiff = thisMonth.getMonth() - oldMonth.getMonth() + (12 * (thisMonth.getFullYear() - oldMonth.getFullYear()));
+    console.log(monthDiff);
+    var json13 =value13; //incomes POINTER , epeidh einai json object
+    var json12 =value12; //fixedcosts POINTER
+    //anti gia to payDayFromString thelw to Day apo to DataSourceIncomes
+    if (monthDiff > 0){//allakse o minas prepei na ginoyn shouldUpdate ola
+      console.log('ALLAKSE O MINAS, UPDATE OLA')
+      if(json13 != null){ //INCOMES
+        var retObj = this.updatePastMonthData(json13,thisMonth,value1);
+        json13 = retObj.json;
+        value1 = retObj.returnValue;          
+        console.log(refIncomesData)
+      }
+      if(json12 != null){ //FIXED COSTS
+        var retObj = this.updatePastMonthData(json12,thisMonth,value1);
+        json12 = retObj.json;
+        value1 = retObj.returnValue;          
+        console.log(refFixedCostsData)
+      }
+    }
+    if(json13 != null){
+      var retObj2 = this.checkForBalanceUpdates(json13,thisMonthDays,value1);
+      json13 = retObj2.json;
+      value1 = retObj2.returnValue;
+      refIncomesData = JSON.stringify(json13);
+      await storageSet('DataSourceIncomes',refIncomesData)
+      value13 = json13;
+      console.log(refIncomesData)
+
+    }
+    if(json12!=null){
+      var retObj2 = this.checkForBalanceUpdates(json12,thisMonthDays,value1);
+      json12 = retObj2.json;
+      value1 = retObj2.returnValue;
+      refFixedCostsData = JSON.stringify(json12);
+      await storageSet('DataSourceFixedCosts',refFixedCostsData)
+      value12 = json12;
+      console.log(refFixedCostsData)
+    }
+    this.setState({shouldShowFixedCosts:this.state.shouldShowFixedCosts,shouldShowIncomes:this.state.shouldShowIncomes,spentMonthState:value1, spentTodayState:'0' , dataSource:value9,moniesState:value7, paydayState:value2,euroState:this.state.euroState});
 
   }
    allLoaded(){
@@ -1128,11 +1289,17 @@ render() {
          <View style={styles.colContainer}>
          { parseFloat(this.state.euroState) <0 &&
          <Text style={[styles.textBold,{color:'#FF2D00DD'}]}>{I18n.t('Balance')} {this.stringWithCorrectCurrencyPosition(this.getEuroStateWithCorrectDecimals())}</Text>
-        }
+         }
          { (parseFloat(this.state.euroState) >=0 || this.state.euroState == null)&&
          <Text style={styles.textBold}>{I18n.t('Balance')} {this.stringWithCorrectCurrencyPosition(this.getEuroStateWithCorrectDecimals())}</Text>
-        }   
+         }   
          <Text style={styles.textFaint}>{I18n.t('StartingBalance')} {this.stringWithCorrectCurrencyPosition(this.getStartingEuroStateWithCorrectDecimals())}</Text>
+         { (parseFloat(this.state.euroState) >=0 && this.state.shouldShowIncomes )&&
+         <Text style={styles.textFaint}>{I18n.t('BalanceAfterIncomes')} {this.stringWithCorrectCurrencyPosition(this.getEuroStateAfterIncomesAdded())}</Text>
+         }
+         { (parseFloat(this.state.euroState) >=0 && this.state.shouldShowFixedCosts )&&
+         <Text style={styles.textFaint}>{I18n.t('BalanceAfterFixedCosts')} {this.stringWithCorrectCurrencyPosition(this.getEuroStateAfterFixedCostsRemoved())}</Text>
+         }
          {(this.state.savingsState!='' && this.state.savingsState!=null && this.state.savingsState!='0')  &&
          <Text style={styles.textFaint}>{I18n.t('SavingsBalance')} {this.stringWithCorrectCurrencyPosition(this.getSavingsStateWithCorrectDecimals())}</Text>
          }
@@ -1198,6 +1365,12 @@ render() {
         {(this.state.savingsState!='' && this.state.savingsState!=null && this.state.savingsState!='0' || refUpdateSetAmountAside == true)  &&
         <Text style={styles.modalMainViewSubInfo}>{I18n.t('SavingsBalance')} {this.stringWithCorrectCurrencyPosition(this.getSavingsStateWithCorrectDecimals())}</Text>
         }
+        { (parseFloat(this.state.euroState) >=0 && this.state.shouldShowIncomes )&&
+         <Text style={styles.modalMainViewSubInfo}>{I18n.t('BalanceAfterIncomes')} {this.stringWithCorrectCurrencyPosition(this.getEuroStateAfterIncomesAdded())}</Text>
+         }
+         { (parseFloat(this.state.euroState) >=0 && this.state.shouldShowFixedCosts )&&
+         <Text style={styles.modalMainViewSubInfo}>{I18n.t('BalanceAfterFixedCosts')} {this.stringWithCorrectCurrencyPosition(this.getEuroStateAfterFixedCostsRemoved())}</Text>
+         }
         </View>
         {/* <View style={styles.twoViewsStartEndContainer}>
         {(this.state.euroState!='' && this.state.euroState!=null && this.state.isEditingEuroState == false)   &&
@@ -1500,10 +1673,10 @@ render() {
           {/* { end TUTORIAL} */}
             <View style={styles.colContainer}>
             {parseFloat(this.getRemainingToday()) >=0 &&
-            <Text style={styles.textBold}>{this.stringWithCorrectCurrencyPosition(this.state.moniesState)} {I18n.t('PerDay')}</Text>
+            <Text style={styles.textBold}>{this.stringWithCorrectCurrencyPosition(this.CalculateEuroPerDayNotAsync())} {I18n.t('PerDay')}</Text>
             }
             {parseFloat(this.getRemainingToday()) <0 &&
-            <Text style={[styles.textBold,{color:'#FF2D00DD'}]}>{this.stringWithCorrectCurrencyPosition(this.state.moniesState)} {I18n.t('PerDay')}</Text>
+            <Text style={[styles.textBold,{color:'#FF2D00DD'}]}>{this.stringWithCorrectCurrencyPosition(this.CalculateEuroPerDayNotAsync())} {I18n.t('PerDay')}</Text>
             }
             <Text style={styles.textFaint}>{I18n.t('SpentToday')} {this.stringWithCorrectCurrencyPosition(this.getSpentTodayStateWithCorrectDecimals())}</Text> 
             { parseFloat(this.getRemainingToday()) <0 &&
@@ -1835,7 +2008,8 @@ render() {
    
  async closeCoffeeShop(){
    let _isPro = await storageGet('IsPro');
-  this.setState({openCoffeeShop:false,isPro:_isPro});
+   let _areAdsRemoved = await storageGet('RemovedAds');
+  this.setState({openCoffeeShop:false,isPro:_isPro,areAdsRemoved : _areAdsRemoved});
  }
  hideThisAd1 = () =>{
    console.log('AD HIIDDEN 1')
@@ -2137,7 +2311,7 @@ handleScroll (event){
                 }}>
           <View >
           <View style={[styles.twoViewsStartEndContainer,{padding:15}]}>
-        <ProBanner isPro={this.state.isPro}></ProBanner>
+        <ProBanner  isPro={this.state.isPro}></ProBanner>
          <FontAwesome
        style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}} icon={SolidIcons.handHoldingUsd}/>
         <TouchableOpacity  onPress={()=>this.openIncomesView()} >
@@ -2147,9 +2321,9 @@ handleScroll (event){
           <View style={[styles.billingWindowStyle,{justifyContent:'space-around'}]}>
             <FontAwesome style={[styles.iconStyle,{position:'absolute',right:26}]} icon={SolidIcons.handHoldingUsd}/>
             <Text style={styles.sideWindowTextBold}>{I18n.t("IncomesHeader")}</Text>
-            <Text style={styles.sideWindowTextFaint}>Set your incomes</Text>                  
+            <Text style={styles.sideWindowTextFaint}>{I18n.t('SetYourIncomes')}</Text>                  
             {this.state.euroState == '' || this.state.euroState == null &&
-              <Text style={styles.modalMainViewSubHeader}>SET BALANCE FIRST</Text>        
+              <Text style={styles.modalMainViewSubHeader}>{I18n.t('SetBalanceFirst')}</Text>        
             }
             {this.state.dataSourceIncomes!=null && this.state.dataSourceIncomes.length !=0 && this.state.euroState != '' && this.state.euroState != null &&
                 <ScrollView style={styles.scrollViewManagerStyle}>                  
@@ -2169,48 +2343,48 @@ handleScroll (event){
                       onChange={(event, selectedDate) => this.datePickedIncomesView(event,selectedDate,item.Number)}
                     />
                   )} */}
-                  <Text numberOfLines={1} style={styles.dayTextLabel}>Every ... </Text>
+                  <Text numberOfLines={1} style={styles.dayTextLabel}>{I18n.t('EveryLabel')}</Text>
                   <Picker
                     style = {styles.dayPicker}                 
                     selectedValue={this.state.incomesDateValues[item.Number]!=undefined ? this.state.incomesDateValues[item.Number]:item.Day}
                     onValueChange={(itemValue, itemIndex) => this.datePickedIncomesView(itemIndex,item.Number)
                     }>
-                    <Picker.Item label="Pick a day pls" value={0} />
-                    <Picker.Item label={moment(new Date(1970,0,1)).format('Do')} value={1} />
-                    <Picker.Item label={moment(new Date(1970,0,2)).format('Do')} value={2} />
-                    <Picker.Item label={moment(new Date(1970,0,3)).format('Do')} value={3} />
-                    <Picker.Item label={moment(new Date(1970,0,4)).format('Do')} value={4} />
-                    <Picker.Item label={moment(new Date(1970,0,5)).format('Do')} value={5} />
-                    <Picker.Item label={moment(new Date(1970,0,6)).format('Do')} value={6} />
-                    <Picker.Item label={moment(new Date(1970,0,7)).format('Do')} value={7} />
-                    <Picker.Item label={moment(new Date(1970,0,8)).format('Do')} value={8} />
-                    <Picker.Item label={moment(new Date(1970,0,9)).format('Do')} value={9} />
-                    <Picker.Item label={moment(new Date(1970,0,10)).format('Do')} value={10} />
-                    <Picker.Item label={moment(new Date(1970,0,11)).format('Do')} value={11} />
-                    <Picker.Item label={moment(new Date(1970,0,12)).format('Do')} value={12} />
-                    <Picker.Item label={moment(new Date(1970,0,13)).format('Do')} value={13} />
-                    <Picker.Item label={moment(new Date(1970,0,14)).format('Do')} value={14} />
-                    <Picker.Item label={moment(new Date(1970,0,15)).format('Do')} value={15} />
-                    <Picker.Item label={moment(new Date(1970,0,16)).format('Do')} value={16} />
-                    <Picker.Item label={moment(new Date(1970,0,17)).format('Do')} value={17} />
-                    <Picker.Item label={moment(new Date(1970,0,18)).format('Do')} value={18} />
-                    <Picker.Item label={moment(new Date(1970,0,19)).format('Do')} value={19} />
-                    <Picker.Item label={moment(new Date(1970,0,20)).format('Do')} value={20} />
-                    <Picker.Item label={moment(new Date(1970,0,21)).format('Do')} value={21} />
-                    <Picker.Item label={moment(new Date(1970,0,22)).format('Do')} value={22} />
-                    <Picker.Item label={moment(new Date(1970,0,23)).format('Do')} value={23} />
-                    <Picker.Item label={moment(new Date(1970,0,24)).format('Do')} value={24} />
-                    <Picker.Item label={moment(new Date(1970,0,25)).format('Do')} value={25} />
-                    <Picker.Item label={moment(new Date(1970,0,26)).format('Do')} value={26} />
-                    <Picker.Item label={moment(new Date(1970,0,27)).format('Do')} value={27} />
-                    <Picker.Item label={moment(new Date(1970,0,28)).format('Do')} value={28} />
-                    <Picker.Item label={moment(new Date(1970,0,29)).format('Do')} value={29} />
-                    <Picker.Item label={moment(new Date(1970,0,30)).format('Do')} value={30} />
-                    <Picker.Item label={moment(new Date(1970,0,31)).format('Do')} value={31} />
+                    <Picker.Item style ={styles.dayPickerItem}  label="..." value={0} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,1)).format('Do')} value={1} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,2)).format('Do')} value={2} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,3)).format('Do')} value={3} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,4)).format('Do')} value={4} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,5)).format('Do')} value={5} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,6)).format('Do')} value={6} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,7)).format('Do')} value={7} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,8)).format('Do')} value={8} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,9)).format('Do')} value={9} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,10)).format('Do')} value={10} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,11)).format('Do')} value={11} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,12)).format('Do')} value={12} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,13)).format('Do')} value={13} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,14)).format('Do')} value={14} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,15)).format('Do')} value={15} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,16)).format('Do')} value={16} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,17)).format('Do')} value={17} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,18)).format('Do')} value={18} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,19)).format('Do')} value={19} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,20)).format('Do')} value={20} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,21)).format('Do')} value={21} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,22)).format('Do')} value={22} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,23)).format('Do')} value={23} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,24)).format('Do')} value={24} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,25)).format('Do')} value={25} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,26)).format('Do')} value={26} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,27)).format('Do')} value={27} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,28)).format('Do')} value={28} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,29)).format('Do')} value={29} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,30)).format('Do')} value={30} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,31)).format('Do')} value={31} />
                   </Picker>
                 </View>
                 <View style={styles.rowContainerManager}>                  
-                  <Text numberOfLines={1} style={styles.dayTextLabel}>Recieve ... </Text>
+                  <Text numberOfLines={1} style={styles.dayTextLabel}>{I18n.t('RecieveLabel')}</Text>
                   <View style={[styles.inputRowContainer,{marginLeft:30}]}>
                     <View style={styles.iconContainer}>
                     <FontAwesome style={styles.inputIcon} icon={this.correctFontAwesomeCurrencyIcon()}/>
@@ -2241,7 +2415,7 @@ handleScroll (event){
                       ref={ref => {this._textInputRefs[item.Number] = ref}} 
                       onChangeText={(text)=> this.onChangeGenericIncomesDescription(text)}
                       onEndEditing={()=>this.onEndEditGenericIncomesDescription(item.Number)}
-                      placeholder='Description'
+                      placeholder={I18n.t('DefaultDescription')}
                       
                     />
                     </View>
@@ -2269,13 +2443,15 @@ handleScroll (event){
               {(this.state.startingEuroState!='' && this.state.startingEuroState!=null)  &&
               <Text style={styles.modalMainViewSubInfo}>{I18n.t('StartingBalance')} {this.stringWithCorrectCurrencyPosition(this.getStartingEuroStateWithCorrectDecimals())}</Text>
               }
-              {(this.state.euroState!='' && this.state.euroState!=null)  &&
-              <Text style={styles.modalMainViewSubInfo}>{I18n.t('SavingsBalance')} {this.stringWithCorrectCurrencyPosition(this.getNewSavingsAmountFloat())}</Text>
-              }
+              { (parseFloat(this.state.euroState) >=0 && this.state.shouldShowIncomes )&&
+              <Text style={styles.modalMainViewSubInfo}>{I18n.t('BalanceAfterIncomes')} {this.stringWithCorrectCurrencyPosition(this.getEuroStateAfterIncomesAdded())}</Text>
+              }           
               </View>
-              <TouchableOpacity onPress={async ()=>await this.createEmptyIncomesField()}>
+              { this.state.euroState != null && this.state.euroState != '' &&
+              <TouchableOpacity onPress={async ()=>await this.createEmptyIncomesField()}>           
               <FontAwesome style={{textAlign:'auto',paddingHorizontal:5,fontSize:35,color:'#000001'}} icon={SolidIcons.plusCircle}></FontAwesome>
               </TouchableOpacity>
+              }
               </View>        
           </View>
         </Modal>
@@ -2292,9 +2468,9 @@ handleScroll (event){
           <View style={[styles.billingWindowStyle,{justifyContent:'space-around'}]}>
             <FontAwesome style={[styles.iconStyle,{position:'absolute',right:26}]} icon={SolidIcons.fileInvoiceDollar}/>
             <Text style={styles.sideWindowTextBold}>{I18n.t("FixedCostsHeader")}</Text>
-            <Text style={styles.sideWindowTextFaint}>Set your fixed costs</Text>                  
+            <Text style={styles.sideWindowTextFaint}>{I18n.t('SetYourFixedCosts')}</Text>                  
             {this.state.euroState == '' || this.state.euroState == null &&
-              <Text style={styles.modalMainViewSubHeader}>SET BALANCE FIRST</Text>        
+              <Text style={styles.modalMainViewSubHeader}>{I18n.t('SetBalanceFirst')}</Text>        
             }
             {this.state.dataSourceFixedCosts!=null && this.state.dataSourceFixedCosts.length !=0 && this.state.euroState != '' && this.state.euroState != null &&
                 <ScrollView style={styles.scrollViewManagerStyle}>                  
@@ -2314,48 +2490,49 @@ handleScroll (event){
                       onChange={(event, selectedDate) => this.datePickedFixedCostsView(event,selectedDate,item.Number)}
                     />
                   )} */}
-                  <Text numberOfLines={1} style={styles.dayTextLabel}>Every ... </Text>
+                  <Text numberOfLines={1} style={styles.dayTextLabel}>{I18n.t('EveryLabel')}</Text>
                   <Picker
-                    style = {styles.dayPicker}                 
+                    style = {styles.dayPicker}
+                                   
                     selectedValue={this.state.fixedCostsDateValues[item.Number]!=undefined ? this.state.fixedCostsDateValues[item.Number]:item.Day}
                     onValueChange={(itemValue, itemIndex) => this.datePickedFixedCostsView(itemIndex,item.Number)
                     }>
-                    <Picker.Item label="Pick a day pls" value={0} />
-                    <Picker.Item label={moment(new Date(1970,0,1)).format('Do')} value={1} />
-                    <Picker.Item label={moment(new Date(1970,0,2)).format('Do')} value={2} />
-                    <Picker.Item label={moment(new Date(1970,0,3)).format('Do')} value={3} />
-                    <Picker.Item label={moment(new Date(1970,0,4)).format('Do')} value={4} />
-                    <Picker.Item label={moment(new Date(1970,0,5)).format('Do')} value={5} />
-                    <Picker.Item label={moment(new Date(1970,0,6)).format('Do')} value={6} />
-                    <Picker.Item label={moment(new Date(1970,0,7)).format('Do')} value={7} />
-                    <Picker.Item label={moment(new Date(1970,0,8)).format('Do')} value={8} />
-                    <Picker.Item label={moment(new Date(1970,0,9)).format('Do')} value={9} />
-                    <Picker.Item label={moment(new Date(1970,0,10)).format('Do')} value={10} />
-                    <Picker.Item label={moment(new Date(1970,0,11)).format('Do')} value={11} />
-                    <Picker.Item label={moment(new Date(1970,0,12)).format('Do')} value={12} />
-                    <Picker.Item label={moment(new Date(1970,0,13)).format('Do')} value={13} />
-                    <Picker.Item label={moment(new Date(1970,0,14)).format('Do')} value={14} />
-                    <Picker.Item label={moment(new Date(1970,0,15)).format('Do')} value={15} />
-                    <Picker.Item label={moment(new Date(1970,0,16)).format('Do')} value={16} />
-                    <Picker.Item label={moment(new Date(1970,0,17)).format('Do')} value={17} />
-                    <Picker.Item label={moment(new Date(1970,0,18)).format('Do')} value={18} />
-                    <Picker.Item label={moment(new Date(1970,0,19)).format('Do')} value={19} />
-                    <Picker.Item label={moment(new Date(1970,0,20)).format('Do')} value={20} />
-                    <Picker.Item label={moment(new Date(1970,0,21)).format('Do')} value={21} />
-                    <Picker.Item label={moment(new Date(1970,0,22)).format('Do')} value={22} />
-                    <Picker.Item label={moment(new Date(1970,0,23)).format('Do')} value={23} />
-                    <Picker.Item label={moment(new Date(1970,0,24)).format('Do')} value={24} />
-                    <Picker.Item label={moment(new Date(1970,0,25)).format('Do')} value={25} />
-                    <Picker.Item label={moment(new Date(1970,0,26)).format('Do')} value={26} />
-                    <Picker.Item label={moment(new Date(1970,0,27)).format('Do')} value={27} />
-                    <Picker.Item label={moment(new Date(1970,0,28)).format('Do')} value={28} />
-                    <Picker.Item label={moment(new Date(1970,0,29)).format('Do')} value={29} />
-                    <Picker.Item label={moment(new Date(1970,0,30)).format('Do')} value={30} />
-                    <Picker.Item label={moment(new Date(1970,0,31)).format('Do')} value={31} />
+                    <Picker.Item style ={styles.dayPickerItem}  label="..." value={0} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,1)).format('Do')} value={1} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,2)).format('Do')} value={2} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,3)).format('Do')} value={3} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,4)).format('Do')} value={4} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,5)).format('Do')} value={5} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,6)).format('Do')} value={6} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,7)).format('Do')} value={7} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,8)).format('Do')} value={8} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,9)).format('Do')} value={9} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,10)).format('Do')} value={10} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,11)).format('Do')} value={11} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,12)).format('Do')} value={12} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,13)).format('Do')} value={13} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,14)).format('Do')} value={14} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,15)).format('Do')} value={15} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,16)).format('Do')} value={16} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,17)).format('Do')} value={17} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,18)).format('Do')} value={18} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,19)).format('Do')} value={19} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,20)).format('Do')} value={20} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,21)).format('Do')} value={21} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,22)).format('Do')} value={22} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,23)).format('Do')} value={23} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,24)).format('Do')} value={24} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,25)).format('Do')} value={25} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,26)).format('Do')} value={26} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,27)).format('Do')} value={27} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,28)).format('Do')} value={28} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,29)).format('Do')} value={29} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,30)).format('Do')} value={30} />
+                    <Picker.Item style ={styles.dayPickerItem} label={moment(new Date(1970,0,31)).format('Do')} value={31} />
                   </Picker>
                 </View>
                 <View style={styles.rowContainerManager}>                  
-                  <Text numberOfLines={1} style={styles.dayTextLabel}>Recieve ... </Text>
+                  <Text numberOfLines={1} style={styles.dayTextLabel}>{I18n.t('PayLabel')}</Text>
                   <View style={[styles.inputRowContainer,{marginLeft:30}]}>
                     <View style={styles.iconContainer}>
                     <FontAwesome style={styles.inputIcon} icon={this.correctFontAwesomeCurrencyIcon()}/>
@@ -2386,7 +2563,7 @@ handleScroll (event){
                       ref={ref => {this._textInputRefs[item.Number] = ref}} 
                       onChangeText={(text)=> this.onChangeGenericFixedCostsDescription(text)}
                       onEndEditing={()=>this.onEndEditGenericFixedCostsDescription(item.Number)}
-                      placeholder='Description'
+                      placeholder={I18n.t('DefaultDescription')}
                       
                     />
                     </View>
@@ -2413,13 +2590,15 @@ handleScroll (event){
               {(this.state.startingEuroState!='' && this.state.startingEuroState!=null)  &&
               <Text style={styles.modalMainViewSubInfo}>{I18n.t('StartingBalance')} {this.stringWithCorrectCurrencyPosition(this.getStartingEuroStateWithCorrectDecimals())}</Text>
               }
-              {(this.state.euroState!='' && this.state.euroState!=null)  &&
-              <Text style={styles.modalMainViewSubInfo}>{I18n.t('SavingsBalance')} {this.stringWithCorrectCurrencyPosition(this.getNewSavingsAmountFloat())}</Text>
+              { (parseFloat(this.state.euroState) >=0 && this.state.shouldShowFixedCosts )&&
+              <Text style={styles.modalMainViewSubInfo}>{I18n.t('BalanceAfterFixedCosts')} {this.stringWithCorrectCurrencyPosition(this.getEuroStateAfterFixedCostsRemoved())}</Text>
               }
               </View>
+              { this.state.euroState != null && this.state.euroState != '' &&
               <TouchableOpacity onPress={async ()=>await this.createEmptyFixedCostsField()}>
               <FontAwesome style={{textAlign:'auto',paddingHorizontal:5,fontSize:35,color:'#000001'}} icon={SolidIcons.plusCircle}></FontAwesome>
               </TouchableOpacity>
+              }
               </View>        
           </View>
         </Modal>
@@ -2436,9 +2615,9 @@ handleScroll (event){
             <View style={[styles.billingWindowStyle,{justifyContent:'space-around'}]}>
             <FontAwesome style={[styles.iconStyle,{position:'absolute',right:20}]} icon={SolidIcons.piggyBank}/>
             <Text style={styles.sideWindowTextBold}>{I18n.t("SavingsHeader")}</Text>
-            <Text style={styles.sideWindowTextFaint}>Set your savings balances</Text>
+            <Text style={styles.sideWindowTextFaint}>{I18n.t('SetYourSavingsBalances')}</Text>
               {this.state.euroState == '' || this.state.euroState == null &&
-              <Text style={styles.modalMainViewSubHeader}>SET BALANCE FIRST</Text>        
+              <Text style={styles.modalMainViewSubHeader}>{I18n.t('SetBalanceFirst')}</Text>        
               }
               
               {this.state.dataSourceSavings!=null && this.state.dataSourceSavings.length !=0 && this.state.euroState != '' && this.state.euroState != null &&
@@ -2492,7 +2671,7 @@ handleScroll (event){
                       ref={ref => {this._textInputRefs[item.Number] = ref}} 
                       onChangeText={(text)=> this.onChangeGenericSavingsDescription(text)}
                       onEndEditing={()=>this.onEndEditGenericSavingsDescription(item.Number)}
-                      placeholder='Description'
+                      placeholder={I18n.t('DefaultDescription')}
                       
                     />
                     </View>
@@ -2525,9 +2704,11 @@ handleScroll (event){
               <Text style={styles.modalMainViewSubInfo}>{I18n.t('SavingsBalance')} {this.stringWithCorrectCurrencyPosition(this.getNewSavingsAmountFloat())}</Text>
               }
               </View>
+              { this.state.euroState != null && this.state.euroState != '' &&
               <TouchableOpacity onPress={async ()=>await this.createEmptySavingsField()}>
               <FontAwesome style={{textAlign:'auto',paddingHorizontal:5,fontSize:35,color:'#000001'}} icon={SolidIcons.plusCircle}></FontAwesome>
               </TouchableOpacity>
+              }
               </View>
                   
           </View>
@@ -2574,7 +2755,23 @@ handleScroll (event){
           </TouchableOpacity>
           <Modal  onBackdropPress={async ()=> await this.refreshCategoryIcons()} useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.coffeeShopModal}  animationIn = {'slideInUp'} animationOut={'slideOutDown'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.openCategoriesSelect}> 
             <View style={styles.billingWindowStyle}>
-          <CategoriesSelect callback={()=>this.buyProVersionPrompt()} isPro={this.state.isPro} changeCategories={this.changeCategories} categoryIcon0={categoryIcon0} categoryIcon1={categoryIcon1}categoryIcon2={categoryIcon2}categoryIcon3={categoryIcon3}categoryIcon4={categoryIcon4}categoryIcon5={categoryIcon5}categoryIcon6={categoryIcon6}categoryIcon7={categoryIcon7}/>       
+          <CategoriesSelect categoryNameChangeCallback={(i,categoryName)=>this.changeNameOfCategory(i,categoryName)} callback={()=>this.buyProVersionPrompt()} isPro={this.state.isPro} changeCategories={this.changeCategories} categoryIcon0={categoryIcon0} categoryIcon1={categoryIcon1}categoryIcon2={categoryIcon2}categoryIcon3={categoryIcon3}categoryIcon4={categoryIcon4}categoryIcon5={categoryIcon5}categoryIcon6={categoryIcon6}categoryIcon7={categoryIcon7} 
+          categoryName0={categoryName0} categoryName1={categoryName1}categoryName2={categoryName2}categoryName3={categoryName3}categoryName4={categoryName4}categoryName5={categoryName5}categoryName6={categoryName6}categoryName7={categoryName7}
+          />
+          <Modal onBackdropPress={(async ()=> await this.refreshCategoryIconsWithoutClosing())} useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.coffeeShopModal}  animationIn = {'slideInUp'} animationOut={'slideOutDown'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.openChangeNameOfCategory}> 
+          <View style={[styles.billingWindowStyle]}>
+            <Text style={[styles.textBold,{marginLeft:0,alignSelf:'center',fontStyle:'italic'}]}>{I18n.t('ChangeNameOfCategoryTitle')} {this.state.changeCategoryNameNo}</Text>
+            <Text></Text>
+            <View style={[styles.inputRowContainer , {borderColor:'#8d8d8d88',borderWidth:1,width:'90%',borderRadius:10}]}>
+            <TextInput 
+            placeholder={this.state.changeCategoryName}
+            onChangeText={(text)=>this.onChangeNameOfCategory(text)}
+            onEndEditing={async ()=> await this.setNameOfCategory()}
+            ></TextInput>
+            </View>
+            <Text></Text>
+          </View>
+          </Modal>
           </View>
         </Modal>
         </View>
@@ -2646,11 +2843,58 @@ handleScroll (event){
       </View>
     );
   };
- 
+  changeNameOfCategory(i,categoryName){
+    console.log(categoryName)
+    this.setState({openChangeNameOfCategory:true,changeCategoryNameNo:(parseInt(i)+1),changeCategoryName:categoryName})
+  }
+  onChangeNameOfCategory(text){
+    console.log(text)
+    this.setState({changedCategoryName:text})
+  }
+  async setNameOfCategory(){
+    if(this.state.changedCategoryName!=undefined){
+      if(this.state.changedCategoryName=='' || this.state.changedCategoryName==null){
+        console.log('NO CHANGE')
+      }else{
+      let isPro = await storageGet("IsPro");
+      if( isPro == 'true'){
+        await storageSet('categoryName'+(this.state.changeCategoryNameNo-1),this.state.changedCategoryName)
+      }
+     this.setState({changedCategoryName:this.state.changedCategoryName})
+    }
+    }
+  }
+  async refreshCategoryIconsWithoutClosing(){
+    let isPro = await storageGet("IsPro");
+    if( isPro != 'true'){
+      this.buyProVersionPrompt();
+    }else{
+      await this.refreshCategoriesIconsAndNames();
+    }
+    this.setState({openChangeNameOfCategory:false});
+  }
+  async refreshCategoriesIconsAndNames(){
+    categoryIcon0 = await storageGet('categoryIcon0');
+    categoryIcon1 = await storageGet('categoryIcon1');
+    categoryIcon2 = await storageGet('categoryIcon2');
+    categoryIcon3 = await storageGet('categoryIcon3');
+    categoryIcon4 = await storageGet('categoryIcon4');
+    categoryIcon5 = await storageGet('categoryIcon5');
+    categoryIcon6 = await storageGet('categoryIcon6');
+    categoryIcon7 = await storageGet('categoryIcon7');
+    categoryName0 = await storageGet('categoryName0');
+    categoryName1 = await storageGet('categoryName1');
+    categoryName2 = await storageGet('categoryName2');
+    categoryName3 = await storageGet('categoryName3');
+    categoryName4 = await storageGet('categoryName4');
+    categoryName5 = await storageGet('categoryName5');
+    categoryName6 = await storageGet('categoryName6');
+    categoryName7 = await storageGet('categoryName7');
+  }
   buyProVersionPrompt(){
     Alert.alert(
-      "Pro version only!",
-      "This feature is not available in the free version. Are you interested in discovering all the features the pro version has to offer?",
+      I18n.t("ProVersionOnlyTitle"),
+      I18n.t("ProVersionOnlyMessage"),
       [
          // The "No" button
         // Does nothing but dismiss the dialog when tapped
@@ -2831,17 +3075,18 @@ handleScroll (event){
     let AlertStringToShow ='';
     let newEuroState = '';
     let diff  = parseFloat(this.state.savingsState) - parseFloat(newAmount);
-    if(this.state.euroState =="" || this.state.euroState == null){
-    }else{    
-      newEuroState = (parseFloat(this.state.euroState) + (diff)).toString();     
-    }
-    if((diff)>0){
-      //added
-      AlertStringToShow =  I18n.t("AddAmount") + newEuroState;
-    }else{
-      //subbed
-      AlertStringToShow = I18n.t("SubtractAmount") + newEuroState;
-    }
+        if(this.state.euroState =="" || this.state.euroState == null){
+          newEuroState = '0';
+        }else{    
+          newEuroState = (parseFloat(this.state.euroState) + (diff)).toString();     
+        }
+        if((diff)>0){
+          //added
+          AlertStringToShow =  I18n.t("AddAmount") +' '+ this.stringWithCorrectCurrencyPosition(diff)+' .\n'+ I18n.t("NewBalanceAmount") +' '+this.stringWithCorrectCurrencyPosition(newEuroState)+ ' .\n'+I18n.t("AreYouSure") ;
+        }else{
+          //subbed
+          AlertStringToShow =  I18n.t("SubtractAmount") +' '+ this.stringWithCorrectCurrencyPosition(Math.abs(diff))+' .\n'+ I18n.t("NewBalanceAmount") +' '+this.stringWithCorrectCurrencyPosition(newEuroState)+ ' .\n'+I18n.t("AreYouSure") ;
+        }
     //this.setState({ savingsState: this.state.savingsState ,euroState: this.state.euroState  });
     //prepi na kanw save edw gia na min ksanaafairesei to neo yparxon poso
     this.state.savingsState = (parseFloat(newAmount)).toString();
@@ -2982,12 +3227,12 @@ handleScroll (event){
     var addComma = ',';
     if(refIncomesData =='[]'){
       addComma='';
-    }
-    var newEntry = this.jsonifyInputIncomesField(0,'Incomes','',count,0,true); 
+    }    
+    var newEntry = this.jsonifyInputIncomesField(0,'Incomes','',count,0,false,moment(new Date()).format('YYYY-MM')); 
     refIncomesData = refIncomesData.substring(0,refIncomesData.length-1)+addComma+newEntry+']';
     console.log(refIncomesData);
     //await storageSet('SpentTodayJson',spentTodayJson); //ayto ginetai sto DataSourceSavings, an ginei confirm
-    this.setState({dataSourceIncomes:JSON.parse(refIncomesData)}); //,showDatePicker:-1
+    this.setState({shouldShowIncomes:true,dataSourceIncomes:JSON.parse(refIncomesData)}); //,showDatePicker:-1
     console.log(refIncomesData)
   }
   deleteIncomesField(no){
@@ -3007,13 +3252,15 @@ handleScroll (event){
       }
     }
     refIncomesData = JSON.stringify(json);
+    this.state.shouldShowIncomes = !(Object.keys(json).length ==0);
+    
     this._textInputRefs = [];
     
     //this._savingsValuesChangeAmount = [];
     this.state.incomesValues =[];
     this.state.incomesDateValues = [];
     this.state.dataSourceIncomes = json;
-    this.setState({dataSourceIncomes:json,incomesValues:this.state.incomesValues,incomesDateValues:this.state.incomesDateValues});
+    this.setState({shouldShowIncomes:this.state.shouldShowIncomes,dataSourceIncomes:json,incomesValues:this.state.incomesValues,incomesDateValues:this.state.incomesDateValues});
   }
   onChangeGenericIncomes(text,no){
     let newText = this.checkInputText(text);
@@ -3029,7 +3276,7 @@ handleScroll (event){
       this.state.incomesValues[no] = this.checkIfAddOrSubNeeded(this.state.incomesValues[no]); //ayto to kanw gia na fainetai to swsto value sto UI
       this.setState({incomesValues: this.state.incomesValues });
       var json : JSON = JSON.parse(refIncomesData);
-      json[no].isEdited = true;
+      //json[no].isEdited = true;
       json[no].Amount = this.state.incomesValues[no] ;
       
       refIncomesData = JSON.stringify(json);
@@ -3052,7 +3299,7 @@ handleScroll (event){
     var json = JSON.parse(refIncomesData);
     if(this._descRef!=null){
       if(this._descRef!=json[no].Description ){
-        json[no].isEdited = true;
+        //json[no].isEdited = true;
         json[no].Description = this._descRef;
         refIncomesData = JSON.stringify(json);
         console.log(refIncomesData);
@@ -3071,11 +3318,19 @@ handleScroll (event){
     this.setState({incomesDateValues: this.state.incomesDateValues });
 
     var json = JSON.parse(refIncomesData);
-    json[itemNumber].isEdited = true;
+    //json[itemNumber].isEdited = true;
     json[itemNumber].Day = selectedDayIndex;
+    console.log('THIS IDS NE WEDATE ' + selectedDayIndex)
+    if(new Date().getDate() >= parseInt(selectedDayIndex)){ //exei perasei h mera poy exei kanei select
+      json[itemNumber].shouldUpdate = false;
+      json[itemNumber].lastUpdated =  moment(new Date()).format('YYYY-MM');
+    }else{
+      json[itemNumber].shouldUpdate = true;
+      json[itemNumber].lastUpdated =  moment(new Date()).subtract(1, 'month').format('YYYY-MM');
+
+    }
     refIncomesData = JSON.stringify(json);
     console.log(refIncomesData);
-
 
   }
 
@@ -3142,11 +3397,11 @@ handleScroll (event){
     if(refFixedCostsData =='[]'){
       addComma='';
     }
-    var newEntry = this.jsonifyInputFixedCostsField(0,'FixedCosts','',count,0,true); 
+    var newEntry = this.jsonifyInputFixedCostsField(0,'FixedCosts','',count,0,false,moment(new Date()).format('YYYY-MM')); 
     refFixedCostsData = refFixedCostsData.substring(0,refFixedCostsData.length-1)+addComma+newEntry+']';
     console.log(refFixedCostsData);
     //await storageSet('SpentTodayJson',spentTodayJson); //ayto ginetai sto DataSourceSavings, an ginei confirm
-    this.setState({dataSourceFixedCosts:JSON.parse(refFixedCostsData)}); //,showDatePicker:-1
+    this.setState({shouldShowFixedCosts:true,dataSourceFixedCosts:JSON.parse(refFixedCostsData)}); //,showDatePicker:-1
     console.log(refFixedCostsData)
   }
   deleteFixedCostsField(no){
@@ -3166,13 +3421,16 @@ handleScroll (event){
       }
     }
     refFixedCostsData = JSON.stringify(json);
+    this.state.shouldShowFixedCosts = !(Object.keys(json).length ==0);
+
+
     this._textInputRefs = [];
     
     //this._savingsValuesChangeAmount = [];
     this.state.fixedCostsValues =[];
     this.state.fixedCostsDateValues = [];
     this.state.dataSourceFixedCosts = json;
-    this.setState({dataSourceFixedCosts:json,fixedCostsValues:this.state.fixedCostsValues,fixedCostsDateValues:this.state.fixedCostsDateValues});
+    this.setState({shouldShowFixedCosts:this.state.shouldShowFixedCosts,dataSourceFixedCosts:json,fixedCostsValues:this.state.fixedCostsValues,fixedCostsDateValues:this.state.fixedCostsDateValues});
   }
   onChangeGenericFixedCosts(text,no){
     let newText = this.checkInputText(text);
@@ -3188,7 +3446,7 @@ handleScroll (event){
       this.state.fixedCostsValues[no] = this.checkIfAddOrSubNeeded(this.state.fixedCostsValues[no]); //ayto to kanw gia na fainetai to swsto value sto UI
       this.setState({fixedCostsValues: this.state.fixedCostsValues });
       var json : JSON = JSON.parse(refFixedCostsData);
-      json[no].isEdited = true;
+      //json[no].isEdited = true;
       json[no].Amount = this.state.fixedCostsValues[no] ;
       
       refFixedCostsData = JSON.stringify(json);
@@ -3211,7 +3469,7 @@ handleScroll (event){
     var json = JSON.parse(refFixedCostsData);
     if(this._descRef!=null){
       if(this._descRef!=json[no].Description ){
-        json[no].isEdited = true;
+       // json[no].isEdited = true;
         json[no].Description = this._descRef;
         refFixedCostsData = JSON.stringify(json);
         console.log(refFixedCostsData);
@@ -3230,8 +3488,17 @@ handleScroll (event){
     this.setState({fixedCostsDateValues: this.state.fixedCostsDateValues });
 
     var json = JSON.parse(refFixedCostsData);
-    json[itemNumber].isEdited = true;
+    //json[itemNumber].isEdited = true;
     json[itemNumber].Day = selectedDayIndex;
+    if(new Date().getDate() >= parseInt(selectedDayIndex)){ //exei perasei h mera poy exei kanei select
+      json[itemNumber].shouldUpdate = false;
+      json[itemNumber].lastUpdated =  moment(new Date()).format('YYYY-MM');
+    }else{
+      json[itemNumber].shouldUpdate = true;
+      json[itemNumber].lastUpdated =  moment(new Date()).subtract(1, 'month').format('YYYY-MM');
+
+    }    
+    //json[itemNumber].isEdited = true;
     refFixedCostsData = JSON.stringify(json);
     console.log(refFixedCostsData);
 
@@ -3256,16 +3523,10 @@ handleScroll (event){
     this.setState({openCategoriesSelect:false})
   }
   async refreshCategoryIcons(){
-    categoryIcon0 = await storageGet('categoryIcon0');
-    categoryIcon1 = await storageGet('categoryIcon1');
-    categoryIcon2 = await storageGet('categoryIcon2');
-    categoryIcon3 = await storageGet('categoryIcon3');
-    categoryIcon4 = await storageGet('categoryIcon4');
-    categoryIcon5 = await storageGet('categoryIcon5');
-    categoryIcon6 = await storageGet('categoryIcon6');
-    categoryIcon7 = await storageGet('categoryIcon7');
+    await this.refreshCategoriesIconsAndNames();
     this.setState({openCategoriesSelect:false});
   }
+ 
   stringWithCorrectCurrencyPosition(stringToReturn){
     if(stringToReturn ==null){
       stringToReturn = '';
@@ -3928,11 +4189,11 @@ handleScroll (event){
   jsonifyInputSavingsField(amount,type,description,number,isEdited){
     return '{"Amount":"'+amount+'", "Type":"'+type+'", "Description":"'+description+'","Number":"'+number+'","isEdited":'+isEdited+'}';
   }
-  jsonifyInputIncomesField(amount,type,description,number,dayNum,isEdited){
-    return '{"Amount":"'+amount+'", "Type":"'+type+'", "Description":"'+description+'","Number":"'+number+'","Day":'+dayNum+',"isEdited":'+isEdited+'}';
+  jsonifyInputIncomesField(amount,type,description,number,dayNum,shouldUpdate,lastUpdated){
+    return '{"Amount":"'+amount+'", "Type":"'+type+'", "Description":"'+description+'","Number":"'+number+'","Day":'+dayNum+',"shouldUpdate":'+shouldUpdate+',"lastUpdated":"'+lastUpdated+'"}';
   }
-  jsonifyInputFixedCostsField(amount,type,description,number,dayNum,isEdited){
-    return '{"Amount":"'+amount+'", "Type":"'+type+'", "Description":"'+description+'","Number":"'+number+'","Day":'+dayNum+',"isEdited":'+isEdited+'}';
+  jsonifyInputFixedCostsField(amount,type,description,number,dayNum,shouldUpdate,lastUpdated){
+    return '{"Amount":"'+amount+'", "Type":"'+type+'", "Description":"'+description+'","Number":"'+number+'","Day":'+dayNum+',"shouldUpdate":'+shouldUpdate+',"lastUpdated":"'+lastUpdated+'"}';
   }
   renderExpensesJsonList = ({ item }) => (
     <View style={[styles.rowContainer,{justifyContent:'space-between'}]}>
@@ -4025,6 +4286,42 @@ handleScroll (event){
    }
   //(parseFloat(this.state.euroState).toFixed(2)).toString()
  }
+ getEuroStateAfterFixedCostsRemoved(){
+  let fixedCostsToBeRemoved = 0;
+  if(this.state.dataSourceFixedCosts!=''){
+  let json = this.state.dataSourceFixedCosts;
+  for(var i=0; i< Object.keys(json).length; i++){
+    if(json[i].shouldUpdate){ //poso pou tha afairethei
+     fixedCostsToBeRemoved += parseFloat(json[i].Amount);
+    }
+  }
+  }
+  let euroRef = (parseFloat(this.state.euroState) - fixedCostsToBeRemoved).toString();
+  var index = euroRef.indexOf('.');
+   if (index >= 0) {
+     return (parseFloat(euroRef).toFixed(2)).toString();
+   } else {
+     return euroRef;
+   }
+ }
+ getEuroStateAfterIncomesAdded(){
+  let incomesToBeAdded = 0;
+  if(this.state.dataSourceIncomes!=''){
+  let json = this.state.dataSourceIncomes;
+  for(var i=0; i< Object.keys(json).length; i++){
+    if(json[i].shouldUpdate){ //poso pou tha afairethei
+      incomesToBeAdded += parseFloat(json[i].Amount);
+    }
+  }
+  }
+  let euroRef = (parseFloat(this.state.euroState) + incomesToBeAdded).toString();
+  var index = euroRef.indexOf('.');
+   if (index >= 0) {
+     return (parseFloat(euroRef).toFixed(2)).toString();
+   } else {
+     return euroRef;
+   }
+ }
  getStartingEuroStateWithCorrectDecimals(){
   if(this.state.startingEuroState =='' || this.state.startingEuroState==null){
     return '';
@@ -4051,6 +4348,7 @@ getSpentTodayStateWithCorrectDecimals(){
 }
 
 getLocalisedFullDateString(dateString){
+  console.log('WTF LOLCALE ' +moment.locale())
   if(dateString == '' || dateString == null){
     return null;
   }
@@ -4066,6 +4364,7 @@ getLocalisedFullDateString(dateString){
    {
     languageCode = 'zh-cn';
    }
+   
    moment.locale(languageCode); //prepei na kaneis import kai to 'moment/locale/de px.'
    return moment(date).format('LL')
   // console.log(moment(new Date('2021-11-01')).locale('en').format('MMMM Do YYYY'))
@@ -4121,6 +4420,9 @@ isValid(date:Date) {
     }
   });
  }
+ /**
+ * DONT CALL IF STATES ARE NOT SET
+ */
   async saveData(){
          //checkForNulls();
          await storageSet('Euros',this.state.euroState);
@@ -4379,7 +4681,8 @@ const deviceHeight =
    backgroundColor: '#FFFFFD',
    marginLeft:30,
    borderRadius:20,
-   marginTop:20
+   marginTop:20,
+   justifyContent:'center'
 
   },
     rowContainer: {
@@ -4572,12 +4875,12 @@ const deviceHeight =
   flex:0.49,backgroundColor:'#62CCFF',
   borderBottomRightRadius:60
 },cancelBtnText:{
-  fontSize:26,
+  fontSize:24,
   alignSelf:'flex-end',
   marginRight:10
 
 },confirmBtnText:{
-  fontSize:26,
+  fontSize:24,
   alignSelf: 'flex-start',
   marginLeft:10
 
@@ -4622,7 +4925,7 @@ modalMainViewSubInfo:{
   // borderRadius:10,
   textAlignVertical:'center',
   fontSize:17,
-  marginLeft:-20
+  marginLeft:-15
 },inputContainer:{
   borderWidth: 0.7,
   height:'80%',
@@ -4690,11 +4993,13 @@ modalMainViewSubInfo:{
   width:'50%',
   marginLeft:30
   
+},dayPickerItem:{
+  
 },dayTextLabel:{
   fontSize:16,
   textAlignVertical:'center',
   color:'#000001',
-  width:'30%',
+  width:'35%',
   fontWeight:'400',
   paddingHorizontal:5
 },scrollViewManagerStyle:{

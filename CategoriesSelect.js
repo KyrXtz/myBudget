@@ -1,5 +1,5 @@
 import React from "react"
-import { TouchableOpacity,View, StyleSheet, Text, ScrollView,Alert } from "react-native"
+import { TouchableOpacity,View, StyleSheet, Text, ScrollView,Alert,Dimensions } from "react-native"
 import FontAwesome, {
   SolidIcons,
   RegularIcons,
@@ -13,36 +13,105 @@ import I18n from "i18n-js";
  import {Picker} from '@react-native-picker/picker';
 import fontawesome from './android/app/src/main/assets/fontawesome.json'
 import AsyncStorage  from '@react-native-community/async-storage';
-
-export const CategoriesSelect = ({callback,isPro,changeCategories,categoryIcon0,categoryIcon1,categoryIcon2,categoryIcon3,categoryIcon4,categoryIcon5,categoryIcon6,categoryIcon7}) => {
+const deviceWidth = Dimensions.get("window").width;
+const deviceHeight =
+  Platform.OS === "ios"
+    ? Dimensions.get("window").height
+    : require("react-native-extra-dimensions-android").get(
+        "REAL_WINDOW_HEIGHT"
+      );
+export const CategoriesSelect = ({categoryNameChangeCallback,callback,isPro,changeCategories,categoryIcon0,categoryIcon1,categoryIcon2,categoryIcon3,categoryIcon4,categoryIcon5,categoryIcon6,categoryIcon7 ,categoryName0,categoryName1,categoryName2,categoryName3,categoryName4,categoryName5,categoryName6,categoryName7}) => {
   console.log('HEYO')
+  
   return (
     <ScrollView contentContainerStyle={{justifyContent:'center'}}>
       <View style={styles.rowContainer}>
-        <Text style={styles.thankyou}>{I18n.t('Category')} 1</Text>
+        <View style={{flexDirection:'row'}}>
+          <Text style={styles.thankyou}>{categoryName0 != null?categoryName0:I18n.t('DefaultCategoryName0')} </Text>
+          <TouchableOpacity onPress={()=>categoryNameChangeCallback(0,categoryName0 != null?categoryName0:I18n.t('DefaultCategoryName0'))} style={styles.editIconTouchable}>
+          <FontAwesome style={styles.editIcon} icon={SolidIcons.edit}></FontAwesome>
+          </TouchableOpacity>
+        </View>
+        <View>
         <CPicker callback={callback} isPro ={isPro} categoryNo={0} categoryIcon={categoryIcon0 != null?categoryIcon0:'fas fa-wallet'}></CPicker>
+        </View>
       </View>
       <View style={styles.rowContainer}>
-        <Text style={styles.thankyou}>{I18n.t('Category')} 2</Text>
+        <View style={{flexDirection:'row'}}>
+        <Text style={styles.thankyou}>{categoryName1 != null?categoryName1:I18n.t('DefaultCategoryName1')}</Text>
+        <TouchableOpacity onPress={()=>categoryNameChangeCallback(1,categoryName1 != null?categoryName1:I18n.t('DefaultCategoryName1'))} style={styles.editIconTouchable}>
+          <FontAwesome style={styles.editIcon} icon={SolidIcons.edit}></FontAwesome>
+          </TouchableOpacity>
+        </View>
+        <View>
         <CPicker callback={callback} isPro ={isPro}  categoryNo={1} categoryIcon={categoryIcon1 != null?categoryIcon1:'fas fa-coffee'}></CPicker>
-      </View><View style={styles.rowContainer}>
-        <Text style={styles.thankyou}>{I18n.t('Category')} 3</Text>
+        </View>
+      </View>
+      <View style={styles.rowContainer}>
+        <View style={{flexDirection:'row'}}>
+        <Text style={styles.thankyou}>{categoryName2 != null?categoryName2:I18n.t('DefaultCategoryName2')}</Text>
+        <TouchableOpacity onPress={()=>categoryNameChangeCallback(2,categoryName2 != null?categoryName2:I18n.t('DefaultCategoryName2'))} style={styles.editIconTouchable}>
+          <FontAwesome style={styles.editIcon} icon={SolidIcons.edit}></FontAwesome>
+          </TouchableOpacity>
+        </View>
+        <View>
         <CPicker callback={callback} isPro ={isPro}  categoryNo={2} categoryIcon={categoryIcon2 != null?categoryIcon2:'fas fa-utensils'}></CPicker>
-      </View><View style={styles.rowContainer}>
-        <Text style={styles.thankyou}>{I18n.t('Category')} 4</Text>
+        </View>
+      </View>
+      <View style={styles.rowContainer}>
+        <View style={{flexDirection:'row'}}>
+        <Text style={styles.thankyou}>{categoryName3 != null?categoryName3:I18n.t('DefaultCategoryName3')}</Text>
+        <TouchableOpacity onPress={()=>categoryNameChangeCallback(3,categoryName3 != null?categoryName3:I18n.t('DefaultCategoryName3'))} style={styles.editIconTouchable}>
+          <FontAwesome style={styles.editIcon} icon={SolidIcons.edit}></FontAwesome>
+          </TouchableOpacity>
+        </View>
+        <View>
         <CPicker callback={callback} isPro ={isPro}  categoryNo={3} categoryIcon={categoryIcon3 != null?categoryIcon3:'fas fa-shopping-cart'}></CPicker>
-      </View><View style={styles.rowContainer}>
-        <Text style={styles.thankyou}>{I18n.t('Category')} 5</Text>
+        </View>
+      </View>
+      <View style={styles.rowContainer}>
+        <View style={{flexDirection:'row'}}>
+        <Text style={styles.thankyou}>{categoryName4 != null?categoryName4:I18n.t('DefaultCategoryName4')}</Text>
+        <TouchableOpacity onPress={()=>categoryNameChangeCallback(4,categoryName4 != null?categoryName4:I18n.t('DefaultCategoryName4'))} style={styles.editIconTouchable}>
+          <FontAwesome style={styles.editIcon} icon={SolidIcons.edit}></FontAwesome>
+          </TouchableOpacity>
+        </View>
+        <View>
         <CPicker callback={callback} isPro ={isPro}  categoryNo={4} categoryIcon={categoryIcon4 != null?categoryIcon4:'fas fa-money-check-alt'}></CPicker>
-      </View><View style={styles.rowContainer}>
-        <Text style={styles.thankyou}>{I18n.t('Category')} 6</Text>
+        </View>
+      </View>
+      <View style={styles.rowContainer}>
+        <View style={{flexDirection:'row'}}>
+        <Text style={styles.thankyou}>{categoryName5 != null?categoryName5:I18n.t('DefaultCategoryName5')}</Text>
+        <TouchableOpacity onPress={()=>categoryNameChangeCallback(5,categoryName5 != null?categoryName5:I18n.t('DefaultCategoryName5'))} style={styles.editIconTouchable}>
+          <FontAwesome style={styles.editIcon} icon={SolidIcons.edit}></FontAwesome>
+          </TouchableOpacity>
+        </View>
+        <View>
         <CPicker callback={callback} isPro ={isPro}  categoryNo={5} categoryIcon={categoryIcon5 != null?categoryIcon5:'fas fa-tshirt'}></CPicker>
-      </View><View style={styles.rowContainer}>
-        <Text style={styles.thankyou}>{I18n.t('Category')} 7</Text>
+        </View>
+      </View>
+      <View style={styles.rowContainer}>
+        <View style={{flexDirection:'row'}}>
+        <Text style={styles.thankyou}>{categoryName6 != null?categoryName6:I18n.t('DefaultCategoryName6')}</Text>
+        <TouchableOpacity onPress={()=>categoryNameChangeCallback(6,categoryName6 != null?categoryName6:I18n.t('DefaultCategoryName6'))} style={styles.editIconTouchable}>
+          <FontAwesome style={styles.editIcon} icon={SolidIcons.edit}></FontAwesome>
+          </TouchableOpacity>
+        </View>
+        <View>
         <CPicker callback={callback} isPro ={isPro}  categoryNo={6} categoryIcon={categoryIcon6 != null?categoryIcon6:'fas fa-gas-pump'}></CPicker>
-      </View><View style={styles.rowContainer}>
-        <Text style={styles.thankyou}>{I18n.t('Category')} 8</Text>
+        </View>
+      </View>
+      <View style={styles.rowContainer}>
+        <View style={{flexDirection:'row'}}>
+        <Text style={styles.thankyou}>{categoryName7 != null?categoryName7:I18n.t('DefaultCategoryName7')}</Text>
+        <TouchableOpacity onPress={()=>categoryNameChangeCallback(7,categoryName7 != null?categoryName7:I18n.t('DefaultCategoryName7'))} style={styles.editIconTouchable}>
+          <FontAwesome style={styles.editIcon} icon={SolidIcons.edit}></FontAwesome>
+          </TouchableOpacity>
+        </View>
+        <View>
         <CPicker callback={callback} isPro ={isPro}  categoryNo={7} categoryIcon={categoryIcon7 != null?categoryIcon7:'fas fa-bus'}></CPicker>
+        </View>
       </View>
 
     </ScrollView>
@@ -101,7 +170,7 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
       justifyContent:'space-between',
       padding:20,
-      width:'80%'
+      width:'77%'
       
 
     },iconStyle: {
@@ -110,7 +179,16 @@ const styles = StyleSheet.create({
       textAlign:'center',
   
       //  aspectRatio:1
-    },thankyou:{
+    },editIconTouchable:{
+      marginTop:11,marginLeft:5
+    },
+    editIcon:{
+      fontSize: 11,
+      color: '#000001CC',
+      textAlign:'left',
+      textAlignVertical:'center'
+    },
+    thankyou:{
       fontSize:20,
       fontStyle:'italic',
     },itemStyle: {
@@ -132,7 +210,6 @@ const styles = StyleSheet.create({
       backdropStyle={{backgroundColor:'transparent'}}
       modalStyle={{borderRadius:10}}
       maxHeight={'84%'}
-      
             options={fontawesome}
             getLabel={item => item.l}
             fieldTemplate={(settings)=>{

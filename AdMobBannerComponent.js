@@ -9,7 +9,7 @@ import FontAwesome, {
 } from 'react-native-fontawesome';
 export const AdMobBannerComponent = ({showAd,callback}) => {
   const onFailToRecieveAd = (error) => console.log(error);
-  console.log('does it pass '+showAd)
+  //console.log('does it pass '+showAd)
   if(showAd){
     return (
       <>
@@ -20,7 +20,7 @@ export const AdMobBannerComponent = ({showAd,callback}) => {
             adSize="smartBanner"
             adUnitID="ca-app-pub-4278197343444747/9268816553"
             onAdFailedToLoad={onFailToRecieveAd}
-            onSizeChange = {(x)=>console.log('THIOS IS SIZE CHANGE'+x.width)}
+           // onSizeChange = {(x)=>console.log('THIOS IS SIZE CHANGE'+x.width)}
           />
           <TouchableOpacity onPress={callback} >
           <FontAwesome

@@ -18,7 +18,7 @@ export const ProBanner = ({isPro}) => {
   }else{
   
   return (
-    <View style={{transform: [{ rotate: '-45deg'}] ,position:'absolute',top:5,left:-13 , backgroundColor:'red', height:'60%',width:'30%',borderRadius:10}}>
+    <View style={{transform: [{ rotate: '-45deg'}] ,position:'absolute',top:5,left:-10 , backgroundColor:'red', height:-60,width:'30%',borderTopRightRadius:10,borderBottomRightRadius:10}}>
         <Text style={{color:'white',alignSelf:'center',textAlignVertical:'center',fontSize:9,fontWeight:'bold'}}>Pro</Text>
     </View>
   )
