@@ -139,7 +139,11 @@
     "SetBalanceFirst":"Please, set your balance first.",
     "ChangeNameOfCategoryTitle":"Change name of category",
     "ProVersionOnlyTitle":"Pro version only!",
-    "ProVersionOnlyMessage":"This feature is not available in the free version. Are you interested in discovering all the features the pro version has to offer?"
+    "ProVersionOnlyMessage":"This feature is not available in the free version. Are you interested in discovering all the features the pro version has to offer?",
+    "FreeUserTrialTitle":"Hey!",
+    "FreeUserTrialMessage":"This is a pro feature , but you get one field for free just to try things out!",
+    "ResultOfSubNegative":"The result of the operation cannot be negative."
+
 
 
 

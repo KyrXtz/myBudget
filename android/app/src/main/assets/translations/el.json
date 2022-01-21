@@ -137,7 +137,10 @@
     "RecieveLabel":"Είσπραξε...",
     "PayLabel":"Πλήρωσε...",
     "SetBalanceFirst":"Παρακαλώ , όρισε το υπόλοιπο σου.",
-    "ChangeNameOfCategoryTitle":"Αλλαγή ονόματος κατηγορίας"
+    "ChangeNameOfCategoryTitle":"Αλλαγή ονόματος κατηγορίας",
+    "FreeUserTrialTitle":"Hey!",
+    "FreeUserTrialMessage":"Αυτή είναι μια pro λειτουργία, αλλά έχεις ένα πεδίο δωρεάν για να τη δοκιμάσεις!",
+    "ResultOfSubNegative":"Το αποτέλεσμα της πράξης δεν μπορεί να είναι αρνητικό."
 
 
     

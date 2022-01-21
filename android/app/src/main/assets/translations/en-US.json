@@ -137,7 +137,10 @@
     "RecieveLabel":"Recieve...",
     "PayLabel":"Pay...",
     "SetBalanceFirst":"Please, set your balance first.",
-    "ChangeNameOfCategoryTitle":"Change name of category"
+    "ChangeNameOfCategoryTitle":"Change name of category",
+    "FreeUserTrialTitle":"Hey!",
+    "FreeUserTrialMessage":"This is a pro feature , but you get one field for free just to try things out!",
+    "ResultOfSubNegative":"The result of the operation cannot be negative."
 
 
 

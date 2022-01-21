@@ -137,7 +137,10 @@
     "RecieveLabel":"领取...",
     "PayLabel":"缴费...",
     "SetBalanceFirst":"请先设定你的余额.",
-    "ChangeNameOfCategoryTitle":"更改类别名称"
+    "ChangeNameOfCategoryTitle":"更改类别名称",
+    "FreeUserTrialTitle":"Hey!",
+    "FreeUserTrialMessage":"这是一个专业的功能，但你可以免费得到一个领域，只是为了试一试.",
+    "ResultOfSubNegative":"操作的结果不能是负数."
 
 
 }

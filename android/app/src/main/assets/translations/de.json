@@ -137,7 +137,10 @@
     "RecieveLabel":"Sammeln...",
     "PayLabel":"Bezahlen...",
     "SetBalanceFirst":"Bitte stellen Sie zuerst Ihr Guthaben ein.",
-    "ChangeNameOfCategoryTitle":"Name der Kategorie ändern"
+    "ChangeNameOfCategoryTitle":"Name der Kategorie ändern",
+    "FreeUserTrialTitle":"Hey!",
+    "FreeUserTrialMessage":"Dies ist eine Profi-Funktion, aber Sie erhalten ein Feld kostenlos, nur um Dinge auszuprobieren!",
+    "ResultOfSubNegative":"Das Ergebnis der Operation kann nicht negativ sein."
 
 
 

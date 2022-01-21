@@ -350,6 +350,8 @@ const locales = RNLocalize.getLocales();
     //console.log(LocaleConfig.locales);
    }
    async init(){
+    //await storageSet('IncomesAndCostsJson','');
+
     //AsyncStorage.clear();
     //await storageSet('Currency','');
     //this.setState({ debug: "debug" }) ;
@@ -468,34 +470,36 @@ const locales = RNLocalize.getLocales();
         if (monthDiff > 0){//allakse o minas prepei na ginoyn shouldUpdate ola
           console.log('ALLAKSE O MINAS, UPDATE OLA')
           if(json13 != null){ //INCOMES
-            var retObj = this.updatePastMonthData(json13,thisMonth,value1);
+            var retObj =await this.updatePastMonthData(json13,thisMonth,value1);
             json13 = retObj.json;
             value1 = retObj.returnValue;          
             //console.log(refIncomesData)
           }
           if(json12 != null){ //FIXED COSTS
-            var retObj = this.updatePastMonthData(json12,thisMonth,value1);
+            var retObj =await this.updatePastMonthData(json12,thisMonth,value1);
             json12 = retObj.json;
             value1 = retObj.returnValue;          
            // console.log(refFixedCostsData)
           }
         }
         if(json13 != null){
-          var retObj2 = this.checkForBalanceUpdates(json13,thisMonthDays,value1);
+          var retObj2 =await this.checkForBalanceUpdates(json13,thisMonthDays,value1);
           json13 = retObj2.json;
           value1 = retObj2.returnValue;
           //refIncomesData = JSON.stringify(json13);
           await storageSet('DataSourceIncomes',JSON.stringify(json13))
+          await storageSet('Euros',value1);
           value13 = json13;
           //console.log(refIncomesData)
 
         }
         if(json12!=null){
-          var retObj2 = this.checkForBalanceUpdates(json12,thisMonthDays,value1);
+          var retObj2 = await this.checkForBalanceUpdates(json12,thisMonthDays,value1);
           json12 = retObj2.json;
           value1 = retObj2.returnValue;
           //refFixedCostsData = JSON.stringify(json12);
           await storageSet('DataSourceFixedCosts',JSON.stringify(json12))
+          await storageSet('Euros',value1);
           value12 = json12;
           //console.log(refFixedCostsData)
 
@@ -556,8 +560,12 @@ const locales = RNLocalize.getLocales();
      // this.state.euroState = value1;
      // this.state.paydayState;
    }
-   updatePastMonthData(json,thisMonth : Date,returnValue){
+   async updatePastMonthData(json,thisMonth : Date,returnValue){
     for(var i=0; i< Object.keys(json).length; i++){
+      let dayOfEntry = json[i].Day;
+      if(dayOfEntry == '0'){
+        continue;
+      }
         //na dw posoi mines perasan gia na to prosthesw toses fores
       var lastUpdatedDate = moment(new Date(json[i].lastUpdated+'-01').valueOf()).toDate();
       let monthDiff2 = thisMonth.getMonth() - lastUpdatedDate.getMonth() + (12 * (thisMonth.getFullYear() - lastUpdatedDate.getFullYear()));
@@ -566,7 +574,8 @@ const locales = RNLocalize.getLocales();
         //edit to returnValue
         //check to json[i].Type
         console.log('UPDATE TO POSO gia past month TYPE = '+ json[i].Type)
-
+        json[i].lastUpdated =  moment(new Date()).subtract(monthDiff2 -1,'month').format('YYYY-MM'); //ayto gia na apothikeytei i swsti imerominia sto IncomesAndCostsJson
+        returnValue =await this.actuallyUpdateCurrentBalance(json,returnValue,i);
         monthDiff2 = monthDiff2 - 1 ;
       }
       json[i].lastUpdated =  moment(new Date()).subtract(1,'month').format('YYYY-MM');
@@ -574,9 +583,12 @@ const locales = RNLocalize.getLocales();
     }
     return {json:json , returnValue:returnValue};
    }
-   checkForBalanceUpdates(json,thisMonthDays,returnValue){
+   async checkForBalanceUpdates(json,thisMonthDays,returnValue){
     for(var i=0; i< Object.keys(json).length; i++){       
       let dayOfEntry = json[i].Day;
+      if(dayOfEntry == '0'){
+        continue;
+      }
       while(parseInt(dayOfEntry) >parseInt(thisMonthDays)){ //ayto edw an o minas den exei 31 meres 
         dayOfEntry = parseInt(dayOfEntry) -1;
         console.log('remove one')
@@ -587,7 +599,7 @@ const locales = RNLocalize.getLocales();
         json[i].lastUpdated =  moment(new Date()).format('YYYY-MM');
         json[i].shouldUpdate = false;
         console.log('UPDATE TO POSO TYPE = '+ json[i].Type)
-
+        returnValue = await this.actuallyUpdateCurrentBalance(json,returnValue,i);
         //check to json[i].Type
         //json13[i].Amount = (parseFloat(json13[i].Amount) + 10).toString();
          //molis teliwsw refIncomesData = JSON.stringify(json);
@@ -599,6 +611,43 @@ const locales = RNLocalize.getLocales();
       // na vlepw an exoyn perasei k mines
     }
     return {json:json , returnValue:returnValue};
+   }
+   /** 
+   *kanei handle kai to fixedCosts kai to Income kai epistrefei to tropopoihmeno ypoloipo
+   */
+   async actuallyUpdateCurrentBalance(json,returnValue,i){
+     //kaloume thn   async saveExpensesToStorage(){
+      // afoy thesoyme to this.state.newspent = 'json[i].Amount' kai afairw kai to amount apo to return value kai this.state.selectedCategoryBtn = 4
+      //meta ta kanw '0' kai 0 (den xreiazetai ginetai meta sto setState apo ekei poy exoyn klhthei)
+      // this.state.newSpent = this.getStringNumberWithCorrectDecimals((json[i].Amount).toString());
+      // this.state.selectedCategoryBtn = 4;
+      // this.saveExpensesToStorage();
+      //ALLAGI SXEDIWN , (oi 3 parapanw grames doylevoyn bebaia, to vazoyn sto swsto day), basika mpainei sto day poy anoigeis tin efarmogi, opote as min ginei etsi
+      //apla tha to afairw, kai isws deixnw to history sto sygkekrimeno tab, gia na min ginetai mperdema
+    if(json[i].Type == 'FixedCosts'){
+      returnValue = this.getStringNumberWithCorrectDecimals((parseFloat(returnValue) - parseFloat(json[i].Amount)).toString())
+    }
+    if(json[i].Type == 'Incomes'){
+      //add to json[i].Amount sto returnvalue
+      returnValue = this.getStringNumberWithCorrectDecimals((parseFloat(returnValue) + parseFloat(json[i].Amount)).toString())
+    }
+    // ta apo katw einai idia kai gia Incomes kai gia FixedCosts
+    var dayToSave =  moment(json[i].lastUpdated+'-'+json[i].Day).format('YYYY-MM-DD'); //to last updated einai o twrinos minas (exei ginei pio prin), opote afairw enan mina gia na paw sto proigoymeno
+    var jsonEntryToSave = this.jsonifyInputFieldForSaving(json[i].Amount,json[i].Type,json[i].Description,json[i].Number,dayToSave); 
+    console.log(jsonEntryToSave)
+    var incomesAndCostsJson = await storageGet('IncomesAndCostsJson');
+    if(incomesAndCostsJson =='' || incomesAndCostsJson == null){
+      incomesAndCostsJson = '[]';
+    } 
+    var addComma = ',';
+    if(incomesAndCostsJson == '[]'){
+      addComma = '';
+    }
+    incomesAndCostsJson = incomesAndCostsJson.substring(0,incomesAndCostsJson.length-1) +addComma+jsonEntryToSave +']';
+    await storageSet('IncomesAndCostsJson',incomesAndCostsJson);
+    console.log('THIS IS INCOMES AND COSTS SAVED')
+    console.log(incomesAndCostsJson)
+    return returnValue;
    } 
    async fetchJsonExpenses(){
     var json = await storageGet('SpentTodayJson');
@@ -886,38 +935,40 @@ const locales = RNLocalize.getLocales();
     if (monthDiff > 0){//allakse o minas prepei na ginoyn shouldUpdate ola
       console.log('ALLAKSE O MINAS, UPDATE OLA')
       if(json13 != null){ //INCOMES
-        var retObj = this.updatePastMonthData(json13,thisMonth,value1);
+        var retObj = await this.updatePastMonthData(json13,thisMonth,value1);
         json13 = retObj.json;
         value1 = retObj.returnValue;          
         console.log(refIncomesData)
       }
       if(json12 != null){ //FIXED COSTS
-        var retObj = this.updatePastMonthData(json12,thisMonth,value1);
+        var retObj = await this.updatePastMonthData(json12,thisMonth,value1);
         json12 = retObj.json;
         value1 = retObj.returnValue;          
         console.log(refFixedCostsData)
       }
     }
     if(json13 != null){
-      var retObj2 = this.checkForBalanceUpdates(json13,thisMonthDays,value1);
+      var retObj2 =await this.checkForBalanceUpdates(json13,thisMonthDays,value1);
       json13 = retObj2.json;
       value1 = retObj2.returnValue;
       refIncomesData = JSON.stringify(json13);
       await storageSet('DataSourceIncomes',refIncomesData)
+      await storageSet('Euros',value1);
       value13 = json13;
       console.log(refIncomesData)
 
     }
     if(json12!=null){
-      var retObj2 = this.checkForBalanceUpdates(json12,thisMonthDays,value1);
+      var retObj2 =await this.checkForBalanceUpdates(json12,thisMonthDays,value1);
       json12 = retObj2.json;
       value1 = retObj2.returnValue;
       refFixedCostsData = JSON.stringify(json12);
       await storageSet('DataSourceFixedCosts',refFixedCostsData)
+      await storageSet('Euros',value1);
       value12 = json12;
       console.log(refFixedCostsData)
     }
-    this.setState({shouldShowFixedCosts:this.state.shouldShowFixedCosts,shouldShowIncomes:this.state.shouldShowIncomes,spentMonthState:value1, spentTodayState:'0' , dataSource:value9,moniesState:value7, paydayState:value2,euroState:this.state.euroState});
+    this.setState({selectedCategoryBtn:0,newSpent:'0',shouldShowFixedCosts:this.state.shouldShowFixedCosts,shouldShowIncomes:this.state.shouldShowIncomes,spentMonthState:value1, spentTodayState:'0' , dataSource:value9,moniesState:value7, paydayState:value2,euroState:this.state.euroState});
 
   }
    allLoaded(){
@@ -2144,14 +2195,18 @@ checkInputText(text){
         }                       
     }
 }
-if(newText=='.'){
+if(newText=='.' || newText=='-' || newText=='+'){
  newText = '0';
 }
+
 return newText;
 }
 checkIfAddOrSubNeeded(text: string){
   if(text.includes('-')){
     let strArr = text.split('-');
+    if(strArr[1] == ''){ //an exei kati toy styl 10- hh' 10+, to xwrize se pinaka ['10','']
+      strArr[1] ='0';
+    }
     if(strArr[0].split('.')[1]?.length>0)
     {
       strArr[0] = (parseFloat(strArr[0]).toFixed(2)).toString();
@@ -2165,10 +2220,17 @@ checkIfAddOrSubNeeded(text: string){
     {
       newNo = (parseFloat(newNo).toFixed(2)).toString();
     }
+    if(parseFloat(newNo)<0){
+      Alert.alert(I18n.t("Error"),I18n.t("ResultOfSubNegative"));
+      return '0';
+    }
     return newNo;
   }
   if(text.includes('+')){
     let strArr = text.split('+');
+    if(strArr[1] == ''){ //an exei kati toy styl 10- hh' 10+, to xwrize se pinaka ['10','']
+      strArr[1] ='0';
+    }
     if(strArr[0].split('.')[1]?.length>0)
     {
       strArr[0] = (parseFloat(strArr[0]).toFixed(2)).toString();
@@ -2181,6 +2243,10 @@ checkIfAddOrSubNeeded(text: string){
     if(newNo.split('.')[1]?.length>0)
     {
       newNo = (parseFloat(newNo).toFixed(2)).toString();
+    }
+    if(parseFloat(newNo)<0){
+      Alert.alert(I18n.t("Error"),I18n.t("ResultOfSubNegative"));
+      return '0';
     }
     return newNo;
   }
@@ -2775,6 +2841,7 @@ handleScroll (event){
           </View>
         </Modal>
         </View>
+        { false && //hidden for now
         <View style={[styles.twoViewsStartEndContainer,{padding:15}]}>
         <ProBanner isPro={this.state.isPro}></ProBanner>
          <FontAwesome
@@ -2788,6 +2855,7 @@ handleScroll (event){
           </View>
         </Modal>
         </View>
+        }
         <View style={styles.footerLine}/>
         <View style={[styles.twoViewsStartEndContainer,{padding:15}]}>
         <FontAwesome
@@ -2891,6 +2959,24 @@ handleScroll (event){
     categoryName6 = await storageGet('categoryName6');
     categoryName7 = await storageGet('categoryName7');
   }
+  freeUserMessage(msg){
+    Alert.alert(
+      I18n.t("FreeUserTrialTitle"),
+      I18n.t("FreeUserTrialMessage"),
+      [       
+        {
+          text: "OK",
+          onPress: async () =>{
+            //min to ksanadeikseis
+            console.log(msg)
+            await storageSet(msg,'true')
+          }
+          
+        },       
+      ]
+    );
+
+  }
   buyProVersionPrompt(){
     Alert.alert(
       I18n.t("ProVersionOnlyTitle"),
@@ -2928,7 +3014,7 @@ handleScroll (event){
   //todo: to savingsValues[] logika thelei arxikopoihsh , mporei kai oxi epeidh tha kanw storageSet to  dataSourceSavings sto closeSavingsView 99% den xreiazetai
   //todo: sto end edit toy textInput kai toy posoy kai toy description , tha kanw update to refSavingsData , gia na to xrisimopoihsw meta sto closeSavingsView
   //todo: sto closeSavingsView tha ginetai o ypologismos tou savingsState
-    openSavingsView(){
+   async openSavingsView(){
     refEuroState = this.state.euroState;
     refSavingsState = this.state.savingsState;
       if(this.state.dataSourceSavings == null || this.state.dataSourceSavings == ''){
@@ -2938,6 +3024,11 @@ handleScroll (event){
       }
     
     this.setState({openSavingsView:true})
+    let isPro = await storageGet("IsPro");
+    let hasSeen = await storageGet("hasSeenSavings");
+    if(isPro != 'true' && hasSeen != 'true'){
+      await this.freeUserMessage('hasSeenSavings');
+    }
   }
   async closeSavingsView(){
     this._textInputRefs = [];
@@ -3177,6 +3268,11 @@ handleScroll (event){
       }
     
     this.setState({openIncomesView:true})
+    let isPro = await storageGet("IsPro");
+    let hasSeen = await storageGet("hasSeenIncomes");
+    if(isPro != 'true' && hasSeen != 'true'){
+      await this.freeUserMessage('hasSeenIncomes');
+    }
   }
   async closeIncomesView(){
     this._textInputRefs = [];
@@ -3344,8 +3440,13 @@ handleScroll (event){
       }else{
         refFixedCostsData = JSON.stringify(this.state.dataSourceFixedCosts);
       }
-    
+   
     this.setState({openFixedCostsView:true})
+    let isPro = await storageGet("IsPro");
+    let hasSeen = await storageGet("hasSeenFixedCosts");
+    if(isPro != 'true' && hasSeen != 'true'){
+      await this.freeUserMessage('hasSeenFixedCosts');
+    }
   }
   async closeFixedCostsView(){
     this._textInputRefs = [];
@@ -4195,6 +4296,9 @@ handleScroll (event){
   jsonifyInputFixedCostsField(amount,type,description,number,dayNum,shouldUpdate,lastUpdated){
     return '{"Amount":"'+amount+'", "Type":"'+type+'", "Description":"'+description+'","Number":"'+number+'","Day":'+dayNum+',"shouldUpdate":'+shouldUpdate+',"lastUpdated":"'+lastUpdated+'"}';
   }
+  jsonifyInputFieldForSaving(amount,type,description,number,lastUpdated){
+    return '{"Amount":"'+amount+'", "Type":"'+type+'", "Description":"'+description+'","Number":"'+number+'","lastUpdated":"'+lastUpdated+'"}';
+  }
   renderExpensesJsonList = ({ item }) => (
     <View style={[styles.rowContainer,{justifyContent:'space-between'}]}>
     <Text style={[styles.textFaint,{marginLeft:0,fontStyle:'italic'}]}>{this.stringWithCorrectCurrencyPosition(item.Amount)}</Text>
@@ -4346,6 +4450,17 @@ getSpentTodayStateWithCorrectDecimals(){
   }
  //(parseFloat(this.state.euroState).toFixed(2)).toString()
 }
+ /**
+ * CARE: Must call with convert float to string (eg. 2.125.toString())
+ */
+  getStringNumberWithCorrectDecimals(str){
+    var index = str.indexOf('.');
+    if (index >= 0) {
+      return (parseFloat(str).toFixed(2)).toString();
+    } else {
+      return str;
+    }
+  }
 
 getLocalisedFullDateString(dateString){
   console.log('WTF LOLCALE ' +moment.locale())
