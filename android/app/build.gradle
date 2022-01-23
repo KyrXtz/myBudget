@@ -500,6 +500,7 @@ android {
 
 dependencies {
      def billing_version = "4.0.0"
+    implementation 'com.google.firebase:firebase-core:9.6.1'
 
     implementation 'com.facebook.fresco:fresco:2.0.0'
     implementation 'com.facebook.fresco:animated-gif:2.5.0'
@@ -542,5 +543,5 @@ task copyDownloadableDepsToLibs(type: Copy) {
     from configurations.implementation
     into 'libs'
 }
-
+apply plugin: 'com.google.gms.google-services'
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
