@@ -22,7 +22,7 @@ PushNotification.configure({
       // process the notification
   
       // (required) Called when a remote is received or opened, or local notification is opened
-      notification.finish(PushNotificationIOS.FetchResult.NoData);
+     // notification.finish(PushNotificationIOS.FetchResult.NoData);
     },
   
     // (optional) Called when Registered Action is pressed and invokeApp is false, if true onNotification will be called (Android)
@@ -60,8 +60,8 @@ PushNotification.configure({
   });
   PushNotification.createChannel(
     {
-      channelId: "2", // (required)
-      channelName: "My channel", // (required)
+      channelId: "1", // (required)
+      channelName: "My Budget", // (required)
       channelDescription: "A channel to categorise your notifications", // (optional) default: undefined.
       playSound: false, // (optional) default: true
       soundName: "default", // (optional) See `soundName` parameter of `localNotification` function
