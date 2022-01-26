@@ -1056,32 +1056,37 @@ const locales = RNLocalize.getLocales();
          PushNotification.localNotificationSchedule(Notif("2","","Payday","It's your payday!","Open the app to update your balance",parseInt(this.state.paydayState)*3600 * 1000 * 24,1,"month"));  
         }
         let jsonIncomes = this.state.dataSourceIncomes;
-        for(var i=0; i< Object.keys(jsonIncomes).length; i++){
-          var diff = 0;
-          if(new Date().getDate() < parseInt(jsonIncomes[i].Day)){
-            diff = this.getDiffInDays(moment(moment(new Date()).format("YYYY-MM")+'-'+jsonIncomes[i].Day),moment(moment(new Date()).format("YYYY-MM-DD")));
+        if(jsonIncomes!=null){
+          for(var i=0; i< Object.keys(jsonIncomes).length; i++){
+            let dayOfEntry = jsonIncomes[i].Day.toString().length == 1 ?'0'+jsonIncomes[i].Day:jsonIncomes[i].Day; //prosthiki tou 0 an einai monopsifios
+            var diff = 0;
+            if(new Date().getDate() < parseInt(jsonIncomes[i].Day)){
+              diff = this.getDiffInDays(moment(moment(new Date()).format("YYYY-MM")+'-'+dayOfEntry),moment(moment(new Date()).format("YYYY-MM-DD")));
+            }
+            if(new Date().getDate() >= parseInt(jsonIncomes[i].Day)){
+              diff = this.getDiffInDays(moment(moment(new Date()).add(1,"month").format("YYYY-MM")+'-'+dayOfEntry),moment(moment(new Date()).format("YYYY-MM-DD")));
+            }          
+            PushNotification.localNotificationSchedule(Notif("Incomes"+jsonIncomes[i].Number,"","Income added","Income with description: '"+ jsonIncomes[i].Description+"' added.","Amount added "+this.stringWithCorrectCurrencyPosition(jsonIncomes[i].Amount)+". Open the app to see more details",diff*3600 * 1000 * 24,1,"month"));
           }
-          if(new Date().getDate() >= parseInt(jsonIncomes[i].Day)){
-            diff = this.getDiffInDays(moment(moment(new Date()).add(1,"month").format("YYYY-MM")+'-'+jsonIncomes[i].Day),moment(moment(new Date()).format("YYYY-MM-DD")));
-          }          
-          PushNotification.localNotificationSchedule(Notif("Incomes"+jsonIncomes[i].Number,"","Income added","Income with description: '"+ jsonIncomes[i].Description+"' added.","Amount added "+this.stringWithCorrectCurrencyPosition(jsonIncomes[i].Amount)+". Open the app to see more details",diff*3600 * 1000 * 24,1,"month"));
         }
         let jsonFixedCosts = this.state.dataSourceFixedCosts;
-        for(var i=0; i< Object.keys(jsonFixedCosts).length; i++){
-          var diff = 0;
-          if(new Date().getDate() < parseInt(jsonFixedCosts[i].Day)){
-            diff = this.getDiffInDays(moment(moment(new Date()).format("YYYY-MM")+'-'+jsonFixedCosts[i].Day),moment(moment(new Date()).format("YYYY-MM-DD")));
+        if(jsonFixedCosts!=null){
+          for(var i=0; i< Object.keys(jsonFixedCosts).length; i++){
+            let dayOfEntry = jsonFixedCosts[i].Day.toString().length == 1 ?'0'+jsonFixedCosts[i].Day:jsonFixedCosts[i].Day; //prosthiki tou 0 an einai monopsifios
+            var diff = 0;
+            if(new Date().getDate() < parseInt(jsonFixedCosts[i].Day)){
+              diff = this.getDiffInDays(moment(moment(new Date()).format("YYYY-MM")+'-'+dayOfEntry),moment(moment(new Date()).format("YYYY-MM-DD")));
+            }
+            if(new Date().getDate() >= parseInt(jsonFixedCosts[i].Day)){
+              diff = this.getDiffInDays(moment(moment(new Date()).add(1,"month").format("YYYY-MM")+'-'+dayOfEntry),moment(moment(new Date()).format("YYYY-MM-DD")));
+            }  
+            PushNotification.localNotificationSchedule(Notif("FixedCosts"+jsonFixedCosts[i].Number,"","Fixed cost paid","Fixed cost with description: '"+ jsonFixedCosts[i].Description+"' paid.","Amount paid "+this.stringWithCorrectCurrencyPosition(jsonFixedCosts[i].Amount)+". Open the app to see more details",diff*3600 * 1000 * 24,1,"month"));
           }
-          if(new Date().getDate() >= parseInt(jsonFixedCosts[i].Day)){
-            diff = this.getDiffInDays(moment(moment(new Date()).add(1,"month").format("YYYY-MM")+'-'+jsonFixedCosts[i].Day),moment(moment(new Date()).format("YYYY-MM-DD")));
-          }  
-          PushNotification.localNotificationSchedule(Notif("FixedCosts"+jsonFixedCosts[i].Number,"","Fixed cost paid","Fixed cost with description: '"+ jsonFixedCosts[i].Description+"' paid.","Amount paid "+this.stringWithCorrectCurrencyPosition(jsonFixedCosts[i].Amount)+". Open the app to see more details",diff*3600 * 1000 * 24,1,"month"));
-        }
-        if(false){
-          PushNotification.localNotificationSchedule(Notif("3","","General","General","General",5000,1,"minute"));
-        }
-          
-        }
+          if(false){
+            PushNotification.localNotificationSchedule(Notif("3","","General","General","General",5000,1,"minute"));
+          }   
+          }
+       }
     if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') { //ayto to brika etoimo
       this.setState({hideThisAd1:false,hideThisAd2:false,hideThisAd3:false,hideThisAd4:false});
 
