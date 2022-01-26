@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "944916193760",
+    "project_id": "my-budget-ceab8",
+    "storage_bucket": "my-budget-ceab8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:944916193760:android:f360a7ee6a76a3b9204b85",
+        "android_client_info": {
+          "package_name": "com.kyrxtz.mybudget"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "944916193760-fp5pp57fopp1c58p29jhecn9ul7v5fvk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCNf65UUXLbzhhHUCm5VgiEk_mBxWV8feI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "944916193760-fp5pp57fopp1c58p29jhecn9ul7v5fvk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -44,7 +44,9 @@ TextInput.defaultProps.allowFontScaling = false;
  import CalendarPicker from 'react-native-calendar-picker';
  import Modal from "react-native-modal";
 //  import Spinner from 'react-native-loading-spinner-overlay';
-
+//import PushNotificationIOS from "@react-native-community/push-notification-ios";
+import PushNotification from "react-native-push-notification";
+import { Notif } from './Notifications';
  import Midnight from 'react-native-midnight';
  import AsyncStorage  from '@react-native-community/async-storage';
  import {
@@ -115,7 +117,7 @@ import 'moment/locale/zh-cn';
  import zh from "./android/app/src/main/assets/translations/zh.json";
 
  import currencies from "./android/app/src/main/assets/currencies/currencies.json";
- 
+
  const availableTranslations = ['en','en-US','en-GB','el','de','zh'];
  I18n.fallbacks = true;
  I18n.defaultLocale = 'en';
@@ -358,6 +360,8 @@ const locales = RNLocalize.getLocales();
      //await storageSet('RemovedAds','false');
     // const latestVersion = await VersionCheck.getLatestVersion()     
          //await storageSet('IsPro','false');
+   
+
 
     let currentBuildNo = VersionCheck.getCurrentBuildNumber();
     let savedBuildNo = await storageGet('CurrentBuildNo');
@@ -971,6 +975,16 @@ const locales = RNLocalize.getLocales();
     this.setState({selectedCategoryBtn:0,newSpent:'0',shouldShowFixedCosts:this.state.shouldShowFixedCosts,shouldShowIncomes:this.state.shouldShowIncomes,spentMonthState:value1, spentTodayState:'0' , dataSource:value9,moniesState:value7, paydayState:value2,euroState:this.state.euroState});
 
   }
+  /**
+   * a kai b,  einai moment objects
+   * 
+   * kai gyrnaei number
+   */
+  getDiffInDays(a,b){       
+      diff = (a.diff(b, 'days')) ;    
+      console.log('diffff = '+diff)
+      return diff;
+  }
    allLoaded(){
      this.state.loading= false;
      this.setState({loading:false});
@@ -1020,13 +1034,81 @@ const locales = RNLocalize.getLocales();
 
    }
    _handleAppStateChange = (nextAppState) => {
-    if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
+  //   //PushNotification.localNotificationSchedule(Notif());
+   
+     if(nextAppState=='active'){//ayta ta egrapsa egw
       console.log('App has come to the foreground!');
+      PushNotification.cancelAllLocalNotifications();
+      
+     }
+     else if (nextAppState =='background'){ //ayta ta egrapsa egw
+        console.log('App has gone to background!');
+        //let date = new Date();
+        //date.setDate(date.getDate() + parseInt(this.state.paydayState));
+        //console.log('THIS IS DAY'+ new Date(Date.now() + parseInt(this.state.paydayState)*3600 * 1000 * 24))
+        if(this.state.startingEuroState != '' && this.state.euroState !='' && this.state.startingEuroState != null && this.state.euroState !=null){
+          if((parseFloat(this.state.euroState))*100/(parseFloat(this.state.startingEuroState)) <= 10){
+            //console.log('AHELOHELHEOHEL');
+            PushNotification.localNotificationSchedule(Notif("1","","Balance is low","Your balance is lower than 10%","Be careful not to run out!",3600 * 1000 * 24,1,"day"));
+          }
+        }
+        if(this.state.paydayState != '' && this.state.paydayState != null ){          
+         PushNotification.localNotificationSchedule(Notif("2","","Payday","It's your payday!","Open the app to update your balance",parseInt(this.state.paydayState)*3600 * 1000 * 24,1,"month"));  
+        }
+        let jsonIncomes = this.state.dataSourceIncomes;
+        for(var i=0; i< Object.keys(jsonIncomes).length; i++){
+          var diff = 0;
+          if(new Date().getDate() < parseInt(jsonIncomes[i].Day)){
+            diff = this.getDiffInDays(moment(moment(new Date()).format("YYYY-MM")+'-'+jsonIncomes[i].Day),moment(moment(new Date()).format("YYYY-MM-DD")));
+          }
+          if(new Date().getDate() >= parseInt(jsonIncomes[i].Day)){
+            diff = this.getDiffInDays(moment(moment(new Date()).add(1,"month").format("YYYY-MM")+'-'+jsonIncomes[i].Day),moment(moment(new Date()).format("YYYY-MM-DD")));
+          }          
+          PushNotification.localNotificationSchedule(Notif("Incomes"+jsonIncomes[i].Number,"","Income added","Income with description: '"+ jsonIncomes[i].Description+"' added.","Amount added "+this.stringWithCorrectCurrencyPosition(jsonIncomes[i].Amount)+". Open the app to see more details",diff*3600 * 1000 * 24,1,"month"));
+        }
+        let jsonFixedCosts = this.state.dataSourceFixedCosts;
+        for(var i=0; i< Object.keys(jsonFixedCosts).length; i++){
+          var diff = 0;
+          if(new Date().getDate() < parseInt(jsonFixedCosts[i].Day)){
+            diff = this.getDiffInDays(moment(moment(new Date()).format("YYYY-MM")+'-'+jsonFixedCosts[i].Day),moment(moment(new Date()).format("YYYY-MM-DD")));
+          }
+          if(new Date().getDate() >= parseInt(jsonFixedCosts[i].Day)){
+            diff = this.getDiffInDays(moment(moment(new Date()).add(1,"month").format("YYYY-MM")+'-'+jsonFixedCosts[i].Day),moment(moment(new Date()).format("YYYY-MM-DD")));
+          }  
+          PushNotification.localNotificationSchedule(Notif("FixedCosts"+jsonFixedCosts[i].Number,"","Fixed cost paid","Fixed cost with description: '"+ jsonFixedCosts[i].Description+"' paid.","Amount paid "+this.stringWithCorrectCurrencyPosition(jsonFixedCosts[i].Amount)+". Open the app to see more details",diff*3600 * 1000 * 24,1,"month"));
+        }
+        if(false){
+          PushNotification.localNotificationSchedule(Notif("3","","General","General","General",5000,1,"minute"));
+        }
+          
+        }
+    if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') { //ayto to brika etoimo
       this.setState({hideThisAd1:false,hideThisAd2:false,hideThisAd3:false,hideThisAd4:false});
 
     }
     this.setState({appState: nextAppState});
   }
+  createNotificationChannel(channelId : string, channelName:string ,channelDescription:string){
+    PushNotification.channelExists(channelId, (exists)=>{
+      if(!exists){
+        PushNotification.createChannel(
+          {
+            channelId: channelId, // (required)
+            channelName: channelName, // (required)
+            channelDescription: channelDescription, // (optional) default: undefined.
+            playSound: false, // (optional) default: true
+            soundName: "default", // (optional) See `soundName` parameter of `localNotification` function
+            vibrate: true, // (optional) default: true. Creates the default vibration pattern if true.
+          },
+          (created) => console.log(`createChannel returned '${created}'`) // (optional) callback returns whether the channel was created, false means it already existed.
+        );
+      }
+    }) 
+  }
+  deleteNotificationChannel(channelId : string){
+    PushNotification.deleteChannel(channelId);
+  }
+  
    _keyboardDidShow =()=> {
     //alert('Keyboard Shown');
   }
@@ -3136,6 +3218,8 @@ handleScroll (event){
       }
       this.showAlertSavings(newAmount);
       }
+      this.setState({dataSourceSavings:json})
+
   }
   
    onChangeGenericSavingsDescription(text){
@@ -3303,6 +3387,14 @@ handleScroll (event){
 
 
       // }
+      let channelsNo = await storageGet("IncomeNotificationChannels")
+      for(var i=parseInt(channelsNo); i> Object.keys(json).length; i--){ //gia na svisei peritta
+        this.deleteNotificationChannel("Incomes"+(i-1).toString()); 
+      }
+      for(var i=0; i< Object.keys(json).length; i++){ //gia na ftiaksei kai alla an xreiazetai
+        this.createNotificationChannel("Incomes"+json[i].Number,"Incomes Channel "+json[i].Number,""); //an yparxei , its ok
+      }
+      await storageSet("IncomeNotificationChannels",(Object.keys(json).length).toString())
       console.log(refIncomesData);
       this.state.incomesValues =[];
       this.state.incomesDateValues = [];
@@ -3384,6 +3476,8 @@ handleScroll (event){
       //   }
       // }
     }
+    this.setState({dataSourceIncomes:json})
+
   }
   
    onChangeGenericIncomesDescription(text){
@@ -3427,6 +3521,7 @@ handleScroll (event){
     }
     refIncomesData = JSON.stringify(json);
     console.log(refIncomesData);
+    this.setState({dataSourceIncomes:json})
 
   }
 
@@ -3477,6 +3572,14 @@ handleScroll (event){
 
 
       // }
+      let channelsNo = await storageGet("FixedCostsNotificationChannels")
+      for(var i=parseInt(channelsNo); i> Object.keys(json).length; i--){ //gia na svisei peritta
+        this.deleteNotificationChannel("FixedCosts"+(i-1).toString()); 
+      }
+      for(var i=0; i< Object.keys(json).length; i++){ //gia na ftiaksei kai alla an xreiazetai
+        this.createNotificationChannel("FixedCosts"+json[i].Number,"Fixed Costs Channel "+json[i].Number,""); //an yparxei , its ok
+      }
+      await storageSet("FixedCostsNotificationChannels",(Object.keys(json).length).toString())
       console.log(refFixedCostsData);
       this.state.fixedCostsValues =[];
       this.state.fixedCostsDateValues = [];
@@ -3559,6 +3662,7 @@ handleScroll (event){
       //   }
       // }
     }
+    this.setState({dataSourceFixedCosts:json})
   }
   
    onChangeGenericFixedCostsDescription(text){
@@ -3602,6 +3706,8 @@ handleScroll (event){
     //json[itemNumber].isEdited = true;
     refFixedCostsData = JSON.stringify(json);
     console.log(refFixedCostsData);
+    this.setState({dataSourceFixedCosts:json})
+
 
 
   }
@@ -4390,16 +4496,17 @@ handleScroll (event){
    }
   //(parseFloat(this.state.euroState).toFixed(2)).toString()
  }
- getEuroStateAfterFixedCostsRemoved(){
-  let fixedCostsToBeRemoved = 0;
-  if(this.state.dataSourceFixedCosts!=''){
-  let json = this.state.dataSourceFixedCosts;
+ getJsonAmountsToBeRemovedOrAdded(json){
+  let jsonAmountsToBeRemovedOrAdded = 0;
   for(var i=0; i< Object.keys(json).length; i++){
     if(json[i].shouldUpdate){ //poso pou tha afairethei
-     fixedCostsToBeRemoved += parseFloat(json[i].Amount);
+      jsonAmountsToBeRemovedOrAdded += parseFloat(json[i].Amount);
     }
   }
-  }
+  return jsonAmountsToBeRemovedOrAdded;
+ }
+ getEuroStateAfterFixedCostsRemoved(){
+  let fixedCostsToBeRemoved = this.getJsonAmountsToBeRemovedOrAdded((this.state.dataSourceFixedCosts));
   let euroRef = (parseFloat(this.state.euroState) - fixedCostsToBeRemoved).toString();
   var index = euroRef.indexOf('.');
    if (index >= 0) {
@@ -4409,15 +4516,7 @@ handleScroll (event){
    }
  }
  getEuroStateAfterIncomesAdded(){
-  let incomesToBeAdded = 0;
-  if(this.state.dataSourceIncomes!=''){
-  let json = this.state.dataSourceIncomes;
-  for(var i=0; i< Object.keys(json).length; i++){
-    if(json[i].shouldUpdate){ //poso pou tha afairethei
-      incomesToBeAdded += parseFloat(json[i].Amount);
-    }
-  }
-  }
+  let incomesToBeAdded = this.getJsonAmountsToBeRemovedOrAdded((this.state.dataSourceIncomes));
   let euroRef = (parseFloat(this.state.euroState) + incomesToBeAdded).toString();
   var index = euroRef.indexOf('.');
    if (index >= 0) {
@@ -4592,6 +4691,8 @@ isValid(date:Date) {
       const value1 =  await storageGet('Euros');
       const value2 =  await  storageGet('PayDay');
       const value3 = await storageGet('SpentToday');
+      const value4 = await storageGet("DataSourceFixedCosts");
+
      // console.log("Payday:"+value2);
      // this.setDebug(value2);
      if(value1 != '' && value2 !='' && value1 != null && value2 !=null){     
@@ -4604,8 +4705,9 @@ isValid(date:Date) {
         remainingDays = 0;
         return (parseFloat(value1) + parseFloat(value3)).toString();
        }
-       let moneyPerDay = ((parseFloat(value1) + parseFloat(value3))/remainingDays).toFixed(2);
-       if(parseFloat(moneyPerDay) <=0){
+      let fixedCostsToBeRemoved = this.getJsonAmountsToBeRemovedOrAdded(JSON.parse(value4));
+      let moneyPerDay = ((parseFloat(value1) - fixedCostsToBeRemoved + parseFloat(value3))/remainingDays).toFixed(2);
+      if(parseFloat(moneyPerDay) <=0){
         return '0';
       }
       if(parseFloat(moneyPerDay) < parseFloat(value3)){ //an to poso poy soy antistoixei ana imera einai mikrotero apo ayta pou ksodepses simera, return to true budget
@@ -4633,7 +4735,8 @@ isValid(date:Date) {
       remainingDays = 0;
       return (parseFloat(value1) + parseFloat(value3)).toString();
      }
-     let moneyPerDay = ((parseFloat(value1) + parseFloat(value3))/remainingDays).toFixed(2);
+     let fixedCostsToBeRemoved = this.getJsonAmountsToBeRemovedOrAdded((this.state.dataSourceFixedCosts));
+     let moneyPerDay = ((parseFloat(value1) - fixedCostsToBeRemoved + parseFloat(value3))/remainingDays).toFixed(2);
      if(parseFloat(moneyPerDay) <=0){
        return '0';
      }
@@ -4646,8 +4749,9 @@ isValid(date:Date) {
    }
  }
    
- }
- 
+}
+ //PushNotification.cancelAllLocalNotifications()
+
  
  
  //GIA TO ASYNC STORAGE

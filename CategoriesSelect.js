@@ -20,6 +20,8 @@ const deviceHeight =
     : require("react-native-extra-dimensions-android").get(
         "REAL_WINDOW_HEIGHT"
       );
+
+
 export const CategoriesSelect = ({categoryNameChangeCallback,callback,isPro,changeCategories,categoryIcon0,categoryIcon1,categoryIcon2,categoryIcon3,categoryIcon4,categoryIcon5,categoryIcon6,categoryIcon7 ,categoryName0,categoryName1,categoryName2,categoryName3,categoryName4,categoryName5,categoryName6,categoryName7}) => {
   console.log('HEYO')
   
