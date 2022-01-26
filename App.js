@@ -1475,7 +1475,7 @@ render() {
             style={styles.input}
             keyboardType='numeric'
             onChangeText={(text)=> this.onChanged1(text)}
-            defaultValue={this.state.euroState}
+            defaultValue={this.getEuroStateWithCorrectDecimals()}
             maxLength={10}  //setting limit of input
             onEndEditing={()=>this.endEdit1()}
             onTouchStart={()=>this.startEdit1()}
