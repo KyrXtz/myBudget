@@ -2466,6 +2466,9 @@ handleScroll (event){
             <Text style={styles.drawerButtonText}>{I18n.t("IncomesHeader")}</Text>
           </TouchableOpacity>
           <Modal  onBackdropPress={async ()=> await this.closeIncomesView()} useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.coffeeShopModal}  animationIn = {'slideInUp'} animationOut={'slideOutDown'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.openIncomesView}> 
+          <KeyboardAvoidingView
+          behavior='position'
+          enabled>
           <View style={[styles.billingWindowStyle,{justifyContent:'space-around'}]}>
             <FontAwesome style={[styles.iconStyle,{position:'absolute',right:26}]} icon={SolidIcons.handHoldingUsd}/>
             <Text style={styles.sideWindowTextBold}>{I18n.t("IncomesHeader")}</Text>
@@ -2602,6 +2605,7 @@ handleScroll (event){
               }
               </View>        
           </View>
+          </KeyboardAvoidingView>
         </Modal>
         
         </View>
@@ -2613,6 +2617,9 @@ handleScroll (event){
             <Text style={styles.drawerButtonText}>{I18n.t("FixedCostsHeader")}</Text>
           </TouchableOpacity> 
           <Modal  onBackdropPress={async ()=> await this.closeFixedCostsView()} useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.coffeeShopModal}  animationIn = {'slideInUp'} animationOut={'slideOutDown'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.openFixedCostsView}> 
+          <KeyboardAvoidingView
+          behavior='position'
+          enabled>
           <View style={[styles.billingWindowStyle,{justifyContent:'space-around'}]}>
             <FontAwesome style={[styles.iconStyle,{position:'absolute',right:26}]} icon={SolidIcons.fileInvoiceDollar}/>
             <Text style={styles.sideWindowTextBold}>{I18n.t("FixedCostsHeader")}</Text>
@@ -2749,6 +2756,7 @@ handleScroll (event){
               }
               </View>        
           </View>
+          </KeyboardAvoidingView>
         </Modal>
         
         </View>
@@ -2760,6 +2768,9 @@ handleScroll (event){
             <Text style={styles.drawerButtonText}>{I18n.t("SavingsHeader")}</Text>
           </TouchableOpacity>        
           <Modal  onBackdropPress={async ()=> await this.closeSavingsView()} useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.coffeeShopModal}  animationIn = {'slideInUp'} animationOut={'slideOutDown'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.openSavingsView}> 
+          <KeyboardAvoidingView
+          behavior='position'
+          enabled>
             <View style={[styles.billingWindowStyle,{justifyContent:'space-around'}]}>
             <FontAwesome style={[styles.iconStyle,{position:'absolute',right:20}]} icon={SolidIcons.piggyBank}/>
             <Text style={styles.sideWindowTextBold}>{I18n.t("SavingsHeader")}</Text>
@@ -2860,6 +2871,7 @@ handleScroll (event){
               </View>
                   
           </View>
+          </KeyboardAvoidingView>
         </Modal>
         
         </View>
@@ -3218,7 +3230,9 @@ handleScroll (event){
       }
       this.showAlertSavings(newAmount);
       }
+      if(json!=undefined){
       this.setState({dataSourceSavings:json})
+      }
 
   }
   
@@ -3476,7 +3490,9 @@ handleScroll (event){
       //   }
       // }
     }
+    if(json!=undefined){
     this.setState({dataSourceIncomes:json})
+    }
 
   }
   
@@ -3662,7 +3678,9 @@ handleScroll (event){
       //   }
       // }
     }
+    if(json!=undefined){
     this.setState({dataSourceFixedCosts:json})
+    }
   }
   
    onChangeGenericFixedCostsDescription(text){
@@ -4498,9 +4516,11 @@ handleScroll (event){
  }
  getJsonAmountsToBeRemovedOrAdded(json){
   let jsonAmountsToBeRemovedOrAdded = 0;
-  for(var i=0; i< Object.keys(json).length; i++){
-    if(json[i].shouldUpdate){ //poso pou tha afairethei
-      jsonAmountsToBeRemovedOrAdded += parseFloat(json[i].Amount);
+  if(json!=undefined){
+    for(var i=0; i< Object.keys(json).length; i++){
+      if(json[i].shouldUpdate){ //poso pou tha afairethei
+        jsonAmountsToBeRemovedOrAdded += parseFloat(json[i].Amount);
+      }
     }
   }
   return jsonAmountsToBeRemovedOrAdded;
