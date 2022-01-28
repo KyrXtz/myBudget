@@ -7,6 +7,8 @@ import App from './App';
 import {name as appName} from './app.json';
 //import PushNotificationIOS from "@react-native-community/push-notification-ios";
 import PushNotification from "react-native-push-notification";
+import AsyncStorage  from '@react-native-community/async-storage';
+
 
 // Must be outside of any component LifeCycle (such as `componentDidMount`).
 PushNotification.configure({
@@ -29,7 +31,15 @@ PushNotification.configure({
     onAction: function (notification) {
       console.log("ACTION:", notification.action);
       console.log("NOTIFICATION:", notification);
-  
+      if(notification.action =='Go away'){
+        console.log('MPAINEI')
+        // PushNotification.cancelLocalNotification(notification.id);
+         PushNotification.clearLocalNotification(notification.tag,notification.notificationId)
+         AsyncStorage.setItem('GoAway', 'true');
+
+        //PushNotification.removeDeliveredNotifications(notification.id);
+
+      }
       // process the action
     },
   
@@ -84,6 +94,17 @@ PushNotification.configure({
     {
       channelId: "3", // (required)
       channelName: "General", // (required)
+    //  channelDescription: "A channel to categorise your notifications", // (optional) default: undefined.
+      playSound: false, // (optional) default: true
+      soundName: "default", // (optional) See `soundName` parameter of `localNotification` function
+      vibrate: true, // (optional) default: true. Creates the default vibration pattern if true.
+    },
+    (created) => console.log(`createChannel returned '${created}'`) // (optional) callback returns whether the channel was created, false means it already existed.
+  );
+  PushNotification.createChannel(
+    {
+      channelId: "4", // (required)
+      channelName: "Over budget warning", // (required)
     //  channelDescription: "A channel to categorise your notifications", // (optional) default: undefined.
       playSound: false, // (optional) default: true
       soundName: "default", // (optional) See `soundName` parameter of `localNotification` function

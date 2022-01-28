@@ -43,10 +43,13 @@ TextInput.defaultProps.allowFontScaling = false;
 
  import CalendarPicker from 'react-native-calendar-picker';
  import Modal from "react-native-modal";
+ import { VictoryPie } from "victory-native";
+ import Carousel from 'react-native-snap-carousel';
+
 //  import Spinner from 'react-native-loading-spinner-overlay';
 //import PushNotificationIOS from "@react-native-community/push-notification-ios";
 import PushNotification from "react-native-push-notification";
-import { Notif } from './Notifications';
+import { Notif, NotifPerma } from './Notifications';
  import Midnight from 'react-native-midnight';
  import AsyncStorage  from '@react-native-community/async-storage';
  import {
@@ -134,7 +137,8 @@ import 'moment/locale/zh-cn';
 //  const [index, setIndex] = useState(() => 0);
 
 //  const [date, setDate] = useState(new Date()) ; 
-//  const [open, setOpen] = useState(false); 
+//  const [open, setOpen] = useState(false);
+let permaNotificationGoAway = false;
 let isEditingTextSavings1 = false;
 let isEditingText1 = false;
 let isEditingText3 = false;
@@ -158,22 +162,9 @@ let refspentMonthHistory ='';
 let refSavingsData ='';
 let refFixedCostsData ='';
 let refIncomesData='';
-let categoryIcon0 = null;
-let categoryIcon1 = null;
-let categoryIcon2 = null;
-let categoryIcon3 = null;
-let categoryIcon4 = null;
-let categoryIcon5 = null;
-let categoryIcon6 = null;
-let categoryIcon7 = null;
-let categoryName0 = null;
-let categoryName1 = null;
-let categoryName2 = null;
-let categoryName3 = null;
-let categoryName4 = null;
-let categoryName5 = null;
-let categoryName6 = null;
-let categoryName7 = null;
+let categoryNames = [];
+let categoryIcons = [];
+let colorPallete = ["#6dc3c3", "#57797b", "#2a3a4a", "#7ce4ec", "#02273d","#a1acac","#346464","#A3ddff"];
 
 let positionYRef = 0; //for scrolling drawer
 
@@ -245,6 +236,8 @@ const locales = RNLocalize.getLocales();
    _drawerScrollRef;
    _textInputRefs : Array = [];
    _descRef = null;
+   _expensesPieRef;
+   _pastExpensesCarousel;
    constructor(props) {
      super(props);
      this.state = { 
@@ -302,7 +295,10 @@ const locales = RNLocalize.getLocales();
        incomesValues : [],
        incomesDateValues : [],
        shouldShowFixedCosts : false,
-       shouldShowIncomes : false
+       shouldShowIncomes : false,
+       expensesPieData: [],
+       triggerAnimationPie:false
+      // expensesPieDataLabels:[]
 
 
 
@@ -360,8 +356,8 @@ const locales = RNLocalize.getLocales();
      //await storageSet('RemovedAds','false');
     // const latestVersion = await VersionCheck.getLatestVersion()     
          //await storageSet('IsPro','false');
-   
-
+    
+    permaNotificationGoAway = (await storageGet('GoAway') == 'true');
 
     let currentBuildNo = VersionCheck.getCurrentBuildNumber();
     let savedBuildNo = await storageGet('CurrentBuildNo');
@@ -539,22 +535,24 @@ const locales = RNLocalize.getLocales();
     refPayDay = this.state.paydayState;
     refFullPayDay = this.state.fullDatePaydayState;
     refSpentToday = this.state.spentTodayState;
-    categoryIcon0 = await storageGet('categoryIcon0');
-    categoryIcon1 = await storageGet('categoryIcon1');
-    categoryIcon2 = await storageGet('categoryIcon2');
-    categoryIcon3 = await storageGet('categoryIcon3');
-    categoryIcon4 = await storageGet('categoryIcon4');
-    categoryIcon5 = await storageGet('categoryIcon5');
-    categoryIcon6 = await storageGet('categoryIcon6');
-    categoryIcon7 = await storageGet('categoryIcon7');
-    categoryName0 = await storageGet('categoryName0');
-    categoryName1 = await storageGet('categoryName1');
-    categoryName2 = await storageGet('categoryName2');
-    categoryName3 = await storageGet('categoryName3');
-    categoryName4 = await storageGet('categoryName4');
-    categoryName5 = await storageGet('categoryName5');
-    categoryName6 = await storageGet('categoryName6');
-    categoryName7 = await storageGet('categoryName7');
+    categoryIcons[0] = await storageGet('categoryIcon0');
+    categoryNames[0] = await storageGet('categoryName0');
+    categoryIcons[1] = await storageGet('categoryIcon1');
+    categoryNames[1] = await storageGet('categoryName1');
+    categoryIcons[2] = await storageGet('categoryIcon2');
+    categoryNames[2] = await storageGet('categoryName2');
+    categoryIcons[3] = await storageGet('categoryIcon3');
+    categoryNames[3] = await storageGet('categoryName3');
+    categoryIcons[4] = await storageGet('categoryIcon4');
+    categoryNames[4] = await storageGet('categoryName4');
+    categoryIcons[5] = await storageGet('categoryIcon5');
+    categoryNames[5] = await storageGet('categoryName5');
+    categoryIcons[6] = await storageGet('categoryIcon6');
+    categoryNames[6] = await storageGet('categoryName6');
+    categoryIcons[7] = await storageGet('categoryIcon7');
+    categoryNames[7] = await storageGet('categoryName7');
+
+    
 
 
     this.isLoading();
@@ -670,11 +668,12 @@ const locales = RNLocalize.getLocales();
     if(date<today && today.toDateString() != date.toDateString()){
      //alert("dont set date in the past pls"); 
      //edw tha deixnoyme dedomena gia past dates
+     this._pastExpensesCarousel?.snapToItem(0,true,true);//an einai sto pie chart, na pigenei sto allo view tou carousel
      let _markedDates2 = {};
      _markedDates2 = this.getMarkedDates(this.state.fullDatePaydayState,moment(date).format('YYYY-MM-DD'));
      let selectedDaysData = this.getSelectedDaysExpenseData(moment(date).format('YYYY-MM-DD'));
      let _selectedDayExpensesString = moment(date).format('YYYY-MM-DD');
-     this.setState({markedDates:_markedDates2,dataSourcePerDay : selectedDaysData, selectedDayExpensesString:_selectedDayExpensesString});
+     this.setState({markedDates:_markedDates2,dataSourcePerDay : selectedDaysData, selectedDayExpensesString:_selectedDayExpensesString,expensesPieData:this.resetPieDataFrom(this.state.dataSourcePerDay)});
      return;
     }
   this.state.fullDatePaydayState = passedDate.dateString;
@@ -737,7 +736,7 @@ const locales = RNLocalize.getLocales();
     if(refExpensesHistoryJson ==null){
       return null;
     }
-    //console.log(refExpensesHistoryJson);
+    console.log(refExpensesHistoryJson);
     let jsondata = JSON.parse(refExpensesHistoryJson);
     for (var i=0; i<jsondata.length; i++) {
       var data = jsondata[i];
@@ -1052,7 +1051,7 @@ const locales = RNLocalize.getLocales();
             PushNotification.localNotificationSchedule(Notif("1","","Balance is low","Your balance is lower than 10%","Be careful not to run out!",3600 * 1000 * 24,1,"day"));
           }
         }
-        if(this.state.paydayState != '' && this.state.paydayState != null ){          
+        if(this.state.paydayState != '' && this.state.paydayState != null && this.state.paydayState!=0){          
          PushNotification.localNotificationSchedule(Notif("2","","Payday","It's your payday!","Open the app to update your balance",parseInt(this.state.paydayState)*3600 * 1000 * 24,1,"month"));  
         }
         let jsonIncomes = this.state.dataSourceIncomes;
@@ -1082,9 +1081,11 @@ const locales = RNLocalize.getLocales();
             }  
             PushNotification.localNotificationSchedule(Notif("FixedCosts"+jsonFixedCosts[i].Number,"","Fixed cost paid","Fixed cost with description: '"+ jsonFixedCosts[i].Description+"' paid.","Amount paid "+this.stringWithCorrectCurrencyPosition(jsonFixedCosts[i].Amount)+". Open the app to see more details",diff*3600 * 1000 * 24,1,"month"));
           }
-          if(false){
-            PushNotification.localNotificationSchedule(Notif("3","","General","General","General",5000,1,"minute"));
-          }   
+             
+          }
+          console.log(permaNotificationGoAway)
+          if(!permaNotificationGoAway && parseFloat(this.getRemainingToday()) <0){
+            PushNotification.localNotification(NotifPerma());
           }
        }
     if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') { //ayto to brika etoimo
@@ -1692,8 +1693,31 @@ render() {
               data={this.state.dataSource}
               renderItem={this.renderExpensesJsonList}
             /> */}
-            
-        { this.state.dataSourcePerDay.map((item) => (
+            <Carousel
+              ref={(c) => { this._pastExpensesCarousel = c; }}
+              data={[0,1]} //index = 0 gia tta data, 1 = gia to pie
+              // data={[0]} //index = 0 gia tta data, 1 = gia to pie
+              renderItem={this.renderPastExpensesAndPieForCarousel}
+              horizontal={true}
+              sliderWidth={deviceWidth*0.7}
+              itemWidth={deviceWidth*0.7}
+              enableMomentum = {true}
+
+              onBeforeSnapToItem = {(index) => {
+                if(index ==0){
+                  this.setState({expensesPieData:this.resetPieDataFrom(this.state.dataSourcePerDay),
+                    triggerAnimationPie:false
+                });
+                }
+                if(index ==1){
+                  this.setState({expensesPieData:this.setPieDataFrom(this.state.dataSourcePerDay),
+                    triggerAnimationPie:true
+                     
+                });
+                }
+              }}
+            />
+        {/* { this.state.dataSourcePerDay.map((item) => (
               <View style={[styles.rowContainer,{paddingHorizontal:10,justifyContent:'space-between'}]}>
               <View style={{width:'40%',alignSelf:'flex-start', flexDirection:'row'}}>
                  <Text style={[styles.textFaint,{marginLeft:0,fontStyle:'italic',alignSelf:'flex-start',flex:1 , textAlignVertical:'center'}]}>{this.stringWithCorrectCurrencyPosition(item.Amount)}</Text>
@@ -1701,51 +1725,51 @@ render() {
                       <FontAwesome
                       style={{alignSelf:'flex-end',marginBottom:2}}
                        
-                      icon={parseIconFromClassName(categoryIcon0 != null?categoryIcon0:'fas fa-wallet')}
+                      icon={parseIconFromClassName(categoryIcons[0] != null?categoryIcons[0]:'fas fa-wallet')}
                       />
                       }
                       {item.Category ==1 && 
                         <FontAwesome
                         style={{alignSelf:'flex-end',marginBottom:2}}
                   
-                        icon={parseIconFromClassName(categoryIcon1 != null?categoryIcon1:'fas fa-coffee')}
+                        icon={parseIconFromClassName(categoryIcons[1] != null?categoryIcons[1]:'fas fa-coffee')}
                         />
                       }{item.Category ==2 && 
                         <FontAwesome
                         style={{alignSelf:'flex-end',marginBottom:2}}
                   
-                        icon={parseIconFromClassName(categoryIcon2 != null?categoryIcon2:'fas fa-utensils')}
+                        icon={parseIconFromClassName(categoryIcons[2] != null?categoryIcons[2]:'fas fa-utensils')}
                         />
                       }{item.Category ==3 && 
                         <FontAwesome
                         style={{alignSelf:'flex-end',marginBottom:2}}
                   
-                        icon={parseIconFromClassName(categoryIcon3 != null?categoryIcon3:'fas fa-shopping-cart')}
+                        icon={parseIconFromClassName(categoryIcons[3] != null?categoryIcons[3]:'fas fa-shopping-cart')}
                         />
                       }
                       {item.Category ==4 && 
                         <FontAwesome
                         style={{alignSelf:'flex-end',marginBottom:2}}
                   
-                        icon={parseIconFromClassName(categoryIcon4 != null?categoryIcon4:'fas fa-money-check-alt')}
+                        icon={parseIconFromClassName(categoryIcons[4] != null?categoryIcons[4]:'fas fa-money-check-alt')}
                         />
                       }{item.Category ==5 && 
                         <FontAwesome
                         style={{alignSelf:'flex-end',marginBottom:2}}
                   
-                        icon={parseIconFromClassName(categoryIcon5 != null?categoryIcon5:'fas fa-tshirt')}
+                        icon={parseIconFromClassName(categoryIcons[5] != null?categoryIcons[5]:'fas fa-tshirt')}
                         />
                       }{item.Category ==6 && 
                         <FontAwesome
                         style={{alignSelf:'flex-end',marginBottom:2}}
                   
-                        icon={parseIconFromClassName(categoryIcon6 != null?categoryIcon6:'fas fa-gas-pump')}
+                        icon={parseIconFromClassName(categoryIcons[6] != null?categoryIcons[6]:'fas fa-gas-pump')}
                         />
                       }{item.Category ==7 && 
                         <FontAwesome
                         style={{alignSelf:'flex-end',marginBottom:2}}
                   
-                        icon={parseIconFromClassName(categoryIcon7 != null?categoryIcon7:'fas fa-bus')}
+                        icon={parseIconFromClassName(categoryIcons[7] != null?categoryIcons[7]:'fas fa-bus')}
                         />
                       }
                </View>
@@ -1755,7 +1779,7 @@ render() {
                
          </View>
        </View>  
-            ))}
+            ))} */}
         </View>
         }
         {/* <Swiper  style={{ }}>
@@ -1823,7 +1847,8 @@ render() {
             { parseFloat(this.getRemainingToday()) >=0 &&
             <Text style={styles.textFaint}>{I18n.t('RemainingMonies')} {this.stringWithCorrectCurrencyPosition(this.getRemainingToday())}</Text>
             }
-         <Modal useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.Modal} coverScreen={true} animationIn = {'fadeIn'} animationOut={'fadeOut'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.buttonModal3}>
+         <Modal useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.Modal} coverScreen={true} animationIn = {'fadeIn'} animationOut={'fadeOut'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.buttonModal3} 
+         onModalShow={()=>{console.log('HAHA')}}>
    <View style={styles.ModalViewWrapper}>
 
          <ModalViewMoveDown style={styles.modalTopBackground} shouldClose = {this.state.closeModal3} > 
@@ -1883,56 +1908,56 @@ render() {
                <FontAwesome
                   style={[this.state.selectedCategoryBtn !=0 && styles.categoryButton,this.state.selectedCategoryBtn == 0 && styles.selectedCategoryButton]}
            
-                 icon={parseIconFromClassName(categoryIcon0 != null?categoryIcon0:'fas fa-wallet')}
+                 icon={parseIconFromClassName(categoryIcons[0] != null?categoryIcons[0]:'fas fa-wallet')}
                />
            </TouchableOpacity>
            <TouchableOpacity onPress={()=> this.setState({selectedCategoryBtn:1})}>
                <FontAwesome
                   style={[this.state.selectedCategoryBtn !=1 && styles.categoryButton,this.state.selectedCategoryBtn == 1 && styles.selectedCategoryButton]}
            
-                  icon={parseIconFromClassName(categoryIcon1 != null?categoryIcon1:'fas fa-coffee')}
+                  icon={parseIconFromClassName(categoryIcons[1] != null?categoryIcons[1]:'fas fa-coffee')}
                   />
            </TouchableOpacity>
            <TouchableOpacity onPress={()=> this.setState({selectedCategoryBtn:2})}>
                <FontAwesome
                   style={[this.state.selectedCategoryBtn !=2 && styles.categoryButton,this.state.selectedCategoryBtn == 2 && styles.selectedCategoryButton]}
            
-                  icon={parseIconFromClassName(categoryIcon2 != null?categoryIcon2:'fas fa-utensils')}
+                  icon={parseIconFromClassName(categoryIcons[2] != null?categoryIcons[2]:'fas fa-utensils')}
                />
            </TouchableOpacity>           
            <TouchableOpacity onPress={()=> this.setState({selectedCategoryBtn:3})}>
                <FontAwesome
                   style={[this.state.selectedCategoryBtn !=3 && styles.categoryButton,this.state.selectedCategoryBtn == 3 && styles.selectedCategoryButton]}
            
-                  icon={parseIconFromClassName(categoryIcon3 != null?categoryIcon3:'fas fa-shopping-cart')}
+                  icon={parseIconFromClassName(categoryIcons[3] != null?categoryIcons[3]:'fas fa-shopping-cart')}
                />
            </TouchableOpacity>
            <TouchableOpacity onPress={()=> this.setState({selectedCategoryBtn:4})}>
                <FontAwesome
                   style={[this.state.selectedCategoryBtn !=4 && styles.categoryButton,this.state.selectedCategoryBtn == 4 && styles.selectedCategoryButton]}
            
-                  icon={parseIconFromClassName(categoryIcon4 != null?categoryIcon4:'fas fa-money-check-alt')}
+                  icon={parseIconFromClassName(categoryIcons[4] != null?categoryIcons[4]:'fas fa-money-check-alt')}
                />
            </TouchableOpacity>
            <TouchableOpacity onPress={()=> this.setState({selectedCategoryBtn:5})}>
                <FontAwesome
                   style={[this.state.selectedCategoryBtn !=5 && styles.categoryButton,this.state.selectedCategoryBtn == 5 && styles.selectedCategoryButton]}
            
-                  icon={parseIconFromClassName(categoryIcon5 != null?categoryIcon5:'fas fa-tshirt')}
+                  icon={parseIconFromClassName(categoryIcons[6] != null?categoryIcons[6]:'fas fa-tshirt')}
                />
            </TouchableOpacity>
            <TouchableOpacity onPress={()=> this.setState({selectedCategoryBtn:6})}>
                <FontAwesome
                   style={[this.state.selectedCategoryBtn !=6 && styles.categoryButton,this.state.selectedCategoryBtn == 6 && styles.selectedCategoryButton]}
            
-                  icon={parseIconFromClassName(categoryIcon6 != null?categoryIcon6:'fas fa-gas-pump')}
+                  icon={parseIconFromClassName(categoryIcons[7] != null?categoryIcons[7]:'fas fa-gas-pump')}
                />
            </TouchableOpacity>
            <TouchableOpacity onPress={()=> this.setState({selectedCategoryBtn:7})}>
                <FontAwesome
                   style={[this.state.selectedCategoryBtn !=7 && styles.categoryButton,this.state.selectedCategoryBtn == 7 && styles.selectedCategoryButton]}
            
-                  icon={parseIconFromClassName(categoryIcon7 != null?categoryIcon7:'fas fa-bus')}
+                  icon={parseIconFromClassName(categoryIcons[5] != null?categoryIcons[5]:'fas fa-bus')}
                />
            </TouchableOpacity>
         </ScrollView>
@@ -1963,75 +1988,33 @@ render() {
               data={this.state.dataSource}
               renderItem={this.renderExpensesJsonList}
             /> */}
-            
-        { this.state.dataSource.map((item) => (
-              <View style={[styles.rowContainer,{paddingHorizontal:10,justifyContent:'space-between'}]}>
-               <View style={{width:'40%',alignSelf:'flex-start', flexDirection:'row'}}>
-                      <Text style={[styles.textFaint,{marginLeft:0,fontStyle:'italic',alignSelf:'flex-start',flex:1 , textAlignVertical:'center'}]}>{this.stringWithCorrectCurrencyPosition(item.Amount)}</Text>
-                      {item.Category ==0 && 
-                      <FontAwesome
-                      style={{alignSelf:'flex-end',marginBottom:2}}
-                       
-                      icon={parseIconFromClassName(categoryIcon0 != null?categoryIcon0:'fas fa-wallet')}
-                      />
-                      }
-                      {item.Category ==1 && 
-                        <FontAwesome
-                        style={{alignSelf:'flex-end',marginBottom:2}}
+        <Carousel
+              //ref={(c) => { this._carousel = c; }}
+              data={[0,1]} //index = 0 gia tta data, 1 = gia to pie
+              // data={[0]} //index = 0 gia tta data, 1 = gia to pie
+              renderItem={this.renderExpensesAndPieForCarousel}
+              shouldCo
+              horizontal={true}
+              sliderWidth={deviceWidth*0.7}
+              itemWidth={deviceWidth*0.7}
+              enableMomentum = {true}
+              onTouchStart={()=>this.setState({triggerAnimationPie:true})} //hack gia na min kolaei to modal
+              
+              onBeforeSnapToItem = {(index) => {
+                if(index ==0){
+                  this.setState({expensesPieData:this.resetPieDataFrom(this.state.dataSource),
+                    triggerAnimationPie:false
+                });
+                }
+                if(index ==1){
+                  this.setState({expensesPieData:this.setPieDataFrom(this.state.dataSource),
+                    triggerAnimationPie:true
+                     
+                });
+                }
+              }}
+            />
                   
-                        icon={parseIconFromClassName(categoryIcon1 != null?categoryIcon1:'fas fa-coffee')}
-                        />
-                      }{item.Category ==2 && 
-                        <FontAwesome
-                        style={{alignSelf:'flex-end',marginBottom:2}}
-                  
-                        icon={parseIconFromClassName(categoryIcon2 != null?categoryIcon2:'fas fa-utensils')}
-                        />
-                      }{item.Category ==3 && 
-                        <FontAwesome
-                        style={{alignSelf:'flex-end',marginBottom:2}}
-                  
-                        icon={parseIconFromClassName(categoryIcon3 != null?categoryIcon3:'fas fa-shopping-cart')}
-                        />
-                      }
-                      {item.Category ==4 && 
-                        <FontAwesome
-                        style={{alignSelf:'flex-end',marginBottom:2}}
-                  
-                        icon={parseIconFromClassName(categoryIcon4 != null?categoryIcon4:'fas fa-money-check-alt')}
-                        />
-                      }{item.Category ==5 && 
-                        <FontAwesome
-                        style={{alignSelf:'flex-end',marginBottom:2}}
-                  
-                        icon={parseIconFromClassName(categoryIcon5 != null?categoryIcon5:'fas fa-tshirt')}
-                        />
-                      }{item.Category ==6 && 
-                        <FontAwesome
-                        style={{alignSelf:'flex-end',marginBottom:2}}
-                  
-                        icon={parseIconFromClassName(categoryIcon6 != null?categoryIcon6:'fas fa-gas-pump')}
-                        />
-                      }{item.Category ==7 && 
-                        <FontAwesome
-                        style={{alignSelf:'flex-end',marginBottom:2}}
-                  
-                        icon={parseIconFromClassName(categoryIcon7 != null?categoryIcon7:'fas fa-bus')}
-                        />
-                      }
-               </View>
-               <View style={{width:'40%',alignSelf:'flex-end', flexDirection:'row'}}>
-               <Text style={[styles.textFaint,{marginLeft:0,fontStyle:'italic',alignSelf:'flex-start',flex:1}]}>{item.Time}</Text>
-                    <TouchableOpacity onPress={async ()=>this.deleteExpense(item)}>
-                        <FontAwesome
-                            style={{alignSelf:'flex-end',marginTop:3,flex:1}}
-                    
-                          icon={RegularIcons.trashAlt}
-                        />
-                    </TouchableOpacity>
-              </View>
-            </View> 
-            ))}
         </View>
         }
         </ScrollView>
@@ -2425,7 +2408,256 @@ handleScroll (event){
   positionYRef = event.nativeEvent.contentOffset.y;
   //console.log(positionYRef);
 };
+renderPastExpensesAndPieForCarousel = ({item, index}) => {
+  if(index == 0){
+    return (
+      this.state.dataSourcePerDay.map((item) => (
+        <View style={[styles.rowContainer,{paddingHorizontal:10,justifyContent:'space-between'}]}>
+        <View style={{width:'40%',alignSelf:'flex-start', flexDirection:'row'}}>
+           <Text style={[styles.textFaint,{marginLeft:0,fontStyle:'italic',alignSelf:'flex-start',flex:1 , textAlignVertical:'center'}]}>{this.stringWithCorrectCurrencyPosition(item.Amount)}</Text>
+           {item.Category ==0 && 
+                <FontAwesome
+                style={{alignSelf:'flex-end',marginBottom:2}}
+                 
+                icon={parseIconFromClassName(categoryIcons[0] != null?categoryIcons[0]:'fas fa-wallet')}
+                />
+                }
+                {item.Category ==1 && 
+                  <FontAwesome
+                  style={{alignSelf:'flex-end',marginBottom:2}}
+            
+                  icon={parseIconFromClassName(categoryIcons[1] != null?categoryIcons[1]:'fas fa-coffee')}
+                  />
+                }{item.Category ==2 && 
+                  <FontAwesome
+                  style={{alignSelf:'flex-end',marginBottom:2}}
+            
+                  icon={parseIconFromClassName(categoryIcons[2] != null?categoryIcons[2]:'fas fa-utensils')}
+                  />
+                }{item.Category ==3 && 
+                  <FontAwesome
+                  style={{alignSelf:'flex-end',marginBottom:2}}
+            
+                  icon={parseIconFromClassName(categoryIcons[3] != null?categoryIcons[3]:'fas fa-shopping-cart')}
+                  />
+                }
+                {item.Category ==4 && 
+                  <FontAwesome
+                  style={{alignSelf:'flex-end',marginBottom:2}}
+            
+                  icon={parseIconFromClassName(categoryIcons[4] != null?categoryIcons[4]:'fas fa-money-check-alt')}
+                  />
+                }{item.Category ==5 && 
+                  <FontAwesome
+                  style={{alignSelf:'flex-end',marginBottom:2}}
+            
+                  icon={parseIconFromClassName(categoryIcons[5] != null?categoryIcons[5]:'fas fa-tshirt')}
+                  />
+                }{item.Category ==6 && 
+                  <FontAwesome
+                  style={{alignSelf:'flex-end',marginBottom:2}}
+            
+                  icon={parseIconFromClassName(categoryIcons[6] != null?categoryIcons[6]:'fas fa-gas-pump')}
+                  />
+                }{item.Category ==7 && 
+                  <FontAwesome
+                  style={{alignSelf:'flex-end',marginBottom:2}}
+            
+                  icon={parseIconFromClassName(categoryIcons[7] != null?categoryIcons[7]:'fas fa-bus')}
+                  />
+                }
+         </View>
+    <View style={{width:'40%',alignSelf:'flex-end', flexDirection:'row'}}>
+    <Text style={[styles.textFaint,{marginLeft:0,fontStyle:'italic',alignSelf:'flex-start',flex:1}]}></Text>
+    <Text style={[styles.textFaint,{marginLeft:0,fontStyle:'italic',alignSelf:'flex-end'}]}>{item.Time}</Text>
+         
+   </View>
+ </View>
+            ))
+      )
+    
+  }else if(index == 1){
+    return (
+      <View style={{marginTop:-80,marginLeft:-15}}>
+      <VictoryPie
+     // ref={(c) => { this._expensesPieRef = c; }}
+      labelPlacement={"perpendicular"}
+      labelRadius={({ innerRadius }) => innerRadius + deviceHeight/23 }
+      data={this.state.expensesPieData}
+      colorScale={colorPallete}
+      //labels={this.state.expensesPieDataLabels}
+      // animate={({ delay :0, easing: 'exp' ,duration:0})}
+      animate={(this.state.triggerAnimationPie?{ delay :0, easing: 'exp', duration:1100 }:{ delay :0, easing: 'exp', duration:0 })}
+      width={deviceWidth*0.8}
+      innerRadius={70}
+      style={{
+        data: {
+          opacity: ({ datum }) => datum.opacity
+        },
+        labels: {
+          opacity: ({ datum }) => datum.opacity,
+          fontSize: 13,
+        },
+        parent:{
+          marginTop:40
+        }
+      }}
+      ></VictoryPie>
+      </View>
+  );
+  }
+  
+}
+renderExpensesAndPieForCarousel = ({item, index}) => {
+  if(index == 0){
+    return (
+       this.state.dataSource.map((item) => (     
+      <View style={[styles.rowContainer,{paddingHorizontal:10,justifyContent:'space-between'}]}>
+               <View style={{width:'40%',alignSelf:'flex-start', flexDirection:'row'}}>
+                      <Text style={[styles.textFaint,{marginLeft:0,fontStyle:'italic',alignSelf:'flex-start',flex:1 , textAlignVertical:'center'}]}>{this.stringWithCorrectCurrencyPosition(item.Amount)}</Text>
+                      {item.Category ==0 && 
+                      <FontAwesome
+                      style={{alignSelf:'flex-end',marginBottom:2}}
+                       
+                      icon={parseIconFromClassName(categoryIcons[0] != null?categoryIcons[0]:'fas fa-wallet')}
+                      />
+                      }
+                      {item.Category ==1 && 
+                        <FontAwesome
+                        style={{alignSelf:'flex-end',marginBottom:2}}
+                  
+                        icon={parseIconFromClassName(categoryIcons[1] != null?categoryIcons[1]:'fas fa-coffee')}
+                        />
+                      }{item.Category ==2 && 
+                        <FontAwesome
+                        style={{alignSelf:'flex-end',marginBottom:2}}
+                  
+                        icon={parseIconFromClassName(categoryIcons[2] != null?categoryIcons[2]:'fas fa-utensils')}
+                        />
+                      }{item.Category ==3 && 
+                        <FontAwesome
+                        style={{alignSelf:'flex-end',marginBottom:2}}
+                  
+                        icon={parseIconFromClassName(categoryIcons[3] != null?categoryIcons[3]:'fas fa-shopping-cart')}
+                        />
+                      }
+                      {item.Category ==4 && 
+                        <FontAwesome
+                        style={{alignSelf:'flex-end',marginBottom:2}}
+                  
+                        icon={parseIconFromClassName(categoryIcons[4] != null?categoryIcons[4]:'fas fa-money-check-alt')}
+                        />
+                      }{item.Category ==5 && 
+                        <FontAwesome
+                        style={{alignSelf:'flex-end',marginBottom:2}}
+                  
+                        icon={parseIconFromClassName(categoryIcons[5] != null?categoryIcons[5]:'fas fa-tshirt')}
+                        />
+                      }{item.Category ==6 && 
+                        <FontAwesome
+                        style={{alignSelf:'flex-end',marginBottom:2}}
+                  
+                        icon={parseIconFromClassName(categoryIcons[6] != null?categoryIcons[6]:'fas fa-gas-pump')}
+                        />
+                      }{item.Category ==7 && 
+                        <FontAwesome
+                        style={{alignSelf:'flex-end',marginBottom:2}}
+                  
+                        icon={parseIconFromClassName(categoryIcons[7] != null?categoryIcons[7]:'fas fa-bus')}
+                        />
+                      }
+               </View>
+               <View style={{width:'40%',alignSelf:'flex-end', flexDirection:'row'}}>
+               <Text style={[styles.textFaint,{marginLeft:0,fontStyle:'italic',alignSelf:'flex-start',flex:1}]}>{item.Time}</Text>
+                    <TouchableOpacity onPress={async ()=>this.deleteExpense(item)}>
+                        <FontAwesome
+                            style={{alignSelf:'flex-end',marginTop:3,flex:1}}
+                    
+                          icon={RegularIcons.trashAlt}
+                        />
+                    </TouchableOpacity>
+              </View>
+            </View>
+            ))
+    )
+  }else if(index == 1 && this.state.triggerAnimationPie) {
+    return (
+      <View style={{marginTop:-80,marginLeft:-15}}>
+      <VictoryPie
+     // ref={(c) => { this._expensesPieRef = c; }}
+      labelPlacement={"perpendicular"}
+      labelRadius={({ innerRadius }) => innerRadius + deviceHeight/23 }
+      data={this.state.expensesPieData}
+      colorScale={colorPallete}
+      //labels={this.state.expensesPieDataLabels}
+      // animate={({ delay :0, easing: 'exp' ,duration:0})}
+      animate={(this.state.triggerAnimationPie?{ delay :0, easing: 'exp', duration:1100 }:{ delay :0, easing: 'exp', duration:0 })}
+      width={deviceWidth*0.8}
+      innerRadius={70}
+      style={{
+        data: {
+          opacity: ({ datum }) => datum.opacity
+        },
+        labels: {
+          opacity: ({ datum }) => datum.opacity,
+          fontSize: 13,
+        },
+        parent:{
+          marginTop:40
+        }
+      }}
+      ></VictoryPie>
+      </View>
+  );
+  }
+  
+}
+resetPieDataFrom(data){
+  //return [{ y: 0 , opacity:0 , label:"General"}, { y: 0, opacity:0,label:"Food" }, { y: 100, opacity:0,label:"Gas" }]
+  console.log(this._expensesPieRef)
+  console.log(data)
+  let defaultLabels =[I18n.t('DefaultCategoryName0'),I18n.t('DefaultCategoryName1'),I18n.t('DefaultCategoryName2'),I18n.t('DefaultCategoryName3'),I18n.t('DefaultCategoryName4'),I18n.t('DefaultCategoryName5'),I18n.t('DefaultCategoryName6'),I18n.t('DefaultCategoryName7')];
+  let groupedData = [{Amount:0,label:categoryNames[0] != null ?categoryNames[0]:defaultLabels[0]},
+                    {Amount:0,label:categoryNames[1] != null ?categoryNames[1]:defaultLabels[1]},
+                    {Amount:0,label:categoryNames[2] != null ?categoryNames[2]:defaultLabels[2]},
+                    {Amount:0,label:categoryNames[3] != null ?categoryNames[3]:defaultLabels[3]},
+                    {Amount:0,label:categoryNames[4] != null ?categoryNames[4]:defaultLabels[4]},
+                    {Amount:0,label:categoryNames[5] != null ?categoryNames[5]:defaultLabels[5]},
+                    {Amount:0,label:categoryNames[6] != null ?categoryNames[6]:defaultLabels[6]},
+                    {Amount:0,label:categoryNames[7] != null ?categoryNames[7]:defaultLabels[7]}
 
+];
+  // for(var i=0;i<data.length;i++){
+  //   groupedData[data[i].Category].Amount += parseFloat(data[i].Amount);
+  // }
+  console.log(groupedData)
+  let x = groupedData.map((item) => ( {y:0, label:item.Amount == 0?" ":item.label ,  opacity:0}  ))
+  x[x.length-1].y = 100;
+  return x;
+}
+setPieDataFrom(data){
+  //console.log(object)
+  let defaultLabels =[I18n.t('DefaultCategoryName0'),I18n.t('DefaultCategoryName1'),I18n.t('DefaultCategoryName2'),I18n.t('DefaultCategoryName3'),I18n.t('DefaultCategoryName4'),I18n.t('DefaultCategoryName5'),I18n.t('DefaultCategoryName6'),I18n.t('DefaultCategoryName7')];
+  let groupedData = [{Amount:0,label:categoryNames[0] != null ?categoryNames[0]:defaultLabels[0]},
+                    {Amount:0,label:categoryNames[1] != null ?categoryNames[1]:defaultLabels[1]},
+                    {Amount:0,label:categoryNames[2] != null ?categoryNames[2]:defaultLabels[2]},
+                    {Amount:0,label:categoryNames[3] != null ?categoryNames[3]:defaultLabels[3]},
+                    {Amount:0,label:categoryNames[4] != null ?categoryNames[4]:defaultLabels[4]},
+                    {Amount:0,label:categoryNames[5] != null ?categoryNames[5]:defaultLabels[5]},
+                    {Amount:0,label:categoryNames[6] != null ?categoryNames[6]:defaultLabels[6]},
+                    {Amount:0,label:categoryNames[7] != null ?categoryNames[7]:defaultLabels[7]}
+
+];
+  for(var i=0;i<data.length;i++){
+    groupedData[data[i].Category].Amount += parseFloat(data[i].Amount);
+  }
+  let totalAmount = 0;
+  for(var i=0;i<groupedData.length;i++){
+     totalAmount+= parseFloat(groupedData[i].Amount);
+  }
+  let x = groupedData.map((item) => ( {y:item.Amount, label:item.Amount == 0?" ":item.label+"\n"+(item.Amount*100/totalAmount).toFixed(0)+"%",  opacity:1}  ))
+  return x;
+}
    settingsMenuContent = () => {
      
     return (
@@ -2920,8 +3152,8 @@ handleScroll (event){
           </TouchableOpacity>
           <Modal  onBackdropPress={async ()=> await this.refreshCategoryIcons()} useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.coffeeShopModal}  animationIn = {'slideInUp'} animationOut={'slideOutDown'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.openCategoriesSelect}> 
             <View style={styles.billingWindowStyle}>
-          <CategoriesSelect categoryNameChangeCallback={(i,categoryName)=>this.changeNameOfCategory(i,categoryName)} callback={()=>this.buyProVersionPrompt()} isPro={this.state.isPro} changeCategories={this.changeCategories} categoryIcon0={categoryIcon0} categoryIcon1={categoryIcon1}categoryIcon2={categoryIcon2}categoryIcon3={categoryIcon3}categoryIcon4={categoryIcon4}categoryIcon5={categoryIcon5}categoryIcon6={categoryIcon6}categoryIcon7={categoryIcon7} 
-          categoryName0={categoryName0} categoryName1={categoryName1}categoryName2={categoryName2}categoryName3={categoryName3}categoryName4={categoryName4}categoryName5={categoryName5}categoryName6={categoryName6}categoryName7={categoryName7}
+          <CategoriesSelect categoryNameChangeCallback={(i,categoryName)=>this.changeNameOfCategory(i,categoryName)} callback={()=>this.buyProVersionPrompt()} isPro={this.state.isPro} changeCategories={this.changeCategories} categoryIcon0={categoryIcons[0]} categoryIcon1={categoryIcons[1]}categoryIcon2={categoryIcons[2]}categoryIcon3={categoryIcons[3]}categoryIcon4={categoryIcons[4]}categoryIcon5={categoryIcons[5]}categoryIcon6={categoryIcons[6]}categoryIcon7={categoryIcons[7]} 
+          categoryName0={categoryNames[0]} categoryName1={categoryNames[1]}categoryName2={categoryNames[2]}categoryName3={categoryNames[3]}categoryName4={categoryNames[4]}categoryName5={categoryNames[5]}categoryName6={categoryNames[6]}categoryName7={categoryNames[7]}
           />
           <Modal onBackdropPress={(async ()=> await this.refreshCategoryIconsWithoutClosing())} useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.coffeeShopModal}  animationIn = {'slideInUp'} animationOut={'slideOutDown'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.openChangeNameOfCategory}> 
           <View style={[styles.billingWindowStyle]}>
@@ -3041,22 +3273,22 @@ handleScroll (event){
     this.setState({openChangeNameOfCategory:false});
   }
   async refreshCategoriesIconsAndNames(){
-    categoryIcon0 = await storageGet('categoryIcon0');
-    categoryIcon1 = await storageGet('categoryIcon1');
-    categoryIcon2 = await storageGet('categoryIcon2');
-    categoryIcon3 = await storageGet('categoryIcon3');
-    categoryIcon4 = await storageGet('categoryIcon4');
-    categoryIcon5 = await storageGet('categoryIcon5');
-    categoryIcon6 = await storageGet('categoryIcon6');
-    categoryIcon7 = await storageGet('categoryIcon7');
-    categoryName0 = await storageGet('categoryName0');
-    categoryName1 = await storageGet('categoryName1');
-    categoryName2 = await storageGet('categoryName2');
-    categoryName3 = await storageGet('categoryName3');
-    categoryName4 = await storageGet('categoryName4');
-    categoryName5 = await storageGet('categoryName5');
-    categoryName6 = await storageGet('categoryName6');
-    categoryName7 = await storageGet('categoryName7');
+    categoryIcons[0] = await storageGet('categoryIcon0');
+    categoryNames[0] = await storageGet('categoryName0');
+    categoryIcons[1] = await storageGet('categoryIcon1');
+    categoryNames[1] = await storageGet('categoryName1');
+    categoryIcons[2] = await storageGet('categoryIcon2');
+    categoryNames[2] = await storageGet('categoryName2');
+    categoryIcons[3] = await storageGet('categoryIcon3');
+    categoryNames[3] = await storageGet('categoryName3');
+    categoryIcons[4] = await storageGet('categoryIcon4');
+    categoryNames[4] = await storageGet('categoryName4');
+    categoryIcons[5] = await storageGet('categoryIcon5');
+    categoryNames[5] = await storageGet('categoryName5');
+    categoryIcons[6] = await storageGet('categoryIcon6');
+    categoryNames[6] = await storageGet('categoryName6');
+    categoryIcons[7] = await storageGet('categoryIcon7');
+    categoryNames[7] = await storageGet('categoryName7');
   }
   freeUserMessage(msg){
     Alert.alert(
@@ -4157,7 +4389,7 @@ handleScroll (event){
       }
       let _markedDates = {};
       _markedDates = this.getMarkedDates(this.state.fullDatePaydayState,null);
-      this.setState({spentPastMonth:this.state.spentPastMonth,markedDates:_markedDates,buttonModal2:bool,closeModal2:!bool,dataSourcePerDay:null});
+      this.setState({spentPastMonth:this.state.spentPastMonth,markedDates:_markedDates,buttonModal2:bool,closeModal2:!bool,dataSourcePerDay:null,triggerAnimationPie:false});
       refFullPayDay = this.state.fullDatePaydayState;
       refPayDay = this.state.paydayState;
       break;
@@ -4165,11 +4397,16 @@ handleScroll (event){
       this.state.buttonModal3 = bool;
       this.state.closeModal3 = !bool;
       this.state.selectedCategoryBtn = 0;
-      this.setState({buttonModal3:bool,closeModal3:!bool,selectedCategoryButton:0});
+      if( this.state.dataSource!=null && this.state.dataSource.length !=0 && true){
+        this.setState({buttonModal3:bool,closeModal3:!bool,selectedCategoryButton:0,expensesPieData:this.resetPieDataFrom(this.state.dataSource),triggerAnimationPie:false})
+      }else{
+        this.setState({buttonModal3:bool,closeModal3:!bool,selectedCategoryButton:0});
+      }
       refSpentToday = this.state.spentTodayState;
       refEuroState = this.state.euroState;
       refNewSpent = '0';
       checkIfSpentTodayEdited =refSpentToday;
+      
 
       break;
     }
