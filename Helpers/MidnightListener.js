@@ -3,7 +3,7 @@ import { Animated, Easing, Text, View } from 'react-native';
 import Midnight from 'react-native-midnight'
 
 export const MidnightListener = (props) => {
-    console.log('MIDNIGHT LISTENER READY');
+    //console.log('MIDNIGHT LISTENER READY');
     React.useEffect(() => {
       const listener = Midnight.addListener(() => {
          // console.log("HELLO FROM LISTERNER");
