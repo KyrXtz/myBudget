@@ -1,8 +1,12 @@
 {
     "configurations": [
-        
-        
-        
+        {
+            "name": "Debug Android Hermes - Experimental",
+            "request": "launch",
+            "type": "reactnativedirect",
+            "cwd": "${workspaceFolder}",
+            "platform": "android"
+        },
         {
             "name": "Debug Android",
             "program": "${workspaceRoot}/.vscode/launchReactNative.js",
@@ -12,6 +16,6 @@
             "sourceMaps": true,
             "outDir": "${workspaceRoot}/.vscode/.react",
             "cwd": "${workspaceFolder}"
-            }
+        }
     ]
 }

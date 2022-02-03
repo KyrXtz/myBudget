@@ -11,7 +11,7 @@ import {
 const { IS_FULL_APP_PURCHASED } = STORAGE_KEYS
 // Play store item Ids
 const itemSKUs = Platform.select({
-  android: ["espresso_for_dev", "double_espresso_for_dev","remove_all_ads"],
+  android: ["espresso_for_dev", "double_espresso_for_dev","remove_all_ads","pro"],
 })
 const useInAppPurchase = () => {
   const [isFullAppPurchased, setIsFullAppPurchased] = useState(false)
@@ -61,12 +61,12 @@ const useInAppPurchase = () => {
             console.log("ackResult: ", ackResult)
             if(ackResult.code == "OK"){
               // console.log('accept '+JSON.parse(receipt).productId)
-              // if (JSON.parse(receipt).productId == 'remove_all_ads'){
-                
-              // }
-              setAndStoreFullAppPurchase(true);
+              if (JSON.parse(receipt).productId == 'pro'){
+                await storageSet('IsPro','true');
+              }
+              setAndStoreFullAppPurchase(true); //PRODUCT = OPIODIPOTE
                 await storageSet('RemovedAds','true');
-                console.log('REMOVED ADS')
+                console.log('REMOVED ADS BY PURCHASE')
 
             }
             
@@ -125,6 +125,32 @@ const useInAppPurchase = () => {
         console.log("Everything failed. Error: ", error)
       }
     }
+  } 
+  const buyProVersion = async () => {
+    
+    // Reset error msg
+    if (connectionErrorMsg !== "") setConnectionErrorMsg("")
+    if (!connected) {
+      setConnectionErrorMsg("Please check your internet connection")
+    }
+    // If we are connected & have products, purchase the item. Google will handle if user has no internet here.
+    else if (products?.length > 0) {
+      
+      requestPurchase(itemSKUs[3])
+      console.log("Purchasing products... PRO VERSION")
+    }
+    // If we are connected but have no products returned, try to get products and purchase.
+    else {
+      console.log("No products. Now trying to get some...")
+      try {
+        await getProducts(itemSKUs)
+        requestPurchase(itemSKUs[3])
+        console.log("Got products, now purchasing PRO VERSION")
+      } catch (error) {
+        setConnectionErrorMsg("Please check your internet connection")
+        console.log("Everything failed. Error: ", error)
+      }
+    }
   }
   const removeAdsCheck = async () => {
     const x = await getPurchaseHistory();
@@ -148,6 +174,31 @@ const useInAppPurchase = () => {
       }else{
         console.log('buy')
         await removeAds();
+      }
+  }
+  const buyProCheck = async () => {
+    const x = await getPurchaseHistory();
+      console.log(x);
+      let isPurchased = false;
+      x.forEach(element => {
+        if (element.productId == "pro" || element.productId == "espresso_for_dev" || element.productId == "double_espresso_for_dev"){
+          isPurchased = true;
+      }     
+     });
+
+      // if (x.length >0){
+      //     isPurchased = true;
+      // }
+      
+      if(isPurchased){
+        console.log('dont buy')
+        await storageSet('IsPro','true');
+        await storageSet('RemovedAds','true');
+        setAndStoreFullAppPurchase(true)
+        
+      }else{
+        console.log('buy')
+        await buyProVersion();
       }
   }
   
@@ -230,7 +281,8 @@ const useInAppPurchase = () => {
     connectionErrorMsg,
     buySmallCoffee: buySmallCoffee,
     buyBigCoffee: buyBigCoffee,
-    removeAdsCheck: removeAdsCheck
+    removeAdsCheck: removeAdsCheck,
+    buyProCheck: buyProCheck
 
 
   }

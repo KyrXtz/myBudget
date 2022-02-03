@@ -422,8 +422,8 @@ android {
         applicationId "com.kyrxtz.mybudget"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 5
-        versionName "1.4"
+        versionCode 26
+        versionName "2.3.2"
         ndk {
             debugSymbolLevel 'FULL'
         }
@@ -492,11 +492,18 @@ android {
 
         }
     }
+
+    dexOptions {
+       javaMaxHeapSize "3g"
+    }
 }
 
 dependencies {
      def billing_version = "4.0.0"
-    
+
+    implementation 'com.google.firebase:firebase-core:9.6.1'
+
+
     implementation 'com.facebook.fresco:fresco:2.0.0'
     implementation 'com.facebook.fresco:animated-gif:2.5.0'
     //adcolony
@@ -538,5 +545,5 @@ task copyDownloadableDepsToLibs(type: Copy) {
     from configurations.implementation
     into 'libs'
 }
-
+apply plugin: 'com.google.gms.google-services'
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)

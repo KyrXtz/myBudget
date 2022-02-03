@@ -31,6 +31,34 @@ export const LanguageSelect = ({changeLanguage}) => {
         size={48}
         />
       </TouchableOpacity>
+      <TouchableOpacity onPress={async ()=>{changeLanguage('de','EUR')}}>
+        <Flag
+        code="DE"
+        size={48}
+        />
+      </TouchableOpacity>
+      </View>
+      <View   style={styles.rowContainer}>
+      <TouchableOpacity onPress={async ()=>{changeLanguage('zh','CNY')}}>
+        <Flag
+        code="CN"
+        size={48}
+        />
+      </TouchableOpacity>  
+      <TouchableOpacity onPress={async ()=>{changeLanguage('es','EUR')}}>
+        <Flag
+        code="ES"
+        size={48}
+        />
+      </TouchableOpacity>   
+      </View>
+      <View   style={styles.rowContainer}>
+      <TouchableOpacity onPress={async ()=>{changeLanguage('fr','EUR')}}>
+        <Flag
+        code="FR"
+        size={48}
+        />
+      </TouchableOpacity>    
       </View>
       {/* <Text style={styles.thankyou}>{I18n.t('ThankYou')}</Text> */}
 
