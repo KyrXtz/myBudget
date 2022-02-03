@@ -44,7 +44,21 @@ export const LanguageSelect = ({changeLanguage}) => {
         code="CN"
         size={48}
         />
-      </TouchableOpacity>     
+      </TouchableOpacity>  
+      <TouchableOpacity onPress={async ()=>{changeLanguage('es','EUR')}}>
+        <Flag
+        code="ES"
+        size={48}
+        />
+      </TouchableOpacity>   
+      </View>
+      <View   style={styles.rowContainer}>
+      <TouchableOpacity onPress={async ()=>{changeLanguage('fr','EUR')}}>
+        <Flag
+        code="FR"
+        size={48}
+        />
+      </TouchableOpacity>    
       </View>
       {/* <Text style={styles.thankyou}>{I18n.t('ThankYou')}</Text> */}
 

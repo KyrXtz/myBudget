@@ -20,26 +20,35 @@ PushNotification.configure({
     // (required) Called when a remote is received or opened, or local notification is opened
     onNotification: function (notification) {
       console.log("NOTIFICATION:", notification);
-  
+      // if(notification.channelId == '4'){ //to channel toy overbudget
+      //   PushNotification.cancelAllLocalNotifications();
+      // }
       // process the notification
-  
+      //PushNotification.invokeApp(notification)
       // (required) Called when a remote is received or opened, or local notification is opened
      // notification.finish(PushNotificationIOS.FetchResult.NoData);
+     notification.finish();
     },
-  
+    
     // (optional) Called when Registered Action is pressed and invokeApp is false, if true onNotification will be called (Android)
-    onAction: function (notification) {
+    onAction: async function (notification) {
       console.log("ACTION:", notification.action);
       console.log("NOTIFICATION:", notification);
-      if(notification.action =='Go away'){
+      if(notification.action =='Hide'){
         console.log('MPAINEI')
-        // PushNotification.cancelLocalNotification(notification.id);
-         PushNotification.clearLocalNotification(notification.tag,notification.notificationId)
-         AsyncStorage.setItem('GoAway', 'true');
+         //PushNotification.cancelLocalNotification(notification.id);
+         try{
+          await AsyncStorage.setItem('GoAway', 'true' ,(error) => {console.log(error)});
 
+         }catch{
+           console.log('errror')
+         }
+         PushNotification.clearLocalNotification(notification.tag,notification.notificationId) // prepei na mpei meta ta actions
         //PushNotification.removeDeliveredNotifications(notification.id);
-
       }
+      if(notification.action =='Keep'){
+        //
+      } 
       // process the action
     },
   

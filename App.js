@@ -43,7 +43,7 @@ TextInput.defaultProps.allowFontScaling = false;
 
  import CalendarPicker from 'react-native-calendar-picker';
  import Modal from "react-native-modal";
- import { VictoryPie } from "victory-native";
+ import { VictoryPie, VictoryTooltip } from "victory-native";
  import Carousel from 'react-native-snap-carousel';
 
 //  import Spinner from 'react-native-loading-spinner-overlay';
@@ -109,6 +109,9 @@ import I18n, { locale } from "i18n-js";
 import 'moment/locale/el';  // without this line it didn't work
 import 'moment/locale/de' ;
 import 'moment/locale/zh-cn';
+import 'moment/locale/es';
+import 'moment/locale/fr';
+
 
 
 
@@ -118,10 +121,13 @@ import 'moment/locale/zh-cn';
  import el from "./android/app/src/main/assets/translations/el.json";
  import de from "./android/app/src/main/assets/translations/de.json";
  import zh from "./android/app/src/main/assets/translations/zh.json";
+ import es from "./android/app/src/main/assets/translations/es.json";
+ import fr from "./android/app/src/main/assets/translations/fr.json";
+
 
  import currencies from "./android/app/src/main/assets/currencies/currencies.json";
 
- const availableTranslations = ['en','en-US','en-GB','el','de','zh'];
+ const availableTranslations = ['en','en-US','en-GB','el','de','zh','es','fr'];
  I18n.fallbacks = true;
  I18n.defaultLocale = 'en';
  I18n.translations = {
@@ -130,7 +136,9 @@ import 'moment/locale/zh-cn';
     enGB,
     el,
     de,
-    zh
+    zh,
+    es,
+    fr
  };
  //END LOCALIZATION
  const SharedStorage = NativeModules.SharedStorage;
@@ -239,7 +247,9 @@ const locales = RNLocalize.getLocales();
    _expensesPieRef;
    _pastExpensesCarousel;
    constructor(props) {
+     //console.log('wtfff')
      super(props);
+     //console.log(props)
      this.state = { 
       spinner: false,
        debug:"DEBUG",
@@ -355,9 +365,12 @@ const locales = RNLocalize.getLocales();
     //this.setState({ debug: "debug" }) ;
      //await storageSet('RemovedAds','false');
     // const latestVersion = await VersionCheck.getLatestVersion()     
-         //await storageSet('IsPro','false');
+    //await storageSet('IsPro','false');
+    //await storageSet('GoAway','false');
+
     
     permaNotificationGoAway = (await storageGet('GoAway') == 'true');
+    PushNotification.cancelAllLocalNotifications();
 
     let currentBuildNo = VersionCheck.getCurrentBuildNumber();
     let savedBuildNo = await storageGet('CurrentBuildNo');
@@ -554,7 +567,9 @@ const locales = RNLocalize.getLocales();
 
     
 
-
+    console.log('THIS IS EXPENSES HISTORY');
+    //console.log(refExpensesHistoryJson);
+    //await storageSet("ExpensesHistoryJson",' [[{"Amount":"1", "Time":"20:46:53", "Day":"2022-01-29", "Category":"0"},{"Amount":"1", "Time":"20:47:00", "Day":"2022-01-29", "Category":"1"}],[{"Amount":"1", "Time":"20:46:53", "Day":"2022-01-30", "Category":"0"},{"Amount":"1", "Time":"20:47:00", "Day":"2022-01-30", "Category":"1"},{"Amount":"1", "Time":"20:47:05", "Day":"2022-01-30", "Category":"2"},{"Amount":"1", "Time":"20:47:13", "Day":"2022-01-30", "Category":"3"},{"Amount":"14", "Time":"20:47:20", "Day":"2022-01-30", "Category":"0"},{"Amount":"5", "Time":"21:36:05", "Day":"2022-01-30", "Category":"2"}]]')
     this.isLoading();
     this.allLoaded();
      
@@ -698,10 +713,14 @@ const locales = RNLocalize.getLocales();
   getMarkedDates(payDayString,selectedDayString){
     
     //moment(refMinDate).format('YYYY-MM-DD')
-    
+    console.log('ITS IS HERE')
+    console.log(new Date().setDate(new Date().getDate() -1 ))
+    console.log(new Date().setHours(0,0,0,0 ))
+    console.log(refMinDate)
     let markedDates = {};
     markedDates[payDayString] = { selected: true, color: '#00B0BF', textColor: '#FFFFFF' };
-    let dateArray = this.getDates(refMinDate,new Date().setDate(new Date().getDate() -1 ));
+    // let dateArray = this.getDates(refMinDate,new Date().setDate(new Date().getDate() -1 ));
+    let dateArray = this.getDates(refMinDate,new Date().setHours(0,0,0,0));
     dateArray.forEach(element => {
       //edw check an to element exei expenses sto ExpensesHistoryJson
       let expenseData = this.getSelectedDaysExpenseData(moment(element).format('YYYY-MM-DD'));
@@ -736,7 +755,7 @@ const locales = RNLocalize.getLocales();
     if(refExpensesHistoryJson ==null){
       return null;
     }
-    console.log(refExpensesHistoryJson);
+    //console.log(refExpensesHistoryJson);
     let jsondata = JSON.parse(refExpensesHistoryJson);
     for (var i=0; i<jsondata.length; i++) {
       var data = jsondata[i];
@@ -910,6 +929,11 @@ const locales = RNLocalize.getLocales();
         console.log('THIS IS EXPENSES HISTORY');
         console.log(expensesHistoryJson);
         refExpensesHistoryJson = expensesHistoryJson;
+
+        //reset to permaNotification giaotan ypervainei to budget
+        await storageSet('GoAway','false') ;
+        permaNotificationGoAway = false;
+
   }
   
   async MidnightDetected(){
@@ -980,7 +1004,7 @@ const locales = RNLocalize.getLocales();
    * kai gyrnaei number
    */
   getDiffInDays(a,b){       
-      diff = (a.diff(b, 'days')) ;    
+      let diff = (a.diff(b, 'days')) ;    
       console.log('diffff = '+diff)
       return diff;
   }
@@ -988,7 +1012,9 @@ const locales = RNLocalize.getLocales();
      this.state.loading= false;
      this.setState({loading:false});
    }
+   appStateSubscription;
    componentDidMount() {
+    
     this.state.loading= true;
     this.setState({loading:true});
     this.isLoading();
@@ -996,8 +1022,8 @@ const locales = RNLocalize.getLocales();
     BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
     this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this._keyboardDidShow);
     this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this._keyboardDidHide);
-    AppState.addEventListener('change', this._handleAppStateChange);
-
+    this.appStateSubscription = AppState.addEventListener('change', this._handleAppStateChange);
+    
     //console.log('DATA SOURCE:'+this.state.dataSource[0].Time);
 
     // I18n.locale
@@ -1029,16 +1055,21 @@ const locales = RNLocalize.getLocales();
     BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
     this.keyboardDidShowListener.remove();
     this.keyboardDidHideListener.remove();
-    AppState.removeEventListener('change', this._handleAppStateChange);
-
+    //AppState.removeEventListener('change', this._handleAppStateChange);
+    //console.log(this.appStateSubscription)
+    this.appStateSubscription.remove();
    }
-   _handleAppStateChange = (nextAppState) => {
+    _handleAppStateChange =  async (nextAppState) => {
   //   //PushNotification.localNotificationSchedule(Notif());
    
      if(nextAppState=='active'){//ayta ta egrapsa egw
       console.log('App has come to the foreground!');
+      permaNotificationGoAway = ( await storageGet('GoAway') == 'true');
       PushNotification.cancelAllLocalNotifications();
-      
+      // PushNotification.getDeliveredNotifications((notifications)=>{
+      //   console.log(notifications)
+      // });
+      //console.log(permaNotificationGoAway)
      }
      else if (nextAppState =='background'){ //ayta ta egrapsa egw
         console.log('App has gone to background!');
@@ -1048,15 +1079,18 @@ const locales = RNLocalize.getLocales();
         if(this.state.startingEuroState != '' && this.state.euroState !='' && this.state.startingEuroState != null && this.state.euroState !=null){
           if((parseFloat(this.state.euroState))*100/(parseFloat(this.state.startingEuroState)) <= 10){
             //console.log('AHELOHELHEOHEL');
-            PushNotification.localNotificationSchedule(Notif("1","","Balance is low","Your balance is lower than 10%","Be careful not to run out!",3600 * 1000 * 24,1,"day"));
+            PushNotification.localNotificationSchedule(Notif("1","",I18n.t("BalanceIsLow"),I18n.t("BalanceLowerThan10%"),I18n.t("BeCarefulNotToRunOut"),3600 * 1000 * 24,3,"day"));
           }
         }
-        if(this.state.paydayState != '' && this.state.paydayState != null && this.state.paydayState!=0){          
-         PushNotification.localNotificationSchedule(Notif("2","","Payday","It's your payday!","Open the app to update your balance",parseInt(this.state.paydayState)*3600 * 1000 * 24,1,"month"));  
+        if(this.state.paydayState != '' && this.state.paydayState != null  && this.state.paydayState != 0 ){          
+         PushNotification.localNotificationSchedule(Notif("2","",I18n.t("PayDay").replace(':',' '),I18n.t("ItsYourPayday"),I18n.t("OpenTheAppToUpdateYourBalance"),parseInt(this.state.paydayState)*3600 * 1000 * 24,1,"month"));  
         }
         let jsonIncomes = this.state.dataSourceIncomes;
         if(jsonIncomes!=null){
           for(var i=0; i< Object.keys(jsonIncomes).length; i++){
+            if(jsonIncomes[i].Day.toString() == '0'){
+              continue;
+            }
             let dayOfEntry = jsonIncomes[i].Day.toString().length == 1 ?'0'+jsonIncomes[i].Day:jsonIncomes[i].Day; //prosthiki tou 0 an einai monopsifios
             var diff = 0;
             if(new Date().getDate() < parseInt(jsonIncomes[i].Day)){
@@ -1065,12 +1099,15 @@ const locales = RNLocalize.getLocales();
             if(new Date().getDate() >= parseInt(jsonIncomes[i].Day)){
               diff = this.getDiffInDays(moment(moment(new Date()).add(1,"month").format("YYYY-MM")+'-'+dayOfEntry),moment(moment(new Date()).format("YYYY-MM-DD")));
             }          
-            PushNotification.localNotificationSchedule(Notif("Incomes"+jsonIncomes[i].Number,"","Income added","Income with description: '"+ jsonIncomes[i].Description+"' added.","Amount added "+this.stringWithCorrectCurrencyPosition(jsonIncomes[i].Amount)+". Open the app to see more details",diff*3600 * 1000 * 24,1,"month"));
+            PushNotification.localNotificationSchedule(Notif(I18n.t("IncomesHeader")+jsonIncomes[i].Number,"",I18n.t("IncomeAdded"),I18n.t("IncomeWithDescription")+ jsonIncomes[i].Description+I18n.t("Added"),I18n.t("AmountAdded")+this.stringWithCorrectCurrencyPosition(jsonIncomes[i].Amount)+". "+I18n.t("OpenTheAppForDetails"),diff*3600 * 1000 * 24,1,"month"));
           }
         }
         let jsonFixedCosts = this.state.dataSourceFixedCosts;
         if(jsonFixedCosts!=null){
           for(var i=0; i< Object.keys(jsonFixedCosts).length; i++){
+            if(jsonFixedCosts[i].Day.toString() == '0'){
+              continue;
+            }
             let dayOfEntry = jsonFixedCosts[i].Day.toString().length == 1 ?'0'+jsonFixedCosts[i].Day:jsonFixedCosts[i].Day; //prosthiki tou 0 an einai monopsifios
             var diff = 0;
             if(new Date().getDate() < parseInt(jsonFixedCosts[i].Day)){
@@ -1079,13 +1116,15 @@ const locales = RNLocalize.getLocales();
             if(new Date().getDate() >= parseInt(jsonFixedCosts[i].Day)){
               diff = this.getDiffInDays(moment(moment(new Date()).add(1,"month").format("YYYY-MM")+'-'+dayOfEntry),moment(moment(new Date()).format("YYYY-MM-DD")));
             }  
-            PushNotification.localNotificationSchedule(Notif("FixedCosts"+jsonFixedCosts[i].Number,"","Fixed cost paid","Fixed cost with description: '"+ jsonFixedCosts[i].Description+"' paid.","Amount paid "+this.stringWithCorrectCurrencyPosition(jsonFixedCosts[i].Amount)+". Open the app to see more details",diff*3600 * 1000 * 24,1,"month"));
+            PushNotification.localNotificationSchedule(Notif(I18n.t("FixedCostsHeader")+jsonFixedCosts[i].Number,"",I18n.t("FixedCostPaid"),I18n.t("FixedCostWithDescription")+ jsonFixedCosts[i].Description+I18n.t("Paid"),I18n.t("AmountPaid")+this.stringWithCorrectCurrencyPosition(jsonFixedCosts[i].Amount)+". "+I18n.t("OpenTheAppForDetails"),diff*3600 * 1000 * 24,1,"month"));
           }
              
           }
-          console.log(permaNotificationGoAway)
-          if(!permaNotificationGoAway && parseFloat(this.getRemainingToday()) <0){
-            PushNotification.localNotification(NotifPerma());
+          //console.log(permaNotificationGoAway)
+         // await storageSet('ongoing','false')
+          if(!permaNotificationGoAway && parseFloat(this.getRemainingToday()) <0){ //&& await storageGet('ongoing') != 'true'
+          //  await storageSet('ongoing','true')
+            PushNotification.localNotification(NotifPerma(I18n.t("DontOverspend")+"<br>"+I18n.t("GoAwayMessage"),I18n.t("InTheRed"),I18n.t("OverBudgetBy")+ this.stringWithCorrectCurrencyPosition(this.getRemainingToday().replace('-',''))+" .",I18n.t("DontOverspend")));
           }
        }
     if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') { //ayto to brika etoimo
@@ -1093,6 +1132,7 @@ const locales = RNLocalize.getLocales();
 
     }
     this.setState({appState: nextAppState});
+    return false;
   }
   createNotificationChannel(channelId : string, channelName:string ,channelDescription:string){
     PushNotification.channelExists(channelId, (exists)=>{
@@ -1217,9 +1257,13 @@ render() {
               <Image  style={{height:'35%',width:'100%', resizeMode:'stretch'}} source={require('./android/app/src/main/assets/playstoregraphics/FeatureGraphic-EL.png')}/>}
               {I18n.locale.includes('de') &&
               <Image  style={{height:'35%',width:'100%', resizeMode:'stretch'}} source={require('./android/app/src/main/assets/playstoregraphics/FeatureGraphic-DE.png')}/>}
+              {I18n.locale.includes('fr') &&
+              <Image  style={{height:'35%',width:'100%', resizeMode:'stretch'}} source={require('./android/app/src/main/assets/playstoregraphics/FeatureGraphic-FR.png')}/>}
+              {I18n.locale.includes('es') &&
+              <Image  style={{height:'35%',width:'100%', resizeMode:'stretch'}} source={require('./android/app/src/main/assets/playstoregraphics/FeatureGraphic-ES.png')}/>}
               {I18n.locale.includes('zh') &&
               <Image  style={{height:'35%',width:'100%', resizeMode:'stretch'}} source={require('./android/app/src/main/assets/playstoregraphics/FeatureGraphic-ZH.png')}/>}
-              {!I18n.locale.includes('el') && !I18n.locale.includes('de') && !I18n.locale.includes('zh') &&
+              {!I18n.locale.includes('el') && !I18n.locale.includes('de') && !I18n.locale.includes('zh') && !I18n.locale.includes('fr') && !I18n.locale.includes('es') &&
               <Image  style={{height:'35%',width:'100%', resizeMode:'stretch'}}  source={require('./android/app/src/main/assets/playstoregraphics/FeatureGraphic-EN.png')}/>}
               <View>
               <Text style={[styles.swiperText,{paddingVertical:30,elevation:10,borderRadius:30,backgroundColor:'#FFFFFD',paddingHorizontal:20,fontSize:30,fontWeight:'bold'}]}>{I18n.t("SwiperTutorial0")}</Text>
@@ -1229,7 +1273,7 @@ render() {
             </View>
             <View style={styles.slideMain}>
               <Image  onLoad={ () => this.setState({ isImageLoaded1: true }) } style={[styles.ImageTut, { display: (this.state.isImageLoaded1 ? 'flex' : 'none') }]}
-                source={{uri:'https://media.giphy.com/media/0TbyHGgC4nDz8BcVLX/giphy.gif'}} />
+                source={{uri:'https://media.giphy.com/media/9iAY0cUdbVJX6Xp9Yv/giphy.gif'}} />
               <ActivityIndicator size = {50} color={'#62CCFF'}
                 style={[styles.loadingTut,{ display: (this.state.isImageLoaded1 ? 'none' : 'flex') }]}
               />
@@ -1241,7 +1285,7 @@ render() {
             </View>
             <View style={styles.slideMain}>
             <Image  onLoad={ () => this.setState({ isImageLoaded2: true }) } style={[styles.ImageTut, { display: (this.state.isImageLoaded2 ? 'flex' : 'none') }]}
-                source={{uri:'https://media.giphy.com/media/xtnUal2T6VqZjxgUs4/giphy.gif'}} />
+                source={{uri:'https://media.giphy.com/media/NGE7CJUL4G90fQGDVu/giphy.gif'}} />
               <ActivityIndicator size = {50} color={'#62CCFF'}
                 style={[styles.loadingTut,{ display: (this.state.isImageLoaded2 ? 'none' : 'flex') }]}
               />
@@ -1253,7 +1297,7 @@ render() {
             </View>
             <View style={styles.slideMain}>
             <Image  onLoad={ () => this.setState({ isImageLoaded3: true }) } style={[styles.ImageTut, { display: (this.state.isImageLoaded3 ? 'flex' : 'none') }]}
-                source={{uri:'https://media.giphy.com/media/ENx4dpyfDPHHuBJct2/giphy.gif'}} />
+                source={{uri:'https://media.giphy.com/media/SPUt3MyMto58xfOCUW/giphy.gif'}} />
               <ActivityIndicator size = {50} color={'#62CCFF'}
                 style={[styles.loadingTut,{ display: (this.state.isImageLoaded3 ? 'none' : 'flex') }]}
               />
@@ -1265,7 +1309,7 @@ render() {
             </View>
             <View style={styles.slideMain}>
             <Image  onLoad={ () => this.setState({ isImageLoaded4: true }) } style={[styles.ImageTut, { display: (this.state.isImageLoaded4 ? 'flex' : 'none') }]}
-                source={{uri:'https://media.giphy.com/media/uTqatneIHjxK5VmfM3/giphy.gif'}}  />
+                source={{uri:'https://media.giphy.com/media/X9KQ5fyD0VMC9MKvKt/giphy.gif'}}  />
               <ActivityIndicator size = {50} color={'#62CCFF'}
                 style={[styles.loadingTut,{ display: (this.state.isImageLoaded4 ? 'none' : 'flex') }]}
               />
@@ -1277,7 +1321,7 @@ render() {
             </View>
             <View style={styles.slideMain}>
             <Image  onLoad={ () => this.setState({ isImageLoaded5: true }) } style={[styles.ImageTut, { display: (this.state.isImageLoaded5 ? 'flex' : 'none') }]}
-                source={{uri:'https://media.giphy.com/media/7DWX67MjlRxVC4rZ7u/giphy.gif'}}  />
+                source={{uri:'https://media.giphy.com/media/aFcgxZkl01XdCPxbSs/giphy.gif'}}  />
               <ActivityIndicator size = {50} color={'#62CCFF'}
                 style={[styles.loadingTut,{ display: (this.state.isImageLoaded5 ? 'none' : 'flex') }]}
               />
@@ -1289,7 +1333,7 @@ render() {
             </View>
             <View style={styles.slideMain}>
             <Image  onLoad={ () => this.setState({ isImageLoaded6: true }) } style={[styles.ImageTut, { display: (this.state.isImageLoaded6 ? 'flex' : 'none') }]}
-               source={{uri:'https://media.giphy.com/media/AME94xJYs9UWHrISjw/giphy.gif'}}   />
+               source={{uri:'https://media.giphy.com/media/p4qzpvPCaDu2ar5Kkn/giphy.gif'}}   />
               <ActivityIndicator size = {50} color={'#62CCFF'}
                 style={[styles.loadingTut,{ display: (this.state.isImageLoaded6 ? 'none' : 'flex') }]}
               />
@@ -1301,7 +1345,7 @@ render() {
             </View>
             <View style={styles.slideMain}>
             <Image  onLoad={ () => this.setState({ isImageLoaded7: true }) } style={[styles.ImageTut, { display: (this.state.isImageLoaded7 ? 'flex' : 'none') }]}
-               source={{uri:'https://media.giphy.com/media/b0xLGGUX2gNvVQtCnj/giphy.gif'}}  />
+               source={{uri:'https://media.giphy.com/media/tNjSApGfEp0xb65WM6/giphy.gif'}}  />
               <ActivityIndicator size = {50} color={'#62CCFF'}
                 style={[styles.loadingTut,{ display: (this.state.isImageLoaded7 ? 'none' : 'flex') }]}
               />
@@ -1321,7 +1365,15 @@ render() {
               <View style={{justifyContent:'space-between'}}>
               {I18n.locale == 'el' &&
               <Image  style={{height:'40%',width:'100%', resizeMode:'stretch'}} source={require('./android/app/src/main/assets/playstoregraphics/FeatureGraphic-EL.png')}/>}
-              {I18n.locale != 'el' && //!= ola ta ypoloipa translations
+              {I18n.locale.includes('de') &&
+              <Image  style={{height:'40%',width:'100%', resizeMode:'stretch'}} source={require('./android/app/src/main/assets/playstoregraphics/FeatureGraphic-DE.png')}/>}
+              {I18n.locale.includes('fr') &&
+              <Image  style={{height:'40%',width:'100%', resizeMode:'stretch'}} source={require('./android/app/src/main/assets/playstoregraphics/FeatureGraphic-FR.png')}/>}
+              {I18n.locale.includes('es') &&
+              <Image  style={{height:'40%',width:'100%', resizeMode:'stretch'}} source={require('./android/app/src/main/assets/playstoregraphics/FeatureGraphic-ES.png')}/>}
+              {I18n.locale.includes('zh') &&
+              <Image  style={{height:'40%',width:'100%', resizeMode:'stretch'}} source={require('./android/app/src/main/assets/playstoregraphics/FeatureGraphic-ZH.png')}/>}
+              {!I18n.locale.includes('el') && !I18n.locale.includes('de') && !I18n.locale.includes('fr') && !I18n.locale.includes('es') && !I18n.locale.includes('zh') &&   //!= ola ta ypoloipa translations
               <Image  style={{height:'40%',width:'100%', resizeMode:'stretch'}} source={require('./android/app/src/main/assets/playstoregraphics/FeatureGraphic-EN.png')}/>}
               <TouchableOpacity onPress={async ()=> await this.setCardTutorial('true')}>
               <Text style={[styles.swiperText,{paddingVertical:30,elevation:10,borderRadius:30,backgroundColor:'#FFFFFD',paddingHorizontal:20,fontSize:30,fontWeight:'bold'}]}>{I18n.t("SwiperTutorial8")}</Text>
@@ -1374,11 +1426,15 @@ render() {
          <View style={styles.titleImageWrapper}>
            {I18n.locale.includes('el') &&
            <Image  style={styles.titleImage} source={require('./android/app/src/main/assets/playstoregraphics/FeatureGraphic-EL.png')}/>}
+           {I18n.locale.includes('fr') &&
+           <Image  style={styles.titleImage} source={require('./android/app/src/main/assets/playstoregraphics/FeatureGraphic-FR.png')}/>}
+           {I18n.locale.includes('es') &&
+           <Image  style={styles.titleImage} source={require('./android/app/src/main/assets/playstoregraphics/FeatureGraphic-ES.png')}/>}
            {I18n.locale.includes('de') &&
            <Image  style={styles.titleImage} source={require('./android/app/src/main/assets/playstoregraphics/FeatureGraphic-DE.png')}/>}
            {I18n.locale.includes('zh') &&
            <Image  style={styles.titleImage} source={require('./android/app/src/main/assets/playstoregraphics/FeatureGraphic-ZH.png')}/>}
-           {!I18n.locale.includes('el') && !I18n.locale.includes('de') && !I18n.locale.includes('zh') &&
+           {!I18n.locale.includes('el') && !I18n.locale.includes('de') && !I18n.locale.includes('zh') && !I18n.locale.includes('fr') && !I18n.locale.includes('es') &&
            <Image  style={styles.titleImage} source={require('./android/app/src/main/assets/playstoregraphics/FeatureGraphic-EN.png')}/>}
            </View>
         }
@@ -1702,7 +1758,6 @@ render() {
               sliderWidth={deviceWidth*0.7}
               itemWidth={deviceWidth*0.7}
               enableMomentum = {true}
-
               onBeforeSnapToItem = {(index) => {
                 if(index ==0){
                   this.setState({expensesPieData:this.resetPieDataFrom(this.state.dataSourcePerDay),
@@ -1998,8 +2053,9 @@ render() {
               sliderWidth={deviceWidth*0.7}
               itemWidth={deviceWidth*0.7}
               enableMomentum = {true}
-              onTouchStart={()=>this.setState({triggerAnimationPie:true})} //hack gia na min kolaei to modal
-              
+              onTouchStart={()=>this.setState({showPieHack:true})} //hack gia na min kolaei to modal
+              //onTouchMove={()=>this.setState({showPieHack:true})}
+              //onScrollBeginDrag={()=>this.setState({showPieHack:true})}
               onBeforeSnapToItem = {(index) => {
                 if(index ==0){
                   this.setState({expensesPieData:this.resetPieDataFrom(this.state.dataSource),
@@ -2008,7 +2064,7 @@ render() {
                 }
                 if(index ==1){
                   this.setState({expensesPieData:this.setPieDataFrom(this.state.dataSource),
-                    triggerAnimationPie:true
+                    triggerAnimationPie:true,
                      
                 });
                 }
@@ -2478,18 +2534,18 @@ renderPastExpensesAndPieForCarousel = ({item, index}) => {
     
   }else if(index == 1){
     return (
-      <View style={{marginTop:-80,marginLeft:-15}}>
+      <View style={{marginTop:-80,marginLeft:0}}>
       <VictoryPie
      // ref={(c) => { this._expensesPieRef = c; }}
       labelPlacement={"perpendicular"}
-      labelRadius={({ innerRadius }) => innerRadius + deviceHeight/23 }
+      labelRadius={({ innerRadius }) => innerRadius + deviceWidth/11 }
       data={this.state.expensesPieData}
       colorScale={colorPallete}
       //labels={this.state.expensesPieDataLabels}
       // animate={({ delay :0, easing: 'exp' ,duration:0})}
       animate={(this.state.triggerAnimationPie?{ delay :0, easing: 'exp', duration:1100 }:{ delay :0, easing: 'exp', duration:0 })}
-      width={deviceWidth*0.8}
-      innerRadius={70}
+      width={deviceWidth*0.7}
+      innerRadius={60}
       style={{
         data: {
           opacity: ({ datum }) => datum.opacity
@@ -2580,20 +2636,20 @@ renderExpensesAndPieForCarousel = ({item, index}) => {
             </View>
             ))
     )
-  }else if(index == 1 && this.state.triggerAnimationPie) {
+  }else if(index == 1 && this.state.showPieHack) {
     return (
-      <View style={{marginTop:-80,marginLeft:-15}}>
+      <View style={{marginTop:-80,marginLeft:0}}>
       <VictoryPie
      // ref={(c) => { this._expensesPieRef = c; }}
       labelPlacement={"perpendicular"}
-      labelRadius={({ innerRadius }) => innerRadius + deviceHeight/23 }
+      labelRadius={({ innerRadius }) => innerRadius + deviceWidth/11 }
       data={this.state.expensesPieData}
       colorScale={colorPallete}
       //labels={this.state.expensesPieDataLabels}
       // animate={({ delay :0, easing: 'exp' ,duration:0})}
       animate={(this.state.triggerAnimationPie?{ delay :0, easing: 'exp', duration:1100 }:{ delay :0, easing: 'exp', duration:0 })}
-      width={deviceWidth*0.8}
-      innerRadius={70}
+      width={deviceWidth*0.7}
+      innerRadius={60}
       style={{
         data: {
           opacity: ({ datum }) => datum.opacity
@@ -2710,8 +2766,8 @@ setPieDataFrom(data){
             <FontAwesome style={[styles.iconStyle,{position:'absolute',right:26}]} icon={SolidIcons.handHoldingUsd}/>
             <Text style={styles.sideWindowTextBold}>{I18n.t("IncomesHeader")}</Text>
             <Text style={styles.sideWindowTextFaint}>{I18n.t('SetYourIncomes')}</Text>                  
-            {this.state.euroState == '' || this.state.euroState == null &&
-              <Text style={styles.modalMainViewSubHeader}>{I18n.t('SetBalanceFirst')}</Text>        
+            {this.state.euroState == '' || this.state.euroState == null || this.state.paydayState =='' || this.state.paydayState == null && 
+              <Text style={styles.modalMainViewSubHeader}>{I18n.t('SetBalanceAndPayDayFirst')}</Text>        
             }
             {this.state.dataSourceIncomes!=null && this.state.dataSourceIncomes.length !=0 && this.state.euroState != '' && this.state.euroState != null &&
                 <ScrollView style={styles.scrollViewManagerStyle}>                  
@@ -2861,8 +2917,8 @@ setPieDataFrom(data){
             <FontAwesome style={[styles.iconStyle,{position:'absolute',right:26}]} icon={SolidIcons.fileInvoiceDollar}/>
             <Text style={styles.sideWindowTextBold}>{I18n.t("FixedCostsHeader")}</Text>
             <Text style={styles.sideWindowTextFaint}>{I18n.t('SetYourFixedCosts')}</Text>                  
-            {this.state.euroState == '' || this.state.euroState == null &&
-              <Text style={styles.modalMainViewSubHeader}>{I18n.t('SetBalanceFirst')}</Text>        
+            {this.state.euroState == '' || this.state.euroState == null || this.state.paydayState =='' || this.state.paydayState == null && 
+              <Text style={styles.modalMainViewSubHeader}>{I18n.t('SetBalanceAndPayDayFirst')}</Text>        
             }
             {this.state.dataSourceFixedCosts!=null && this.state.dataSourceFixedCosts.length !=0 && this.state.euroState != '' && this.state.euroState != null &&
                 <ScrollView style={styles.scrollViewManagerStyle}>                  
@@ -3012,9 +3068,9 @@ setPieDataFrom(data){
             <FontAwesome style={[styles.iconStyle,{position:'absolute',right:20}]} icon={SolidIcons.piggyBank}/>
             <Text style={styles.sideWindowTextBold}>{I18n.t("SavingsHeader")}</Text>
             <Text style={styles.sideWindowTextFaint}>{I18n.t('SetYourSavingsBalances')}</Text>
-              {this.state.euroState == '' || this.state.euroState == null &&
-              <Text style={styles.modalMainViewSubHeader}>{I18n.t('SetBalanceFirst')}</Text>        
-              }
+            {this.state.euroState == '' || this.state.euroState == null || this.state.paydayState =='' || this.state.paydayState == null && 
+              <Text style={styles.modalMainViewSubHeader}>{I18n.t('SetBalanceAndPayDayFirst')}</Text>        
+            }
               
               {this.state.dataSourceSavings!=null && this.state.dataSourceSavings.length !=0 && this.state.euroState != '' && this.state.euroState != null &&
                 <ScrollView style={styles.scrollViewManagerStyle}>
@@ -3226,6 +3282,13 @@ setPieDataFrom(data){
       
       
       <View style={[styles.footerLine]}/>
+      {/* <View style={[styles.twoViewsStartEndContainer,{padding:15}]}>
+        <FontAwesome
+       style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}} icon={SolidIcons.bug}/>
+       <TouchableOpacity  onPress={async ()=>await storageSet('GoAway','false')} >
+            <Text style={styles.drawerButtonText}>reset go away notification</Text>
+          </TouchableOpacity>
+      </View> */}
       <View style={{height:100}}></View>
       </View>
       </ScrollView>
@@ -4398,7 +4461,7 @@ setPieDataFrom(data){
       this.state.closeModal3 = !bool;
       this.state.selectedCategoryBtn = 0;
       if( this.state.dataSource!=null && this.state.dataSource.length !=0 && true){
-        this.setState({buttonModal3:bool,closeModal3:!bool,selectedCategoryButton:0,expensesPieData:this.resetPieDataFrom(this.state.dataSource),triggerAnimationPie:false})
+        this.setState({buttonModal3:bool,closeModal3:!bool,selectedCategoryButton:0,expensesPieData:this.resetPieDataFrom(this.state.dataSource),triggerAnimationPie:false,showPieHack:false})
       }else{
         this.setState({buttonModal3:bool,closeModal3:!bool,selectedCategoryButton:0});
       }
@@ -4706,8 +4769,8 @@ setPieDataFrom(data){
   
     }
     refSpentToday = (parseFloat(this.state.spentTodayState) - parseFloat(this.state.newSpent)).toString();
+    checkIfSpentTodayEdited =refSpentToday; //ayto xreiazetai gia otan kanei delete expense, kai meta valei kainoyrgio expense kateytheian
     //refNewSpent = '0';
-    //checkIfSpentTodayEdited =refSpentToday;
     this.setState({euroState:this.state.euroState,spentTodayState:this.state.spentTodayState,dataSource:this.state.dataSource})
 
   }
@@ -4760,9 +4823,65 @@ setPieDataFrom(data){
   let jsonAmountsToBeRemovedOrAdded = 0;
   if(json!=undefined){
     for(var i=0; i< Object.keys(json).length; i++){
-      if(json[i].shouldUpdate){ //poso pou tha afairethei
+      if(json[i].Day == '0'){
+        continue;
+      }
+      let dayOfEntry = json[i].Day;
+      var thisMonthDays = moment(new Date()).daysInMonth();
+      var payday = moment(this.state.fullDatePaydayState)  
+      let monthDiff = payday.toDate().getMonth() - new Date().getMonth() + (12 * (payday.toDate().getFullYear() - new Date().getFullYear()));
+      
+      if(monthDiff > 0 ){ //to payday einai se allo mina
+        dayOfEntry = json[i].Day;
+        //var futureMonth =  moment(new Date()).add(monthDiff,"month");
+        var futureMonthDays = moment(new Date()).add(monthDiff,"month").daysInMonth();
+        while(parseInt(dayOfEntry) >parseInt(futureMonthDays)){ //ayto edw an o minas den exei 31 meres 
+          dayOfEntry = parseInt(dayOfEntry) -1;
+          console.log('remove one')
+        }
+        if(dayOfEntry>payday.toDate().getDate()){ 
+          jsonAmountsToBeRemovedOrAdded += parseFloat(json[i].Amount) * (monthDiff - 1);
+        }else{
+          jsonAmountsToBeRemovedOrAdded += parseFloat(json[i].Amount) * monthDiff;
+        }
+      }
+      //meta tsekarw ti ginetai ston twrino mina
+      dayOfEntry = json[i].Day;
+      while(parseInt(dayOfEntry) >parseInt(thisMonthDays)){ //ayto edw an o minas den exei 31 meres 
+        dayOfEntry = parseInt(dayOfEntry) -1;
+        console.log('remove one')
+      }
+      if(dayOfEntry>new Date().getDate()){ 
+        // an to date einai megalytero toy twra prepei na to lavw ypopsin alli mia fora
         jsonAmountsToBeRemovedOrAdded += parseFloat(json[i].Amount);
       }
+      
+      // var lastPayday = moment(this.state.fullDatePaydayState).subtract(1,"month");
+      // //let monthDiff = payday.toDate().getMonth() - new Date().getMonth() + (12 * (payday.toDate().getFullYear() - new Date().getFullYear()));
+      // // var lastPayday = moment(this.state.fullDatePaydayState).subtract(monthDiff,"month");
+      // let dayOfEntry = json[i].Day;
+      // dayOfEntry = dayOfEntry.toString().length == 1 ?'0'+dayOfEntry:dayOfEntry; //prosthiki tou 0 an einai monopsifios
+      // var dayOfEntryFull ;
+      // if(dayOfEntry<=new Date().getDate()){ //prepei na paei ston epomeno mina
+      //   dayOfEntryFull = moment(moment(new Date()).add(1,"month").format('YYYY-MM')+'-'+dayOfEntry)
+      // }else{
+      //   dayOfEntryFull = moment(moment(new Date()).format('YYYY-MM')+'-'+dayOfEntry)
+      // }
+      // console.log(payday)
+      // console.log(lastPayday)
+      // console.log(dayOfEntryFull)
+      // if(dayOfEntryFull>lastPayday && dayOfEntryFull<=payday){
+      //   console.log('ITS IN')
+      //   jsonAmountsToBeRemovedOrAdded += parseFloat(json[i].Amount);
+
+      // }
+      
+      
+      
+      //if(new Date(moment(new Date()).format('YYYY-MM')+'-'+dayOfEntry) <= new Date()){  
+      // if(json[i].shouldUpdate){ //poso pou tha afairethei
+      //   jsonAmountsToBeRemovedOrAdded += parseFloat(json[i].Amount);
+      // }
     }
   }
   return jsonAmountsToBeRemovedOrAdded;
@@ -4973,7 +5092,7 @@ isValid(date:Date) {
         return '0';
       }
       if(parseFloat(moneyPerDay) < parseFloat(value3)){ //an to poso poy soy antistoixei ana imera einai mikrotero apo ayta pou ksodepses simera, return to true budget
-        moneyPerDay = (parseFloat(value1)/remainingDays).toFixed(2);
+        moneyPerDay = ((parseFloat(value1)- fixedCostsToBeRemoved)/remainingDays).toFixed(2);
       }
        return moneyPerDay.toString();
      }else{
@@ -5003,7 +5122,7 @@ isValid(date:Date) {
        return '0';
      }
      if(parseFloat(moneyPerDay) < parseFloat(value3)){ //an to poso poy soy antistoixei ana imera einai mikrotero apo ayta pou ksodepses simera, return to true budget
-      moneyPerDay = (parseFloat(value1)/remainingDays).toFixed(2);
+      moneyPerDay = ((parseFloat(value1)- fixedCostsToBeRemoved)/remainingDays).toFixed(2);
     }
      return moneyPerDay.toString();
    }else{
@@ -5029,7 +5148,7 @@ isValid(date:Date) {
  const storageGet = async(key) => {
  try {
       const result = await AsyncStorage.getItem(key);
-      console.log("StorageGetResult: "+result);
+     // console.log("StorageGetResult: "+result);
       return result;
    } catch(error) {
      //console.log(error);
