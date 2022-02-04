@@ -1092,6 +1092,11 @@ const locales = RNLocalize.getLocales();
               continue;
             }
             let dayOfEntry = jsonIncomes[i].Day.toString().length == 1 ?'0'+jsonIncomes[i].Day:jsonIncomes[i].Day; //prosthiki tou 0 an einai monopsifios
+            var thisMonthDays = moment(new Date()).daysInMonth();
+            while(parseInt(dayOfEntry) >parseInt(thisMonthDays)){ //ayto edw an o minas den exei 31 meres 
+              dayOfEntry = parseInt(dayOfEntry) -1;
+              console.log('remove one')
+            }
             var diff = 0;
             if(new Date().getDate() < parseInt(jsonIncomes[i].Day)){
               diff = this.getDiffInDays(moment(moment(new Date()).format("YYYY-MM")+'-'+dayOfEntry),moment(moment(new Date()).format("YYYY-MM-DD")));
@@ -1108,7 +1113,12 @@ const locales = RNLocalize.getLocales();
             if(jsonFixedCosts[i].Day.toString() == '0'){
               continue;
             }
-            let dayOfEntry = jsonFixedCosts[i].Day.toString().length == 1 ?'0'+jsonFixedCosts[i].Day:jsonFixedCosts[i].Day; //prosthiki tou 0 an einai monopsifios
+            let dayOfEntry = jsonIncomes[i].Day.toString().length == 1 ?'0'+jsonIncomes[i].Day:jsonIncomes[i].Day; //prosthiki tou 0 an einai monopsifios
+            var thisMonthDays = moment(new Date()).daysInMonth();
+            while(parseInt(dayOfEntry) >parseInt(thisMonthDays)){ //ayto edw an o minas den exei 31 meres 
+              dayOfEntry = parseInt(dayOfEntry) -1;
+              console.log('remove one')
+            }
             var diff = 0;
             if(new Date().getDate() < parseInt(jsonFixedCosts[i].Day)){
               diff = this.getDiffInDays(moment(moment(new Date()).format("YYYY-MM")+'-'+dayOfEntry),moment(moment(new Date()).format("YYYY-MM-DD")));
