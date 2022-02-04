@@ -47,7 +47,7 @@ public class Widget2 extends AppWidgetProvider {
 			String appString = sharedPref.getString("appData", "{\"text\":'no data'}");
 			JSONObject appData = new JSONObject(appString);
 			// Construct the RemoteViews object
-			RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget);
+			RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget2);
 			
 
             // ReactInstanceManager reactInstanceManager = context.getReactNativeHost().getReactInstanceManager();
@@ -59,10 +59,10 @@ public class Widget2 extends AppWidgetProvider {
             // catalystInstance.callFunction("JavaScriptVisibleToJava", "nameOfJsMethod", params);
 
             //edw einai gia na setaroume to on click
-            Intent intent = new Intent(context, MainActivity.class);
+            Intent intent = new Intent(context, VoiceActivity.class);
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);       
-            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);   
-            views.setOnClickPendingIntent(R.id.widget, pendingIntent);
+            PendingIntent pendingIntent = PendingIntent.getActivity(context, appWidgetId, intent, 0);   
+            views.setOnClickPendingIntent(R.id.widget2, pendingIntent);
             //appWidgetManager.updateAppWidget(appWidgetId, views);
 
             //edw einai gia na setaroume to refresh

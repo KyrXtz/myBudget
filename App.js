@@ -1014,7 +1014,7 @@ const locales = RNLocalize.getLocales();
    }
    appStateSubscription;
    componentDidMount() {
-    
+
     this.state.loading= true;
     this.setState({loading:true});
     this.isLoading();
@@ -1023,7 +1023,7 @@ const locales = RNLocalize.getLocales();
     this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this._keyboardDidShow);
     this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this._keyboardDidHide);
     this.appStateSubscription = AppState.addEventListener('change', this._handleAppStateChange);
-    
+
     //console.log('DATA SOURCE:'+this.state.dataSource[0].Time);
 
     // I18n.locale
