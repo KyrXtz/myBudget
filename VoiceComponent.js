@@ -9,10 +9,11 @@ import {
   Image,
   TouchableHighlight,
   ScrollView,
+  TouchableOpacity
 } from 'react-native';
 
 // import Voice
-import Voice from 'react-native-voice';
+import Voice from '@react-native-voice/voice';
 
 export const VoiceComponent  = () => {
   const [pitch, setPitch] = useState('');
@@ -76,7 +77,7 @@ export const VoiceComponent  = () => {
   const startRecognizing = async () => {
     //Starts listening for speech for a specific locale
     try {
-      await Voice.start('en-US');
+      await Voice.start('en');
       setPitch('');
       setError('');
       setStarted('');
@@ -197,7 +198,7 @@ export const VoiceComponent  = () => {
             </Text>
           </TouchableHighlight>
           <TouchableHighlight
-            onPress={cancelRecognizing}
+            onPress={startRecognizing}
             style={styles.buttonStyle}>
             <Text style={styles.buttonTextStyle}>
               Cancel
