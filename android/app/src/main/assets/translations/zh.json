@@ -157,7 +157,15 @@
     "InTheRed": "处于亏损状态!",
     "DontOverspend": "我在这里提醒你不要过度消费.",
     "OverBudgetBy": "你比今天的预算多了",
-    "GoAwayMessage": "按'HIDE'来隐藏我今天的情况."
+    "GoAwayMessage": "按'HIDE'来隐藏我今天的情况.",
+    "Expenses":"费用:",
+    "EditWidgetHeader":"编辑小工具",
+    "EditWidgetSubtitle":"*如果你把小部件做得太大, 你可能需要从主屏幕上手动调整它的大小",
+    "Preview":"预览",
+    "ProVersionOnlyTitle":"仅限专业版!",
+    "ProVersionOnlyMessage":"这个功能在免费版中是没有的。你是否有兴趣发现专业版所提供的所有功能 ?",
+    "SaveChangesToWidgetQuestion":"保存对小组件的更改?"
+
 
 
 }

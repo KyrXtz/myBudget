@@ -138,8 +138,6 @@
     "PayLabel": "Pagar...",
     "SetBalanceAndPayDayFirst": "Por favor, establezca su saldo y día de pago",
     "ChangeNameOfCategoryTitle": "Cambiar el nombre de la categoría",
-    "ProVersionOnlyTitle": "¡Sólo versión Pro!",
-    "ProVersionOnlyMessage": "Esta función no está disponible en la versión gratuita. ¿Está interesado en descubrir todas las funciones que ofrece la versión pro?",
     "FreeUserTrialTitle": "¡Hola!",
     "FreeUserTrialMessage": "¡Esta es una función pro, pero tienes un campo gratis para probar!",
     "ResultOfSubNegative": "El resultado de la operación no puede ser negativo",
@@ -160,7 +158,15 @@
     "InTheRed": "¡En rojo!",
     "DontOverspend": "Estoy aquí para recordarte que no gastes más de la cuenta",
     "OverBudgetBy": "Te has pasado del presupuesto de hoy en ",
-    "GoAwayMessage": "Pulsa 'HIDE' para ocultarme por hoy."
+    "GoAwayMessage": "Pulsa 'HIDE' para ocultarme por hoy.",
+    "Expenses":"Gastos:",
+    "EditWidgetHeader":"Editar widget",
+    "EditWidgetSubtitle":"*Si haces el widget demasiado grande puede que tengas que redimensionarlo manualmente desde la pantalla de inicio",
+    "Preview":"Previsualización",
+    "ProVersionOnlyTitle": "¡Sólo versión Pro!",
+    "ProVersionOnlyMessage": "Esta función no está disponible en la versión gratuita. ¿Está interesado en descubrir todas las funciones que ofrece la versión pro?",
+    "SaveChangesToWidgetQuestion":"¿Guardar los cambios en el widget?"
+
 
 
 }

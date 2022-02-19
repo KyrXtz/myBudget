@@ -158,7 +158,17 @@
     "InTheRed":"In the red!",
     "DontOverspend":"I am here to remind you not to overspend.",
     "OverBudgetBy":"You are over today's budget by ",
-    "GoAwayMessage":"Press 'HIDE' to hide me for today."
+    "GoAwayMessage":"Press 'HIDE' to hide me for today.",
+    "Expenses":"Expenses:",
+    "EditWidgetHeader":"Edit Widget",
+    "EditWidgetSubtitle":"*If you make the widget too big you might need to resize it manually from the homescreen",
+    "Preview":"Preview",
+    "ProVersionOnlyTitle":"Pro version only!",
+    "ProVersionOnlyMessage":"This feature is not available in the free version. Are you interested in discovering all the features the pro version has to offer?",
+    "SaveChangesToWidgetQuestion":"Save changes to widget?"
+
+    
+
 
 
 

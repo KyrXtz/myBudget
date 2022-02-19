@@ -97,6 +97,7 @@ import Swiper from 'react-native-swiper'
 import {LocaleConfig,Calendar, CalendarList, Agenda} from 'react-native-calendars';
 import { AdMobBannerComponent } from './AdMobBannerComponent';
 import {AdMobInterstitial} from 'react-native-admob';
+import Slider from '@react-native-community/slider';
 
 
 
@@ -126,6 +127,7 @@ import 'moment/locale/fr';
 
 
  import currencies from "./android/app/src/main/assets/currencies/currencies.json";
+import ColorPicker from 'react-native-wheel-color-picker';
 
  const availableTranslations = ['en','en-US','en-GB','el','de','zh','es','fr'];
  I18n.fallbacks = true;
@@ -285,6 +287,7 @@ const locales = RNLocalize.getLocales();
        openLanguageSelect:false,
        openCurrencySelect:false,
        openCategoriesSelect:false,
+       openEditWidget:false,
        openSettings:false,
        isEditingEuroState:false,
        areAdsRemoved:'false',
@@ -533,7 +536,7 @@ const locales = RNLocalize.getLocales();
      //ena modal k einai ok to prompt to rate
      
      console.log('ARE ADS REMOVE'+_areAdsRemoved)
-     this.setState({shouldShowFixedCosts:this.state.shouldShowFixedCosts,shouldShowIncomes:this.state.shouldShowIncomes,markedDates:_markedDates,dataSourceSavings:value11,dataSourceFixedCosts:value12,dataSourceIncomes:value13,dataSourcePerDay:null,dataSource:value9,savingsState:value8,isEditingEuroState:false,newSpent:'0',openSettings:false,openCurrencySelect:false,openCategoriesSelect:false,openLanguageSelect:false,openCoffeeShop:false,removeAdsShop:false,closeModal1:false,closeModal2:false,closeModal3:false,moniesState:value7,spentMonthState: value6,fullDatePaydayState:value5, startingEuroState: value4 ,euroState: value1, paydayState: value2,spentTodayState: value3 , open: false ,cardTutorial:cardTutorial,tutorialViewd:tut,idOfTutToShow:0 , xPx:0,yPx:0,buttonModal1:false,buttonModal2:false,buttonModal3:false,areAdsRemoved:_areAdsRemoved,isPro:_isPro,daysPassed:_daysPassed,stopShowingPromptToRate:_stopShowingPromptToRate, swiperIndex:0,selectedCategoryBtn:0,tutorialText:I18n.t('TutorialText1')}) ;
+     this.setState({shouldShowFixedCosts:this.state.shouldShowFixedCosts,shouldShowIncomes:this.state.shouldShowIncomes,markedDates:_markedDates,dataSourceSavings:value11,dataSourceFixedCosts:value12,dataSourceIncomes:value13,dataSourcePerDay:null,dataSource:value9,savingsState:value8,isEditingEuroState:false,newSpent:'0',openSettings:false,openCurrencySelect:false,openCategoriesSelect:false,openEditWidget:false,openLanguageSelect:false,openCoffeeShop:false,removeAdsShop:false,closeModal1:false,closeModal2:false,closeModal3:false,moniesState:value7,spentMonthState: value6,fullDatePaydayState:value5, startingEuroState: value4 ,euroState: value1, paydayState: value2,spentTodayState: value3 , open: false ,cardTutorial:cardTutorial,tutorialViewd:tut,idOfTutToShow:0 , xPx:0,yPx:0,buttonModal1:false,buttonModal2:false,buttonModal3:false,areAdsRemoved:_areAdsRemoved,isPro:_isPro,daysPassed:_daysPassed,stopShowingPromptToRate:_stopShowingPromptToRate, swiperIndex:0,selectedCategoryBtn:0,tutorialText:I18n.t('TutorialText1')}) ;
      if(this.state.tutorialViewd == 'false'){
       this.setState({tutorialViewd:'false'});
       intervalId =  setInterval(() => {
@@ -640,7 +643,7 @@ const locales = RNLocalize.getLocales();
       // this.state.selectedCategoryBtn = 4;
       // this.saveExpensesToStorage();
       //ALLAGI SXEDIWN , (oi 3 parapanw grames doylevoyn bebaia, to vazoyn sto swsto day), basika mpainei sto day poy anoigeis tin efarmogi, opote as min ginei etsi
-      //apla tha to afairw, kai isws deixnw to history sto sygkekrimeno tab, gia na min ginetai mperdema
+      //apla tha to afairw, kai isws deixnw to  sto sygkekrimeno tab, gia na min ginetai mperdema
     if(json[i].Type == 'FixedCosts'){
       returnValue = this.getStringNumberWithCorrectDecimals((parseFloat(returnValue) - parseFloat(json[i].Amount)).toString())
     }
@@ -884,8 +887,9 @@ const locales = RNLocalize.getLocales();
           //await this.saveData();
         }
         await storageSet('PayDay',this.state.paydayState);
-
-        
+         //reset to permaNotification giaotan ypervainei to budget
+         await storageSet('GoAway','false') ;
+         permaNotificationGoAway = false;
         
         let spentMonthF = parseFloat(value1) + parseFloat(value2);
         await storageSet('SpentToday','0');
@@ -930,9 +934,7 @@ const locales = RNLocalize.getLocales();
         console.log(expensesHistoryJson);
         refExpensesHistoryJson = expensesHistoryJson;
 
-        //reset to permaNotification giaotan ypervainei to budget
-        await storageSet('GoAway','false') ;
-        permaNotificationGoAway = false;
+       
 
   }
   
@@ -1502,7 +1504,10 @@ render() {
          { (parseFloat(this.state.euroState) >=0 && this.state.shouldShowIncomes )&&
          <Text style={styles.textFaint}>{I18n.t('BalanceAfterIncomes')} {this.stringWithCorrectCurrencyPosition(this.getEuroStateAfterIncomesAdded())}</Text>
          }
-         { (parseFloat(this.state.euroState) >=0 && this.state.shouldShowFixedCosts )&&
+         { (parseFloat(this.state.euroState) >=0 && this.state.shouldShowFixedCosts )&& parseFloat(this.getEuroStateAfterFixedCostsRemoved())<0 &&
+         <Text style={[styles.textFaint,{color:'#FF2D00DD'}]}>{I18n.t('BalanceAfterFixedCosts')} {this.stringWithCorrectCurrencyPosition(this.getEuroStateAfterFixedCostsRemoved())}</Text>
+         }
+         { (parseFloat(this.state.euroState) >=0 && this.state.shouldShowFixedCosts ) && parseFloat(this.getEuroStateAfterFixedCostsRemoved())>=0 &&
          <Text style={styles.textFaint}>{I18n.t('BalanceAfterFixedCosts')} {this.stringWithCorrectCurrencyPosition(this.getEuroStateAfterFixedCostsRemoved())}</Text>
          }
          {(this.state.savingsState!='' && this.state.savingsState!=null && this.state.savingsState!='0')  &&
@@ -3238,6 +3243,165 @@ setPieDataFrom(data){
           </View>
         </Modal>
         </View>
+        <View style={[styles.twoViewsStartEndContainer,{padding:15}]}>
+        <ProBanner isPro={this.state.isPro}></ProBanner>
+         <FontAwesome
+       style={{alignSelf:'center',marginTop:3,textAlignVertical:'center'}} icon={SolidIcons.borderAll}/>
+        <TouchableOpacity  onPress={async()=> await this.openEditWidgetView()} >
+            <Text style={styles.drawerButtonText}>{I18n.t('EditWidgetHeader')}</Text>
+          </TouchableOpacity>
+          <Modal  onBackdropPress={async ()=>await this.editWidget()} useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.coffeeShopModal}  animationIn = {'slideInUp'} animationOut={'slideOutDown'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.openEditWidget}> 
+            <View style={styles.billingWindowStyle}>             
+              <View style={widgetStyles.outerContainer}>
+                <View>
+                    <Text style={styles.sideWindowTextBold}>{I18n.t("EditWidgetHeader")}</Text>
+                    <Text style={styles.sideWindowTextFaint}>{I18n.t("EditWidgetSubtitle")}</Text>
+
+                </View> 
+                <View style={widgetStyles.container}>
+                    <View style={widgetStyles.widgetView}>
+                        <Text style={[widgetStyles.textView1,{fontSize:this.state.widgetSliderValue1,
+                          fontWeight:this.state.text1bold?'bold':'normal',
+                          fontStyle:this.state.text1italic?'italic':'normal',
+                          color:this.state.textColor1
+                          }]}>
+                            {this.stringWithCorrectCurrencyPosition(this.getEuroStateWithCorrectDecimals())}
+                        </Text>          
+                        <Text style={[widgetStyles.textView1,{fontSize:this.state.widgetSliderValue2,
+                        fontWeight:this.state.text2bold?'bold':'normal',
+                        fontStyle:this.state.text2italic?'italic':'normal',
+                        color:this.state.textColor2
+                        }]}>
+                            {this.stringWithCorrectCurrencyPosition(this.CalculateEuroPerDayNotAsync()) + I18n.t('PerDay')}
+                        </Text>
+                        <Text style={[widgetStyles.textView1,{fontSize:this.state.widgetSliderValue3,
+                        fontWeight:this.state.text3bold?'bold':'normal',
+                        fontStyle:this.state.text3italic?'italic':'normal',
+                        color:this.state.textColor3
+                        }]}>
+                            {I18n.t('Expenses')+this.stringWithCorrectCurrencyPosition(this.getSpentTodayStateWithCorrectDecimals())}
+                        </Text>
+                    </View>
+                                      
+                </View>
+                  <View style={widgetStyles.editView}>
+                    <Text style={styles.textFaint}>{I18n.t("Preview")}</Text>
+                      <View style={widgetStyles.editContainer}>
+                            <Slider
+                                style={widgetStyles.slider}
+                                value={this.state.widgetSliderValue1}
+                                minimumValue={12}
+                                maximumValue={72}
+                                onValueChange={value => this.setState({widgetSliderValue1:value})}
+                            />
+                            <TouchableOpacity style={{marginLeft:10}} onPress={()=> this.setState({text1bold:!this.state.text1bold})} >
+                              <FontAwesome style={[widgetStyles.iconStyle,{backgroundColor:this.state.text1bold?'gray':'transparent'}]}  icon={SolidIcons.bold} />  
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={()=> this.setState({text1italic:!this.state.text1italic})}>
+                              <FontAwesome style={[widgetStyles.iconStyle,{backgroundColor:this.state.text1italic?'gray':'transparent'}]} icon={SolidIcons.italic} />  
+                            </TouchableOpacity>
+                            <TouchableOpacity style={{marginHorizontal:20,alignSelf:'center',height:20,width:20,backgroundColor:this.state.textColor1!=null?this.state.textColor1:'white',borderColor:'black',borderRadius:10,borderWidth:2}} onPress={()=>this.setState({widgetColorSelectModal1:true})}>
+                              <Modal onBackdropPress={()=>this.setState({widgetColorSelectModal1:false})}  useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.coffeeShopModal}  animationIn = {'slideInUp'} animationOut={'slideOutDown'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.widgetColorSelectModal1}>
+                                <View style={{height:deviceHeight*0.4}}>
+                                </View>
+                                <View style={{height:deviceHeight*0.4}}>
+                                  <ColorPicker
+                                  ref={r => { this.picker = r }}
+                                  color={this.state.textColor1}
+                                  // swatchesOnly={this.state.swatchesOnly}
+                                  // onColorChange={(color)=> this.setState({textColor1:color})}
+                                  // onColorChangeComplete={this.onColorChangeComplete}
+                                  onColorChangeComplete={(color)=> this.setState({textColor1:color})}
+                                  thumbSize={20}
+                                  sliderSize={20}
+                                  noSnap={true}
+                                  row={false}
+                                  swatchesLast={true}
+                                  swatches={true}
+                                  />
+                                  </View>
+                              </Modal>
+                            </TouchableOpacity>
+                        </View>
+                      <View style={widgetStyles.editContainer}>
+                          <Slider
+                              style={widgetStyles.slider}
+                              value={this.state.widgetSliderValue2}
+                              minimumValue={12}
+                              maximumValue={72}
+                              onValueChange={value => this.setState({widgetSliderValue2:value})}
+                          /> 
+                          <TouchableOpacity style={{marginLeft:10}}  onPress={()=> this.setState({text2bold:!this.state.text2bold})} >
+                              <FontAwesome style={[widgetStyles.iconStyle,{backgroundColor:this.state.text2bold?'gray':'transparent'}]}  icon={SolidIcons.bold} />  
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={()=> this.setState({text2italic:!this.state.text2italic})}>
+                              <FontAwesome style={[widgetStyles.iconStyle,{backgroundColor:this.state.text2italic?'gray':'transparent'}]} icon={SolidIcons.italic} />  
+                            </TouchableOpacity>
+                            <TouchableOpacity style={{marginHorizontal:20,alignSelf:'center',height:20,width:20,backgroundColor:this.state.textColor2!=null?this.state.textColor2:'white',borderColor:'black',borderRadius:10,borderWidth:2}} onPress={()=>this.setState({widgetColorSelectModal2:true})}>
+                              <Modal onBackdropPress={()=>this.setState({widgetColorSelectModal2:false})}  useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.coffeeShopModal}  animationIn = {'slideInUp'} animationOut={'slideOutDown'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.widgetColorSelectModal2}>
+                                <View style={{height:deviceHeight*0.4}}>
+                                </View>
+                                <View style={{height:deviceHeight*0.4}}>
+                                  <ColorPicker
+                                  ref={r => { this.picker = r }}
+                                  color={this.state.textColor2}
+                                  // swatchesOnly={this.state.swatchesOnly}
+                                  // onColorChange={(color)=> this.setState({textColor1:color})}
+                                  // onColorChangeComplete={this.onColorChangeComplete}
+                                  onColorChangeComplete={(color)=> this.setState({textColor2:color})}
+                                  thumbSize={20}
+                                  sliderSize={20}
+                                  noSnap={true}
+                                  row={false}
+                                  swatchesLast={true}
+                                  swatches={true}
+                                  />
+                                  </View>
+                              </Modal>
+                            </TouchableOpacity>
+                          </View>
+                      <View style={widgetStyles.editContainer}>
+                          <Slider
+                              style={widgetStyles.slider}
+                              value={this.state.widgetSliderValue3}
+                              minimumValue={12}
+                              maximumValue={72}
+                              onValueChange={value => this.setState({widgetSliderValue3:value})}
+                          /> 
+                          <TouchableOpacity style={{marginLeft:10}}  onPress={()=> this.setState({text3bold:!this.state.text3bold})} >
+                              <FontAwesome style={[widgetStyles.iconStyle,{backgroundColor:this.state.text3bold?'gray':'transparent'}]}  icon={SolidIcons.bold} />  
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={()=> this.setState({text3italic:!this.state.text3italic})}>
+                              <FontAwesome style={[widgetStyles.iconStyle,{backgroundColor:this.state.text3italic?'gray':'transparent'}]} icon={SolidIcons.italic} />  
+                            </TouchableOpacity>
+                            <TouchableOpacity style={{marginHorizontal:20,alignSelf:'center',height:20,width:20,backgroundColor:this.state.textColor3!=null?this.state.textColor3:'white',borderColor:'black',borderRadius:10,borderWidth:2}} onPress={()=>this.setState({widgetColorSelectModal3:true})}>
+                              <Modal onBackdropPress={()=>this.setState({widgetColorSelectModal3:false})}  useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.coffeeShopModal}  animationIn = {'slideInUp'} animationOut={'slideOutDown'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.widgetColorSelectModal3}>
+                                <View style={{height:deviceHeight*0.4}}>
+                                </View>
+                                <View style={{height:deviceHeight*0.4}}>
+                                  <ColorPicker
+                                  ref={r => { this.picker = r }}
+                                  color={this.state.textColor3}
+                                  // swatchesOnly={this.state.swatchesOnly}
+                                  // onColorChange={(color)=> this.setState({textColor1:color})}
+                                  // onColorChangeComplete={this.onColorChangeComplete}
+                                  onColorChangeComplete={(color)=> this.setState({textColor3:color})}
+                                  thumbSize={20}
+                                  sliderSize={20}
+                                  noSnap={true}
+                                  row={false}
+                                  swatchesLast={true}
+                                  swatches={true}
+                                  />
+                                  </View>
+                              </Modal>
+                            </TouchableOpacity>
+                      </View>
+                     </View>               
+            </View>
+          </View>
+        </Modal>         
+        </View>
         { false && //hidden for now
         <View style={[styles.twoViewsStartEndContainer,{padding:15}]}>
         <ProBanner isPro={this.state.isPro}></ProBanner>
@@ -3315,6 +3479,92 @@ setPieDataFrom(data){
       </View>
     );
   };
+  async openEditWidgetView(){
+    let _widgetSliderValue1 = await storageGet("widgetSliderValue1");
+    let _widgetSliderValue2 = await storageGet("widgetSliderValue2");
+    let _widgetSliderValue3 = await storageGet("widgetSliderValue3");
+    let _widgetTextBold1 = await storageGet("widgetTextBold1");
+    let _widgetTextBold2 = await storageGet("widgetTextBold2");
+    let _widgetTextBold3 = await storageGet("widgetTextBold3");
+    let _widgetTextItalic1 = await storageGet("widgetTextItalic1");
+    let _widgetTextItalic2 = await storageGet("widgetTextItalic2");
+    let _widgetTextItalic3 = await storageGet("widgetTextItalic3");
+    let _widgetTextColor1 = await storageGet("widgetTextColor1");
+    let _widgetTextColor2 = await storageGet("widgetTextColor2");
+    let _widgetTextColor3 = await storageGet("widgetTextColor3");
+
+
+
+
+    this.setState({openEditWidget:true,
+      widgetSliderValue1:_widgetSliderValue1==null?14:parseInt(_widgetSliderValue1),
+      widgetSliderValue2:_widgetSliderValue2==null?13:parseInt(_widgetSliderValue2),
+      widgetSliderValue3:_widgetSliderValue3==null?12:parseInt(_widgetSliderValue3),
+      text1bold:_widgetTextBold1 =='true',
+      text2bold:_widgetTextBold2 =='true',
+      text3bold:_widgetTextBold3 =='true',
+      text1italic:_widgetTextItalic1 =='true',
+      text2italic:_widgetTextItalic2 =='true',
+      text3italic:_widgetTextItalic3 =='true',
+      textColor1:_widgetTextColor1==null?'white':_widgetTextColor1,
+      textColor2:_widgetTextColor2==null?'white':_widgetTextColor2,
+      textColor3:_widgetTextColor3==null?'white':_widgetTextColor3
+
+
+     })
+  }
+  async editWidget(){
+    Alert.alert(
+      I18n.t("EditWidgetHeader"),
+      I18n.t("SaveChangesToWidgetQuestion"),
+      [
+         // The "No" button
+        // Does nothing but dismiss the dialog when tapped
+        {
+          text: I18n.t("Cancel"),
+          onPress: () =>{
+           
+          }
+          
+        },
+        {
+          text: I18n.t("No"),
+          onPress: () =>{
+            this.setState({openEditWidget:false})
+          }
+          
+        },
+        // The "Yes" button
+        {
+          text: I18n.t("Yes"),
+          onPress: async () => {
+            this.setState({openEditWidget:false})
+            let isPro = await storageGet("IsPro");
+            if( isPro != 'true'){
+              this.setState({openEditWidget:false})
+              this.buyProVersionPrompt();
+              return;
+            }
+            await storageSet("widgetSliderValue1",this.state.widgetSliderValue1?.toString());
+            await storageSet("widgetSliderValue2",this.state.widgetSliderValue2?.toString());
+            await storageSet("widgetSliderValue3",this.state.widgetSliderValue3?.toString());
+            await storageSet("widgetTextBold1",this.state.text1bold?.toString());
+            await storageSet("widgetTextBold2",this.state.text2bold?.toString());
+            await storageSet("widgetTextBold3",this.state.text3bold?.toString());
+            await storageSet("widgetTextItalic1",this.state.text1italic?.toString());
+            await storageSet("widgetTextItalic2",this.state.text2italic?.toString());
+            await storageSet("widgetTextItalic3",this.state.text3italic?.toString());
+            await storageSet("widgetTextColor1",this.state.textColor1?.toString());
+            await storageSet("widgetTextColor2",this.state.textColor2?.toString());
+            await storageSet("widgetTextColor3",this.state.textColor3?.toString());
+            await this.saveAndSetSharedStorage();
+          },
+        },
+       
+      ]
+    );
+    
+  }
   changeNameOfCategory(i,categoryName){
     console.log(categoryName)
     this.setState({openChangeNameOfCategory:true,changeCategoryNameNo:(parseInt(i)+1),changeCategoryName:categoryName})
@@ -4484,9 +4734,9 @@ setPieDataFrom(data){
       break;
     }
 
-    // AdMobInterstitial.setAdUnitID('ca-app-pub-4278197343444747/8778680203');
-    // AdMobInterstitial.setTestDevices(['CF583E54-34C6-453C-80FC-493D2468A51E']);
-    // AdMobInterstitial.requestAd().then(() => AdMobInterstitial.showAd());
+    //  AdMobInterstitial.setAdUnitID('ca-app-pub-4278197343444747/9645989370');
+    // // AdMobInterstitial.setTestDevices(['CF583E54-34C6-453C-80FC-493D2468A51E']);
+    //  AdMobInterstitial.requestAd().then(() => AdMobInterstitial.showAd());
 
   }
   cancelBtnModal(i,bool){
@@ -4520,7 +4770,10 @@ setPieDataFrom(data){
       () => {
       this.openBtnModal(i,!bool);
    },300);
-
+   setTimeout(
+    async ()=>{
+      await this.checkIfShouldRateAndShowAd();
+    },400);
   }
   async confirmBtnModal(i,bool,conditionalAlertBool1,conditionalAlertBool2,responseBool1){
     console.log("LOCK")
@@ -4660,7 +4913,12 @@ setPieDataFrom(data){
    },300);
     setTimeout(
       async ()=>{
-        console.log('REVIEW????????????????')
+        await this.checkIfShouldRateAndShowAd();
+      },400);
+    console.log("UNLOCK")
+  }
+  async checkIfShouldRateAndShowAd(){
+    console.log('REVIEW????????????????')
         let times = await storageGet('howManyTimesPressedConfirm');
         let hasReviewdInApp = await storageGet('hasReviewdInApp');
         if(times =='' || times == null){
@@ -4669,7 +4927,7 @@ setPieDataFrom(data){
           times = (parseInt(times)+1).toString();
           await storageSet('howManyTimesPressedConfirm',times);
         }
-        if(parseInt(times)>=2 && hasReviewdInApp!='true'){
+        if(parseInt(times)>=3 && hasReviewdInApp!='true'){
           const options = {
             //AppleAppID:"2193813192",
             GooglePackageName:"com.kyrxtz.mybudget",
@@ -4692,10 +4950,13 @@ setPieDataFrom(data){
             }
           });
         }
-      },400);
-    console.log("UNLOCK")
+        if(parseInt(times)>=10 && this.state.areAdsRemoved != 'true'){
+          AdMobInterstitial.setAdUnitID('ca-app-pub-4278197343444747/9645989370');
+          // AdMobInterstitial.setTestDevices(['CF583E54-34C6-453C-80FC-493D2468A51E']);
+          AdMobInterstitial.requestAd().then(() => AdMobInterstitial.showAd());
+          await storageSet('howManyTimesPressedConfirm','0');
+        }
   }
-
   async saveExpensesToStorage(){
     
     var spentTodayJson = await storageGet('SpentTodayJson');
@@ -5062,6 +5323,24 @@ isValid(date:Date) {
       let value1 = await storageGet('Euros');
       let value2 = await storageGet('monies');
       let value3 = await  storageGet('SpentToday');
+      let _textSize1 = await storageGet("widgetSliderValue1");
+      _textSize1 = _textSize1==null?14:_textSize1;
+      let _textSize2 = await storageGet("widgetSliderValue2");
+      _textSize2 = _textSize2==null?13:_textSize2;
+      let _textSize3 = await storageGet("widgetSliderValue3");
+      _textSize3 = _textSize3==null?12:_textSize3;
+      let _textBold1 = await storageGet("widgetTextBold1") =='true';
+      let _textBold2 = await storageGet("widgetTextBold2") =='true';
+      let _textBold3 = await storageGet("widgetTextBold3") =='true';
+      let _textItalic1 = await storageGet("widgetTextItalic1") =='true';
+      let _textItalic2 = await storageGet("widgetTextItalic2") =='true';
+      let _textItalic3 = await storageGet("widgetTextItalic3") =='true';
+      let _textColor1 = await storageGet("widgetTextColor1");
+      _textColor1 = _textColor1==null?'#ffffff':_textColor1;
+      let _textColor2 = await storageGet("widgetTextColor2");
+      _textColor2 = _textColor2==null?'#ffffff':_textColor2;
+      let _textColor3 = await storageGet("widgetTextColor3");
+      _textColor3 = _textColor3==null?'#ffffff':_textColor3;
       var index = value1.indexOf('.');
        if (index >= 0) {
          value1= (parseFloat(value1).toFixed(2)).toString();
@@ -5075,7 +5354,12 @@ isValid(date:Date) {
          value3= (parseFloat(value3).toFixed(2)).toString();
        }
      SharedStorage.set(
-       JSON.stringify({text1: this.stringWithCorrectCurrencyPosition(value1) ,text2: this.stringWithCorrectCurrencyPosition(value2)+'/Day' ,text3: this.stringWithCorrectCurrencyPosition(value3)+' spent today' }),
+       JSON.stringify({text1: this.stringWithCorrectCurrencyPosition(value1) ,text2: this.stringWithCorrectCurrencyPosition(value2)+I18n.t('PerDay') ,text3: I18n.t('Expenses')+this.stringWithCorrectCurrencyPosition(value3),
+       text1size:_textSize1,text2size:_textSize2,text3size:_textSize3,
+       textBold1:_textBold1, textBold2:_textBold2,textBold3:_textBold3,
+       textItalic1:_textItalic1,textItalic2:_textItalic2,textItalic3:_textItalic3,
+       textColor1:_textColor1,textColor2:_textColor2,textColor3:_textColor3
+      }),
      );
    }
   async CalculateEuroPerDay(){
@@ -5309,7 +5593,7 @@ const deviceHeight =
     width:'65%',
     borderRadius:20,
     height:'130%',
-    paddingHorizontal:2
+    paddingHorizontal:5
 
     // flexDirection:'row'
 
@@ -5620,6 +5904,62 @@ modalMainViewSubInfo:{
   flexDirection:'row',justifyContent:'flex-start'
 }
 
+});
+const widgetStyles = StyleSheet.create({
+  outerContainer:{
+
+  },editContainer:{
+    flexDirection:'row'
+
+  },
+  container:{
+      //justifyContent:'center',
+      padding:10,
+      flexDirection:'row'
+  },
+  slidersView:{
+    
+  },
+  slider:{
+    height:deviceHeight*0.03,
+    width:deviceWidth*0.5
+  },
+  editView:{
+
+  },
+  iconStyle:{backgroundColor:'gray',padding:3,borderRadius:5},
+  widgetView:{
+      borderColor:'black',
+      borderWidth:3,
+      borderRadius:20,
+      padding:10,
+      backgroundColor:'#6fc3c3',
+      flexDirection:'column',
+      
+  },
+  textView1:{
+     alignSelf:'center',
+     fontSize:14,
+     color:'white',
+     fontStyle:'italic',
+     fontWeight:'bold',
+     paddingVertical:1
+  },
+  textView2:{
+     alignSelf:'center',
+     fontSize:13,
+     color:'white',
+     fontStyle:'italic',
+     fontWeight:'bold'
+  },
+  textView3:{
+     alignSelf:'center',
+     fontSize:12,
+     color:'white',
+     fontStyle:'italic',
+     fontWeight:'bold'
+     
+  }
 });
 
  export default withIAPContext(App);

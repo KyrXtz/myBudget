@@ -158,7 +158,15 @@
     "InTheRed": "Im roten Bereich!",
     "DontOverspend": "Ich bin hier, um Sie daran zu erinnern, nicht zu viel auszugeben.",
     "OverBudgetBy": "Sie haben Ihr heutiges Budget um ",
-    "GoAwayMessage": "Drücken Sie 'HIDE', um mich für heute auszublenden."
+    "GoAwayMessage": "Drücken Sie 'HIDE', um mich für heute auszublenden.",
+    "Expenses":"Ausgaben:",
+    "EditWidgetHeader":"Widget bearbeiten",
+    "EditWidgetSubtitle":"*Wenn Sie das Widget zu groß machen, müssen Sie es möglicherweise manuell auf dem Startbildschirm verkleinern",
+    "Preview":"Vorschau",
+    "ProVersionOnlyTitle":"Nur Pro-Version!",
+    "ProVersionOnlyMessage":"Diese Funktion ist in der kostenlosen Version nicht verfügbar. Sind Sie daran interessiert, alle Funktionen zu entdecken, die die Pro-Version zu bieten hat?",
+    "SaveChangesToWidgetQuestion":"Änderungen am Widget speichern?"
+
 
 
 

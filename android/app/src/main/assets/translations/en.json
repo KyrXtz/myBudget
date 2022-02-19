@@ -138,8 +138,6 @@
     "PayLabel":"Pay...",
     "SetBalanceAndPayDayFirst":"Please, set your balance and payday.",
     "ChangeNameOfCategoryTitle":"Change name of category",
-    "ProVersionOnlyTitle":"Pro version only!",
-    "ProVersionOnlyMessage":"This feature is not available in the free version. Are you interested in discovering all the features the pro version has to offer?",
     "FreeUserTrialTitle":"Hey!",
     "FreeUserTrialMessage":"This is a pro feature , but you get one field for free just to try things out!",
     "ResultOfSubNegative":"The result of the operation cannot be negative.",
@@ -160,7 +158,14 @@
     "InTheRed":"In the red!",
     "DontOverspend":"I am here to remind you not to overspend.",
     "OverBudgetBy":"You are over today's budget by ",
-    "GoAwayMessage":"Press 'HIDE' to hide me for today."
+    "GoAwayMessage":"Press 'HIDE' to hide me for today.",
+    "Expenses":"Expenses:",
+    "EditWidgetHeader":"Edit Widget",
+    "EditWidgetSubtitle":"*If you make the widget too big you might need to resize it manually from the homescreen",
+    "Preview":"Preview",
+    "ProVersionOnlyTitle":"Pro version only!",
+    "ProVersionOnlyMessage":"This feature is not available in the free version. Are you interested in discovering all the features the pro version has to offer?",
+    "SaveChangesToWidgetQuestion":"Save changes to widget?"
 
 
 

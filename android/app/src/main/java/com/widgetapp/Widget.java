@@ -23,7 +23,10 @@ import android.util.TypedValue;
 import org.json.JSONException;
 import org.json.JSONObject;
 import android.widget.Toast;
-
+import android.text.style.StyleSpan;
+import android.text.SpannableString;
+import 	android.graphics.Typeface;
+import android.graphics.Color;
 public class Widget extends AppWidgetProvider {
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
@@ -36,10 +39,25 @@ public class Widget extends AppWidgetProvider {
 			JSONObject appData = new JSONObject(appString);
 			// Construct the RemoteViews object
 			RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget);
-			views.setTextViewText(R.id.appwidget_text1, appData.getString("text1"));
-            views.setTextViewText(R.id.appwidget_text2, appData.getString("text2"));
-            views.setTextViewText(R.id.appwidget_text3, appData.getString("text3"));
-           // views.setTextViewTextSize(R.id.appwidget_text1,TypedValue.COMPLEX_UNIT_SP, 5f);
+            SpannableString text1 = new SpannableString(appData.getString("text1")); 
+            SpannableString text2 = new SpannableString(appData.getString("text2")); 
+            SpannableString text3 = new SpannableString(appData.getString("text3")); 
+            if(appData.getBoolean("textBold1")) {text1.setSpan(new StyleSpan(Typeface.BOLD),0,text1.length(),0); }
+            if(appData.getBoolean("textItalic1")) {text1.setSpan(new StyleSpan(Typeface.ITALIC),0,text1.length(),0); }
+            if(appData.getBoolean("textBold2")) {text2.setSpan(new StyleSpan(Typeface.BOLD),0,text2.length(),0); }
+            if(appData.getBoolean("textItalic2")) {text2.setSpan(new StyleSpan(Typeface.ITALIC),0,text2.length(),0); }
+            if(appData.getBoolean("textBold3")) {text3.setSpan(new StyleSpan(Typeface.BOLD),0,text3.length(),0); }
+            if(appData.getBoolean("textItalic3")) {text3.setSpan(new StyleSpan(Typeface.ITALIC),0,text3.length(),0); }
+			views.setTextViewText(R.id.appwidget_text1, text1);
+            views.setTextViewText(R.id.appwidget_text2, text2);
+            views.setTextViewText(R.id.appwidget_text3, text3);
+            views.setTextViewTextSize(R.id.appwidget_text1,TypedValue.COMPLEX_UNIT_SP, appData.getInt("text1size"));
+            views.setTextViewTextSize(R.id.appwidget_text2,TypedValue.COMPLEX_UNIT_SP, appData.getInt("text2size"));
+            views.setTextViewTextSize(R.id.appwidget_text3,TypedValue.COMPLEX_UNIT_SP, appData.getInt("text3size"));
+            views.setTextColor(R.id.appwidget_text1,Color.parseColor(appData.getString("textColor1")));
+            views.setTextColor(R.id.appwidget_text2,Color.parseColor(appData.getString("textColor2")));
+            views.setTextColor(R.id.appwidget_text3,Color.parseColor(appData.getString("textColor3")));
+
 
             // TextView t = (TextView)findViewById(R.id.appwidget_text1);
             // t.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f);
