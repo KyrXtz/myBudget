@@ -3279,7 +3279,7 @@ setPieDataFrom(data){
                         fontStyle:this.state.text3italic?'italic':'normal',
                         color:this.state.textColor3
                         }]}>
-                            {I18n.t('Expenses')+this.stringWithCorrectCurrencyPosition(this.getSpentTodayStateWithCorrectDecimals())}
+                            {I18n.t('Expenses')+" "+this.stringWithCorrectCurrencyPosition(this.getSpentTodayStateWithCorrectDecimals())}
                         </Text>
                     </View>
                                       
@@ -5354,7 +5354,7 @@ isValid(date:Date) {
          value3= (parseFloat(value3).toFixed(2)).toString();
        }
      SharedStorage.set(
-       JSON.stringify({text1: this.stringWithCorrectCurrencyPosition(value1) ,text2: this.stringWithCorrectCurrencyPosition(value2)+I18n.t('PerDay') ,text3: I18n.t('Expenses')+this.stringWithCorrectCurrencyPosition(value3),
+       JSON.stringify({text1: this.stringWithCorrectCurrencyPosition(value1) ,text2: this.stringWithCorrectCurrencyPosition(value2)+I18n.t('PerDay') ,text3: I18n.t('Expenses')+" "+ this.stringWithCorrectCurrencyPosition(value3),
        text1size:_textSize1,text2size:_textSize2,text3size:_textSize3,
        textBold1:_textBold1, textBold2:_textBold2,textBold3:_textBold3,
        textItalic1:_textItalic1,textItalic2:_textItalic2,textItalic3:_textItalic3,
