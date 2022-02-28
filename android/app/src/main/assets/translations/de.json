@@ -165,7 +165,9 @@
     "Preview":"Vorschau",
     "ProVersionOnlyTitle":"Nur Pro-Version!",
     "ProVersionOnlyMessage":"Diese Funktion ist in der kostenlosen Version nicht verfügbar. Sind Sie daran interessiert, alle Funktionen zu entdecken, die die Pro-Version zu bieten hat?",
-    "SaveChangesToWidgetQuestion":"Änderungen am Widget speichern?"
+    "SaveChangesToWidgetQuestion":"Änderungen am Widget speichern?",
+    "DefaultDescriptionTitle":"Beschreibung der Ausgaben",
+    "DefaultDescriptionNotSet":"Keine Beschreibung eingestellt"
 
 
 

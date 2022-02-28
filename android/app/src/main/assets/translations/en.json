@@ -165,7 +165,9 @@
     "Preview":"Preview",
     "ProVersionOnlyTitle":"Pro version only!",
     "ProVersionOnlyMessage":"This feature is not available in the free version. Are you interested in discovering all the features the pro version has to offer?",
-    "SaveChangesToWidgetQuestion":"Save changes to widget?"
+    "SaveChangesToWidgetQuestion":"Save changes to widget?",
+    "DefaultDescriptionTitle":"Description of expense",
+    "DefaultDescriptionNotSet":"No description set"
 
 
 

@@ -165,7 +165,9 @@
     "Preview":"Προεπισκόπηση",
     "ProVersionOnlyTitle":"Pro έκδοση μόνο!",
     "ProVersionOnlyMessage":"Αυτή η λειτουργία δεν είναι διαθέσιμη στη δωρεάν έκδοση. Ενδιαφέρεσαι να ανακαλύψεις όλες τις δυνατότητες που προσφέρει η pro έκδοση;",
-    "SaveChangesToWidgetQuestion":"Αποθήκευση αλλαγών στο widget ;"
+    "SaveChangesToWidgetQuestion":"Αποθήκευση αλλαγών στο widget ;",
+    "DefaultDescriptionTitle":"Περιγραφή δαπάνης",
+    "DefaultDescriptionNotSet":"Δεν έχει οριστεί περιγραφή"
 
 
     

@@ -164,7 +164,9 @@
     "Preview":"预览",
     "ProVersionOnlyTitle":"仅限专业版!",
     "ProVersionOnlyMessage":"这个功能在免费版中是没有的。你是否有兴趣发现专业版所提供的所有功能 ?",
-    "SaveChangesToWidgetQuestion":"保存对小组件的更改?"
+    "SaveChangesToWidgetQuestion":"保存对小组件的更改?",
+    "DefaultDescriptionTitle":"支出的描述",
+    "DefaultDescriptionNotSet":"没有定义描述"
 
 
 

@@ -165,7 +165,9 @@
     "Preview":"Prévisualisation",
     "ProVersionOnlyTitle" : "Version pro uniquement !",
     "ProVersionOnlyMessage" : "Cette fonctionnalité n'est pas disponible dans la version gratuite. Êtes-vous intéressé à découvrir toutes les fonctionnalités de la version pro ?",
-    "SaveChangesToWidgetQuestion":"Enregistrer les changements dans le widget ?"
+    "SaveChangesToWidgetQuestion":"Enregistrer les changements dans le widget ?",
+    "DefaultDescriptionTitle":"Description de la dépense",
+    "DefaultDescriptionNotSet":"Aucune description n'a été définie"
 
     
 

@@ -422,8 +422,8 @@ android {
         applicationId "com.kyrxtz.mybudget"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 31
-        versionName "2.4.1"
+        versionCode 32
+        versionName "2.5.0"
         ndk {
             debugSymbolLevel 'FULL'
         }

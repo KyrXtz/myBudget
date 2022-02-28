@@ -262,6 +262,7 @@ const locales = RNLocalize.getLocales();
        fullDatePaydayState:"",
        spentTodayState:"",
        newSpent:"",
+       expenseDescription:"",
        spentMonthState:"",
        moniesState:"",
        selectedDayExpensesString : '',
@@ -767,6 +768,8 @@ const locales = RNLocalize.getLocales();
 
       
         if(data[0].Day == dateString){
+          // console.log('THIS IS HERE BITCH')
+          // console.log(data)
           return data;
         }
       }
@@ -862,7 +865,7 @@ const locales = RNLocalize.getLocales();
         //this.state.paydayState = (parseInt(payday) - 30*monthDiff).toString();
         //allagi edw
         console.log(paydayString)
-        if(this.state.paydayState<0){
+        if(this.state.paydayState<=0){
           let checkBool = moment(paydayString).add(monthDiff, 'month') < moment(new Date())
           var nextMonthStr  = moment(paydayString).add(checkBool?monthDiff+1:monthDiff, 'month').format('YYYY-MM-DD');
           var nextMonthDays = moment(nextMonthStr).daysInMonth();
@@ -997,7 +1000,7 @@ const locales = RNLocalize.getLocales();
       value12 = json12;
       console.log(refFixedCostsData)
     }
-    this.setState({selectedCategoryBtn:0,newSpent:'0',shouldShowFixedCosts:this.state.shouldShowFixedCosts,shouldShowIncomes:this.state.shouldShowIncomes,spentMonthState:value1, spentTodayState:'0' , dataSource:value9,moniesState:value7, paydayState:value2,euroState:this.state.euroState});
+    this.setState({selectedCategoryBtn:0,newSpent:'0',expenseDescription:'',shouldShowFixedCosts:this.state.shouldShowFixedCosts,shouldShowIncomes:this.state.shouldShowIncomes,spentMonthState:value1, spentTodayState:'0' , dataSource:value9,moniesState:value7, paydayState:value2,euroState:this.state.euroState});
 
   }
   /**
@@ -1973,6 +1976,24 @@ render() {
           </View>
         </TouchableOpacity>
         </View>
+        <View style={[styles.rowContainer,{paddingVertical:0,paddingHorizontal:15}]}>
+          <View style={[styles.descriptionInputContainer,{width:'100%'}]}  >
+
+          <TextInput
+            style={styles.descriptionInput}
+            maxLength={30}
+            value={this.state.expenseDescription}
+            //defaultValue={item.Description}
+            // onFocus={()=>this.setTouchOfDescriptionInput(true)}                     
+            //ref={ref => {this._textInputRefs[item.Number] = ref}} 
+            onChangeText={(text)=> this.onChangeDescriptionExpenses(text)}
+            onEndEditing={()=>this.onEndEditDescriptionExpenses()}
+            placeholder={I18n.t('DefaultDescription')}
+                      
+          />
+          </View>                  
+        </View>
+        
         <ScrollView style={{marginHorizontal:15, paddingVertical:10,flex:1}} horizontal={true} contentContainerStyle={{justifyContent:'space-between',flex:1}}>
            <TouchableOpacity onPress={()=> this.setState({selectedCategoryBtn:0})}>
                <FontAwesome
@@ -2484,63 +2505,71 @@ renderPastExpensesAndPieForCarousel = ({item, index}) => {
     return (
       this.state.dataSourcePerDay.map((item) => (
         <View style={[styles.rowContainer,{paddingHorizontal:10,justifyContent:'space-between'}]}>
-        <View style={{width:'40%',alignSelf:'flex-start', flexDirection:'row'}}>
-           <Text style={[styles.textFaint,{marginLeft:0,fontStyle:'italic',alignSelf:'flex-start',flex:1 , textAlignVertical:'center'}]}>{this.stringWithCorrectCurrencyPosition(item.Amount)}</Text>
+               <View style={{width:'35%',justifyContent:'space-between', flexDirection:'row'}}>
+           <Text style={[styles.textFaint,{marginLeft:0,fontStyle:'italic' , textAlignVertical:'center'}]}>{this.stringWithCorrectCurrencyPosition(item.Amount)}</Text>
            {item.Category ==0 && 
                 <FontAwesome
-                style={{alignSelf:'flex-end',marginBottom:2}}
+                style={{marginTop:4}}
                  
                 icon={parseIconFromClassName(categoryIcons[0] != null?categoryIcons[0]:'fas fa-wallet')}
                 />
                 }
                 {item.Category ==1 && 
                   <FontAwesome
-                  style={{alignSelf:'flex-end',marginBottom:2}}
+                  style={{marginTop:4}}
             
                   icon={parseIconFromClassName(categoryIcons[1] != null?categoryIcons[1]:'fas fa-coffee')}
                   />
                 }{item.Category ==2 && 
                   <FontAwesome
-                  style={{alignSelf:'flex-end',marginBottom:2}}
+                  style={{marginTop:4}}
             
                   icon={parseIconFromClassName(categoryIcons[2] != null?categoryIcons[2]:'fas fa-utensils')}
                   />
                 }{item.Category ==3 && 
                   <FontAwesome
-                  style={{alignSelf:'flex-end',marginBottom:2}}
+                  style={{marginTop:4}}
             
                   icon={parseIconFromClassName(categoryIcons[3] != null?categoryIcons[3]:'fas fa-shopping-cart')}
                   />
                 }
                 {item.Category ==4 && 
                   <FontAwesome
-                  style={{alignSelf:'flex-end',marginBottom:2}}
+                  style={{marginTop:4}}
             
                   icon={parseIconFromClassName(categoryIcons[4] != null?categoryIcons[4]:'fas fa-money-check-alt')}
                   />
                 }{item.Category ==5 && 
                   <FontAwesome
-                  style={{alignSelf:'flex-end',marginBottom:2}}
+                  style={{marginTop:4}}
             
                   icon={parseIconFromClassName(categoryIcons[5] != null?categoryIcons[5]:'fas fa-tshirt')}
                   />
                 }{item.Category ==6 && 
                   <FontAwesome
-                  style={{alignSelf:'flex-end',marginBottom:2}}
+                  style={{marginTop:4}}
             
                   icon={parseIconFromClassName(categoryIcons[6] != null?categoryIcons[6]:'fas fa-gas-pump')}
                   />
                 }{item.Category ==7 && 
                   <FontAwesome
-                  style={{alignSelf:'flex-end',marginBottom:2}}
+                  style={{marginTop:4}}
             
                   icon={parseIconFromClassName(categoryIcons[7] != null?categoryIcons[7]:'fas fa-bus')}
                   />
                 }
          </View>
-    <View style={{width:'40%',alignSelf:'flex-end', flexDirection:'row'}}>
-    <Text style={[styles.textFaint,{marginLeft:0,fontStyle:'italic',alignSelf:'flex-start',flex:1}]}></Text>
-    <Text style={[styles.textFaint,{marginLeft:0,fontStyle:'italic',alignSelf:'flex-end'}]}>{item.Time}</Text>
+    <View style={{width:'50%',justifyContent:'space-between', flexDirection:'row'}}>
+      <View style={{}}>
+      <TouchableOpacity onPress={ ()=> Alert.alert(I18n.t('DefaultDescriptionTitle'),item.Description=='' || item.Description==null?I18n.t('DefaultDescriptionNotSet'):item.Description,null,{cancelable:true})}>
+                        <FontAwesome
+                            style={{marginTop:3}}
+                    
+                          icon={RegularIcons.commentDots}
+                        />
+          </TouchableOpacity>
+      </View>
+      <Text style={[styles.textFaint,{marginLeft:0,fontStyle:'italic'}]}>{item.Time}</Text>
          
    </View>
  </View>
@@ -2584,69 +2613,76 @@ renderExpensesAndPieForCarousel = ({item, index}) => {
     return (
        this.state.dataSource.map((item) => (     
       <View style={[styles.rowContainer,{paddingHorizontal:10,justifyContent:'space-between'}]}>
-               <View style={{width:'40%',alignSelf:'flex-start', flexDirection:'row'}}>
-                      <Text style={[styles.textFaint,{marginLeft:0,fontStyle:'italic',alignSelf:'flex-start',flex:1 , textAlignVertical:'center'}]}>{this.stringWithCorrectCurrencyPosition(item.Amount)}</Text>
+               <View style={{width:'35%',justifyContent:'space-between', flexDirection:'row'}}>
+                      <Text style={[styles.textFaint,{marginLeft:0,fontStyle:'italic', textAlignVertical:'center'}]}>{this.stringWithCorrectCurrencyPosition(item.Amount)}</Text>
                       {item.Category ==0 && 
                       <FontAwesome
-                      style={{alignSelf:'flex-end',marginBottom:2}}
+                      style={{marginTop:4}}
                        
                       icon={parseIconFromClassName(categoryIcons[0] != null?categoryIcons[0]:'fas fa-wallet')}
                       />
                       }
                       {item.Category ==1 && 
                         <FontAwesome
-                        style={{alignSelf:'flex-end',marginBottom:2}}
+                        style={{marginTop:4}}
                   
                         icon={parseIconFromClassName(categoryIcons[1] != null?categoryIcons[1]:'fas fa-coffee')}
                         />
                       }{item.Category ==2 && 
                         <FontAwesome
-                        style={{alignSelf:'flex-end',marginBottom:2}}
+                        style={{marginTop:4}}
                   
                         icon={parseIconFromClassName(categoryIcons[2] != null?categoryIcons[2]:'fas fa-utensils')}
                         />
                       }{item.Category ==3 && 
                         <FontAwesome
-                        style={{alignSelf:'flex-end',marginBottom:2}}
+                        style={{marginTop:4}}
                   
                         icon={parseIconFromClassName(categoryIcons[3] != null?categoryIcons[3]:'fas fa-shopping-cart')}
                         />
                       }
                       {item.Category ==4 && 
                         <FontAwesome
-                        style={{alignSelf:'flex-end',marginBottom:2}}
+                        style={{marginTop:4}}
                   
                         icon={parseIconFromClassName(categoryIcons[4] != null?categoryIcons[4]:'fas fa-money-check-alt')}
                         />
                       }{item.Category ==5 && 
                         <FontAwesome
-                        style={{alignSelf:'flex-end',marginBottom:2}}
+                        style={{marginTop:4}}
                   
                         icon={parseIconFromClassName(categoryIcons[5] != null?categoryIcons[5]:'fas fa-tshirt')}
                         />
                       }{item.Category ==6 && 
                         <FontAwesome
-                        style={{alignSelf:'flex-end',marginBottom:2}}
+                        style={{marginTop:4}}
                   
                         icon={parseIconFromClassName(categoryIcons[6] != null?categoryIcons[6]:'fas fa-gas-pump')}
                         />
                       }{item.Category ==7 && 
                         <FontAwesome
-                        style={{alignSelf:'flex-end',marginBottom:2}}
+                        style={{marginTop:4}}
                   
                         icon={parseIconFromClassName(categoryIcons[7] != null?categoryIcons[7]:'fas fa-bus')}
                         />
                       }
                </View>
-               <View style={{width:'40%',alignSelf:'flex-end', flexDirection:'row'}}>
-               <Text style={[styles.textFaint,{marginLeft:0,fontStyle:'italic',alignSelf:'flex-start',flex:1}]}>{item.Time}</Text>
-                    <TouchableOpacity onPress={async ()=>this.deleteExpense(item)}>
-                        <FontAwesome
-                            style={{alignSelf:'flex-end',marginTop:3,flex:1}}
-                    
-                          icon={RegularIcons.trashAlt}
-                        />
-                    </TouchableOpacity>
+               <View style={{width:'60%',alignSelf:'flex-end',justifyContent:'space-between', flexDirection:'row'}}>
+               <Text style={[styles.textFaint,{fontStyle:'italic'}]}>{item.Time}</Text>
+               <TouchableOpacity onPress={ ()=> Alert.alert(I18n.t('DefaultDescriptionTitle'),item.Description==''?I18n.t('DefaultDescriptionNotSet'):item.Description,null,{cancelable:true})}>
+                    <FontAwesome
+                        style={{marginTop:3}}
+                
+                      icon={RegularIcons.commentDots}
+                    />
+               </TouchableOpacity>
+               <TouchableOpacity onPress={async ()=>await this.deleteExpense(item)}>
+                    <FontAwesome
+                        style={{marginTop:3}}
+                
+                      icon={RegularIcons.trashAlt}
+                    />
+               </TouchableOpacity>
               </View>
             </View>
             ))
@@ -4645,6 +4681,26 @@ setPieDataFrom(data){
 
     }
   }
+  onChangeDescriptionExpenses(text){
+    this.state.expenseDescription = text;
+    this.setState({expenseDescription:this.state.expenseDescription});
+
+   }
+   onEndEditDescriptionExpenses(no){
+    // var json = JSON.parse(refSavingsData);
+    // if(this._descRef!=null){
+    //   if(this._descRef!=json[no].Description ){
+    //     json[no].isEdited = true;
+    //     json[no].Description = this._descRef;
+    //     refSavingsData = JSON.stringify(json);
+    //     console.log(refSavingsData);
+    //     this._descRef = null;
+    //   }
+    // //this.setTouchOfDescriptionInput(false);
+
+    // }
+         
+  }
   async spentTodayButton(i){
   
     //await this.endEdit3();
@@ -4721,9 +4777,9 @@ setPieDataFrom(data){
       this.state.closeModal3 = !bool;
       this.state.selectedCategoryBtn = 0;
       if( this.state.dataSource!=null && this.state.dataSource.length !=0 && true){
-        this.setState({buttonModal3:bool,closeModal3:!bool,selectedCategoryButton:0,expensesPieData:this.resetPieDataFrom(this.state.dataSource),triggerAnimationPie:false,showPieHack:false})
+        this.setState({buttonModal3:bool,closeModal3:!bool,selectedCategoryButton:0,expenseDescription:'',expensesPieData:this.resetPieDataFrom(this.state.dataSource),triggerAnimationPie:false,showPieHack:false})
       }else{
-        this.setState({buttonModal3:bool,closeModal3:!bool,selectedCategoryButton:0});
+        this.setState({buttonModal3:bool,closeModal3:!bool,selectedCategoryButton:0,expenseDescription:''});
       }
       refSpentToday = this.state.spentTodayState;
       refEuroState = this.state.euroState;
@@ -4762,7 +4818,7 @@ setPieDataFrom(data){
       this.state.euroState = refEuroState;
       this.state.closeModal3 = bool;
       refNewSpent = 0;
-      this.setState({newSpent:'0',closeModal3:bool,euroState:this.state.euroState,spentTodayState:this.state.spentTodayState});
+      this.setState({newSpent:'0',closeModal3:bool,expenseDescription:'',euroState:this.state.euroState,spentTodayState:this.state.spentTodayState});
       break;
     }
     console.log("UNLOCK")
@@ -4903,7 +4959,7 @@ setPieDataFrom(data){
       console.log('NEW SPENT'+this.state.newSpent+' TIME:' +moment(new Date()).local().format('HH:mm:ss'));
       //await storageSet(
       var spentTodayJson = await this.saveExpensesToStorage();
-      this.setState({dataSource:spentTodayJson,newSpent:'0',closeModal3:bool,moniesState:this.state.moniesState});
+      this.setState({dataSource:spentTodayJson,newSpent:'0',expenseDescription:'',closeModal3:bool,moniesState:this.state.moniesState});
       break;
     }
     await this.saveData();
@@ -4970,7 +5026,7 @@ setPieDataFrom(data){
     if(spentTodayJson =='[]'){
       addComma='';
     }
-    var newEntry = this.jsonifySpentToday(this.state.newSpent,moment(new Date()).local().format('HH:mm:ss'),this.state.selectedCategoryBtn);
+    var newEntry = this.jsonifySpentToday(this.state.newSpent,moment(new Date()).local().format('HH:mm:ss'),this.state.selectedCategoryBtn,this.state.expenseDescription);
     
     spentTodayJson = spentTodayJson.substring(0,spentTodayJson.length-1)+addComma+newEntry+']';
     await storageSet('SpentTodayJson',spentTodayJson);
@@ -4983,9 +5039,9 @@ setPieDataFrom(data){
         }
     return JSON.parse(spentTodayJson);
   }
-  jsonifySpentToday(spent,time,category){
+  jsonifySpentToday(spent,time,category,desc){
     var todate =  moment(new Date()).format('YYYY-MM-DD');
-    return '{"Amount":"'+spent+'", "Time":"'+time+'", "Day":"'+todate+'", "Category":"'+category+'"}';
+    return '{"Amount":"'+spent+'", "Time":"'+time+'", "Day":"'+todate+'", "Category":"'+category+'", "Description":"'+desc+'"}';
   }
   jsonifyInputSavingsField(amount,type,description,number,isEdited){
     return '{"Amount":"'+amount+'", "Type":"'+type+'", "Description":"'+description+'","Number":"'+number+'","isEdited":'+isEdited+'}';
@@ -5378,7 +5434,7 @@ isValid(date:Date) {
        }
        if(remainingDays <=0){
         remainingDays = 0;
-        return (parseFloat(value1) + parseFloat(value3)).toString();
+        return (parseFloat(value1) + parseFloat(value3)).toFixed(2).toString();
        }
       let fixedCostsToBeRemoved = this.getJsonAmountsToBeRemovedOrAdded(JSON.parse(value4));
       let moneyPerDay = ((parseFloat(value1) - fixedCostsToBeRemoved + parseFloat(value3))/remainingDays).toFixed(2);
@@ -5408,7 +5464,7 @@ isValid(date:Date) {
     }
      if(remainingDays <=0){
       remainingDays = 0;
-      return (parseFloat(value1) + parseFloat(value3)).toString();
+      return (parseFloat(value1) + parseFloat(value3)).toFixed(2).toString();
      }
      let fixedCostsToBeRemoved = this.getJsonAmountsToBeRemovedOrAdded((this.state.dataSourceFixedCosts));
      let moneyPerDay = ((parseFloat(value1) - fixedCostsToBeRemoved + parseFloat(value3))/remainingDays).toFixed(2);
