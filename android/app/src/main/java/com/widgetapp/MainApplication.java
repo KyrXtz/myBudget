@@ -10,6 +10,8 @@ import com.facebook.react.ReactPackage;
 import com.facebook.soloader.SoLoader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+//import com.wmjmc.reactspeech.VoicePackage;  // <--- import 
+import com.wenkesj.voice.VoicePackage; // <------ Add this!
 
 
 public class MainApplication extends Application implements ReactApplication {
@@ -28,7 +30,8 @@ public class MainApplication extends Application implements ReactApplication {
           // Packages that cannot be autolinked yet can be added manually here, for example:
           // packages.add(new MyReactNativePackage());
           packages.add(new SharedStoragePackager());
-
+          //packages.add(new VoicePackage());
+          
           return packages;
         }
 

@@ -19,36 +19,50 @@ import android.widget.RemoteViews;
 import android.content.SharedPreferences;
 
 import java.io.Console;
-import android.util.TypedValue;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import android.widget.Toast;
+import android.util.Log;
 
-public class Widget extends AppWidgetProvider {
+import com.facebook.react.ReactInstanceManager;
+import com.facebook.react.ReactNativeHost;
+import com.facebook.react.ReactPackage;
+import com.facebook.react.shell.MainReactPackage;
+import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.ReactContextBaseJavaModule;
+import com.facebook.react.bridge.CatalystInstance;
+import com.facebook.react.bridge.WritableNativeArray;
+import com.facebook.react.ReactNativeHost;
+
+public class Widget2 extends AppWidgetProvider {
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
 
 		try {
             //edw einai gia na setaroume ta values tou widget
+            
 			SharedPreferences sharedPref = context.getSharedPreferences("DATA", Context.MODE_PRIVATE);
 			String appString = sharedPref.getString("appData", "{\"text\":'no data'}");
 			JSONObject appData = new JSONObject(appString);
 			// Construct the RemoteViews object
-			RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget);
-			views.setTextViewText(R.id.appwidget_text1, appData.getString("text1"));
-            views.setTextViewText(R.id.appwidget_text2, appData.getString("text2"));
-            views.setTextViewText(R.id.appwidget_text3, appData.getString("text3"));
-           // views.setTextViewTextSize(R.id.appwidget_text1,TypedValue.COMPLEX_UNIT_SP, 5f);
+			RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget2);
+			
 
-            // TextView t = (TextView)findViewById(R.id.appwidget_text1);
-            // t.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f);
+            // ReactInstanceManager reactInstanceManager = context.getReactNativeHost().getReactInstanceManager();
+            // ReactContext reactContext = (ReactContext)context;
+            
+            // CatalystInstance catalystInstance = reactContext.getCatalystInstance();
+            // WritableNativeArray params = new WritableNativeArray();
+            // params.pushString("Message to show using nameOfJsMethod");
+            // catalystInstance.callFunction("JavaScriptVisibleToJava", "nameOfJsMethod", params);
 
             //edw einai gia na setaroume to on click
-            Intent intent = new Intent(context, MainActivity.class); 
+            Intent intent = new Intent(context, VoiceActivity.class);
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);       
-            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);   
-            views.setOnClickPendingIntent(R.id.widget, pendingIntent);
+            PendingIntent pendingIntent = PendingIntent.getActivity(context, appWidgetId, intent, 0);   
+            views.setOnClickPendingIntent(R.id.widget2, pendingIntent);
             //appWidgetManager.updateAppWidget(appWidgetId, views);
 
             //edw einai gia na setaroume to refresh
@@ -65,7 +79,7 @@ public class Widget extends AppWidgetProvider {
 			e.printStackTrace();
 		}
     }
-
+   
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
       
@@ -73,7 +87,6 @@ public class Widget extends AppWidgetProvider {
         // There may be multiple widgets active, so update all of them
         for (int appWidgetId : appWidgetIds) {
             updateAppWidget(context, appWidgetManager, appWidgetId);
-            
 
 
           

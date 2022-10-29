@@ -1,0 +1,23 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent"
+            android:id="@+id/widget2"
+    android:updatePeriodMillis="43200000"
+    
+    >
+
+    <ImageView
+         android:id="@+id/appwidget_text4"
+         android:layout_width="match_parent"
+         android:layout_height="match_parent"
+         android:src="@drawable/ic_notification"
+         android:maxHeight="1px"
+         android:maxWidth ="1px"
+
+         />
+      
+       
+
+
+</RelativeLayout>

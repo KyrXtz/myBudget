@@ -422,8 +422,8 @@ android {
         applicationId "com.kyrxtz.mybudget"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 26
-        versionName "2.3.2"
+        versionCode 29
+        versionName "3"
         ndk {
             debugSymbolLevel 'FULL'
         }
@@ -500,6 +500,10 @@ android {
 
 dependencies {
      def billing_version = "4.0.0"
+    // compile project(':@react-native-voice_voice')
+
+    // implementation project(':VoiceModule')
+
     implementation 'com.google.firebase:firebase-core:9.6.1'
 
     implementation 'com.facebook.fresco:fresco:2.0.0'

@@ -41,5 +41,12 @@ public class SharedStorage extends ReactContextBaseJavaModule {
 		intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
 		getCurrentActivity().getApplicationContext().sendBroadcast(intent);
 
+		// Intent intent2 = new Intent(getCurrentActivity().getApplicationContext(), Widget2.class);
+		// intent2.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+		// //CHANGE TO THE NAME OF YOUR WIDGET
+		// int[] ids2 = AppWidgetManager.getInstance(getCurrentActivity().getApplicationContext()).getAppWidgetIds(new ComponentName(getCurrentActivity().getApplicationContext(), Widget2.class));
+		// intent2.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids2);
+		// getCurrentActivity().getApplicationContext().sendBroadcast(intent2);
+
 	}
 }

@@ -97,7 +97,7 @@ import Swiper from 'react-native-swiper'
 import {LocaleConfig,Calendar, CalendarList, Agenda} from 'react-native-calendars';
 import { AdMobBannerComponent } from './AdMobBannerComponent';
 import {AdMobInterstitial} from 'react-native-admob';
-
+import { VoiceComponent } from './VoiceComponent';
 
 
 
@@ -1014,7 +1014,7 @@ const locales = RNLocalize.getLocales();
    }
    appStateSubscription;
    componentDidMount() {
-    
+
     this.state.loading= true;
     this.setState({loading:true});
     this.isLoading();
@@ -1023,7 +1023,7 @@ const locales = RNLocalize.getLocales();
     this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this._keyboardDidShow);
     this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this._keyboardDidHide);
     this.appStateSubscription = AppState.addEventListener('change', this._handleAppStateChange);
-    
+
     //console.log('DATA SOURCE:'+this.state.dataSource[0].Time);
 
     // I18n.locale
@@ -2016,6 +2016,16 @@ render() {
                />
            </TouchableOpacity>
         </ScrollView>
+        <TouchableOpacity onPress={()=> this.setState({openNewModal:true})}>
+               <FontAwesome
+                  style={styles.categoryButton}
+           
+                 icon={SolidIcons.microphone}
+               />
+           </TouchableOpacity>
+           <Modal  useNativeDriverForBackdrop={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight} animationOutTiming={200} animationInTiming={200} style={styles.coffeeShopModal}  animationIn = {'slideInUp'} animationOut={'slideOutDown'}  transparent ={true} statusBarTranslucent={true} isVisible={this.state.openNewModal}> 
+        <VoiceComponent ></VoiceComponent>
+        </Modal>
         <View  style={styles.inputInfoColContainer}>
         {(this.state.spentTodayState!='' && this.state.spentTodayState!=null)  &&
         <Text style={styles.modalMainViewSubInfo}>{I18n.t('SpentToday')} {this.stringWithCorrectCurrencyPosition(this.getSpentTodayStateWithCorrectDecimals())}</Text>
@@ -5129,7 +5139,7 @@ isValid(date:Date) {
      return '0';
    }
  }
-   
+ 
 }
  //PushNotification.cancelAllLocalNotifications()
 
