@@ -49,7 +49,7 @@ TextInput.defaultProps.allowFontScaling = false;
 //  import Spinner from 'react-native-loading-spinner-overlay';
 //import PushNotificationIOS from "@react-native-community/push-notification-ios";
 import PushNotification from "react-native-push-notification";
-import { Notif, NotifPerma } from './Notifications';
+import { Notif, NotifPerma } from './Components/Notifications';
  import Midnight from 'react-native-midnight';
  import AsyncStorage  from '@react-native-community/async-storage';
  import {
@@ -80,12 +80,12 @@ import {ModalViewMoveUp} from './Animations/ModalViewMoveUp'
 import {ModalIconViewMoveDown} from './Animations/ModalIconViewMoveDown'
 import { MidnightListener } from './Helpers/MidnightListener';
 import { ViewFadeInOut } from './Animations/ViewFadeInOut';
-import { Billing } from './Billing';
-import { RemoveAds } from './RemoveAds';
-import { LanguageSelect } from './LanguageSelect';
-import { CurrencySelect } from './CurrencySelect';
-import { CategoriesSelect } from './CategoriesSelect';
-import { ProBanner } from './ProBanner';
+import { Billing } from './Components/Billing';
+import { RemoveAds } from './Components/RemoveAds';
+import { LanguageSelect } from './Components/LanguageSelect';
+import { CurrencySelect } from './Components/CurrencySelect';
+import { CategoriesSelect } from './Components/CategoriesSelect';
+import { ProBanner } from './Components/ProBanner';
 
 import {withIAPContext} from 'react-native-iap';
 import { LogBox } from 'react-native';
@@ -95,7 +95,7 @@ import MenuDrawer from 'react-native-side-drawer'
 import GestureRecognizer, {swipeDirections} from 'react-native-swipe-gestures';
 import Swiper from 'react-native-swiper'
 import {LocaleConfig,Calendar, CalendarList, Agenda} from 'react-native-calendars';
-import { AdMobBannerComponent } from './AdMobBannerComponent';
+import { AdMobBannerComponent } from './Components/AdMobBannerComponent';
 import {AdMobInterstitial} from 'react-native-admob';
 import Slider from '@react-native-community/slider';
 

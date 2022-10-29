@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 import { TouchableOpacity,View, StyleSheet, Text } from "react-native"
-import useInAppPurchase from "./android/app/src/lib/custom_hooks/useInAppPurchase"
+import useInAppPurchase from "../android/app/src/lib/custom_hooks/useInAppPurchase"
 import {withIAP} from 'react-native-iap';
 
 

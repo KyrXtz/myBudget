@@ -1,28 +1,3 @@
-//genika kaleis apo opoy thes to PushNotification.localNotificationSchedule( object) , me object to Notif() apo edw
-//gia kathe chanell mporeis na kaneis schedule ena notification. px.
-//an ftiaxei 2 eisodimata kai thelw na kanw schedule notification k gia ta dyo, me time = 84000 px. sto ena, kai 84000*2 sto allo
-//an kanw PushNotification.localNotificationSchedule(chanelid= "1", object1) 
-// kai PushNotification.localNotificationSchedule(chanelid ="1", object2)
-// tha meinei mono to deytero notification. 
-// prepei h nftiaxnw chanel gia to kathe ena, h na to kanw handle alliws. (px. irthe eisodima to ypoloipo s (channel ena) , mpes na deis) 
-//,(px. efyge eksodo to ypoloipo s (channel dyo) , mpes na deis)
-
-/**
-* bigText = main text , kamia fora kryvetai , ase to message kalytera
-*
-* smallText = stin epikefalida, dipla sto onoma toy app
-*
-*title = o titlos panw apo to main text
-*
-*message =  IDIO ME TO MAIN TEXT, KALYTERO
-*
-*time = se posi wra apo tin wra poy tha paei h efarmogi sto background
-*
-*repeatTime = ana poso na epanalamvanetai
-
-*repeatType = kathe pote na epanalmvanetai (month, week, day, hour, minute, time.)
-px. repeatTime =2 , repeatType = minutes => kathe 2 lepta notification
-*/
 export const Notif = (channelId,bigText,smallText,title,message,time,repeatTime,repeatType) => {
     return{
     /* Android Only Properties */

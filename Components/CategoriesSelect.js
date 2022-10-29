@@ -11,7 +11,7 @@ import { CustomPicker } from 'react-native-custom-picker'
 import I18n from "i18n-js";
  import * as RNLocalize from "react-native-localize";
  import {Picker} from '@react-native-picker/picker';
-import fontawesome from './android/app/src/main/assets/fontawesome.json'
+import fontawesome from '../android/app/src/main/assets/fontawesome.json'
 import AsyncStorage  from '@react-native-community/async-storage';
 const deviceWidth = Dimensions.get("window").width;
 const deviceHeight =

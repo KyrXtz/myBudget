@@ -1,7 +1,7 @@
 import React from "react"
 import { TouchableOpacity,View, StyleSheet, Text ,Image} from "react-native"
-import Button from "./android/app/src/lib/components/Button"
-import useInAppPurchase from "./android/app/src/lib/custom_hooks/useInAppPurchase"
+import Button from "../android/app/src/lib/components/Button"
+import useInAppPurchase from "../android/app/src/lib/custom_hooks/useInAppPurchase"
 import {withIAP} from 'react-native-iap';
 import Rate, { AndroidMarket } from 'react-native-rate'
 
